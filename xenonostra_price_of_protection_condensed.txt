@@ -1,0 +1,183 @@
+THE PRICE OF PROTECTION
+Edge Gaps, Phase Gaps, and the Memory Cost of Quantumlike Bits in Reservoir Computing
+
+Xenonostra Research Notes
+September 2026
+
+
+EPISTEMIC TAGS
+
+[K] Known: established in the cited literature, proved here, or measured in our simulations. For measured results, the tested scope is given in brackets.
+[A] Assumed: a working assumption, or a reading our data support but do not prove.
+[S] Speculative: an untested conjecture.
+[G] Gap: something we did not do, or a limit on what the results show.
+
+
+ABSTRACT
+
+Classical networks can host "quantumlike" (QL) states. These are emergent eigenvectors of structured graphs that superpose like qubits and resist noise because a spectral gap isolates them from the rest of the network. The founding QL paper left open whether they offer any advantage for computation. We test the most direct machine-learning reading of that question: do QL-structured networks make better reservoirs?
+
+In toy experiments on rate networks and on damped oscillator networks, they do not. The reason is spectral. When the protected QL eigenvalue sits at the top edge of the spectrum, it also sets the stability limit, so every other mode is pushed below it by at least the protection gap. Combined with the exact memory curve for normal networks, this gives a closed-form price: protection is paid for with long-range memory.
+
+The cost is avoidable. Separating the protected modes from the rest of the network by phase instead of by decay rate keeps the protection and restores memory. A dense construction does this with memory that grows with network size. A sparse, non-reciprocal graph does it partially. A sparse construction whose memory also grows with size remains open.
+
+
+1. QUESTION
+
+Scholes and collaborators showed that two dense random regular modules joined by sparse links produce two isolated emergent eigenstates, one with identical phase across the modules and one with opposite phase. Together these form a "QL bit" (Scholes 2024; Amati & Scholes 2025a). Such states are reported to grow more robust to noise as the network grows (Amati & Scholes 2025a). Later work added gates, product states, multi-level "dits," synchronizing-dynamics encodings, rigorous spectral conditions, and oscillator dynamics (Amati & Scholes 2025a, 2025b; Scholes & Amati 2025; Saha & Scholes 2025; Dickey, Vyas & Kais; Scholes 2026). The founding paper left a QL computing advantage as an open question (Scholes 2024).
+
+In reservoir computing, a recurrent network is kept fixed and only a linear readout is trained, so learning is cheap. That makes a reservoir the cheapest place to ask whether QL modes help learning. Our question is whether QL-structured reservoirs generalize better per unit of compute than matched controls. This hypothesis is ours, not a claim by the QL authors. [G]
+
+
+2. SETUP
+
+QL construction. N nodes are split into two modules. Each module is a random k-regular graph, and the modules are joined by an l-regular bipartite coupling. The adjacency matrix has exact eigenvalues k + l and k − l, with eigenvectors
+  e0 = (1,…,1, 1,…,1)/√N    (identical phase)
+  e1 = (1,…,1, −1,…,−1)/√N   (opposite phase).   [K]
+The remaining eigenvalues lie approximately within ±2√(k + l − 1) (Friedman 2008). [A; at N = 400 the bulk maximum was 6.90 against an edge of 7.21] The default is k = 12, l = 2.
+
+Reservoir. The state updates as x(t) = tanh(W x(t−1) + w_in u(t)), with W rescaled to spectral radius ρ and a ridge-regression readout. For each network type we tuned ρ ∈ {0.7, 0.9, 0.99}, input scale ∈ {0.1, 1}, and the ridge penalty on validation data, and we report held-out test results. Each run used 3,000 training, 1,000 validation, and 2,000 test steps, with 3–5 seeds.
+
+Tasks.
+- Linear memory capacity (MC), summed over 200 delays (Jaeger 2002).
+- NARMA-10 prediction error (normalized RMSE).
+- State noise injected at every step.
+- A slow hidden-bit task designed to favor slow protected modes.
+- A damped-oscillator substrate in the spirit of HORN (Effenberger et al. 2025), in which eigenvalues set frequencies instead of decay rates.
+
+Controls.
+  ESN      directed random graph, random signs
+  Orth     random orthogonal matrix (pure rotation)
+  ERs/ERu  undirected random graph, signed/unsigned
+  RRu      single random regular graph, unsigned
+  QLs      QL wiring with random signs (modules kept, QL modes destroyed)
+  QLspec   QL eigenvalues with random eigenvectors (spectrum kept, graph destroyed)
+  Hetero   uncoupled oscillators with random frequencies
+
+
+3. RESULT 1: QL STRUCTURE DOES NOT HELP   [K; N ≤ 400]
+
+Memory capacity / NARMA-10 error, 5 seeds:
+
+   N     ESN          Orth           ERs          QL           QLs          QLspec
+   100   34.5/0.348   94.0/0.388     15.7/0.523   8.9/0.595    16.0/0.521   8.7/0.574
+   200   47.7/0.273   165.4/0.328    17.3/0.504   9.5/0.582    17.9/0.501   9.6/0.574
+   400   61.4/0.211   193.5*/0.245   18.7/0.468   10.1/0.545   18.8/0.469   10.0/0.542
+   * limited by the 200-delay window
+
+- QL matches QLspec at every size, so the graph adds nothing beyond its spectrum.
+- Destroying the QL modes while keeping the wiring (QLs) raises memory 1.8–1.9× and cuts NARMA error 12–14%.
+- QL memory barely grows with size (8.9 → 10.1 as N quadruples). The ESN goes from 34.5 to 61.4.
+- The unsigned controls ERu and RRu track QL (8.0–9.7).
+
+Noise (N = 200). At noise 0.02, MC was 3.6 for QL, 6.1 for QLs, 17.9 for ESN, and 34.2 for Orth. At noise 0.10 it was 2.0, 3.3, 10.4, and 15.5. QL shows no robustness advantage.
+
+Slow hidden bit. The Bayes-optimal filter scored 0.887 accuracy, a one-variable leaky integrator 0.864, QL 0.869, and the other reservoirs 0.860–0.879. The task needed no network at all.
+
+Oscillator substrate. MC was 20.7 for Hetero, 19.7 for ERs, 13.0 for QL, 19.8 for QLs, and 13.0 for QLspec. The pattern is the same.
+
+
+4. RESULT 2: THE SPECTRAL REASON
+
+Protection. The QL subspace is separated from the rest of the spectrum by the gap δ = λ2 − λ3. By Davis–Kahan, a symmetric perturbation E rotates it by at most sin Θ ≤ ||E||/δ (Davis & Kahan 1970). [K] The measured rotation ran about 5× below this bound. The robustness is real, and it is the ordinary robustness of a well-separated eigenspace.
+
+Lemma 1 (edge gap). Let W be symmetric with λ1 = ρ(W) = ρ ≥ λ2 and δ = λ2 − λ3. Then every unprotected eigenvalue satisfies
+  λi ≤ λ2 − δ ≤ ρ − δ.   [K]
+For unsigned QL graphs, λ1 is the Perron root and equals the spectral radius (Horn & Johnson 2012). The protected mode therefore also sets the stability limit, and it is what every rescaling divides by. [K] With a roughly symmetric bulk, the bulk radius satisfies r ≤ ρ − δ. [A; held in all 14 constructions tested] At N = 400 and ρ = 0.9, the QL modes sit at 0.900 and 0.643, while all 398 other modes sit at |λ| ≤ 0.444. In a signed random graph, 31% of modes lie above 0.5.
+
+Proposition 1 (tail memory). Take a linear network with normal W and isotropic noise. Its Fisher memory curve, in units of input signal-to-noise ratio, is
+  J(k) = Σi pi (1 − |λi|²)|λi|^(2k),   pi = |ui·v|²/||v||²,
+and it sums to exactly 1 (Ganguli, Huh & Sompolinsky 2008). [K] The memory remaining beyond lag T is therefore
+  L_T = Σi pi |λi|^(2T) ≤ p_P ρ^(2T) + (1 − p_P)(ρ − δ)^(2T),
+where p_P is the share of the input landing on the protected modes (≈ m/N for random inputs). [A]
+
+Corollary 1 (price of protection). Certifying sin Θ ≤ s against perturbations of size ε requires δ ≥ ε/s. Therefore
+  L_T ≤ p_P ρ^(2T) + (1 − p_P)(ρ − ε/s)^(2T).   [K, given the conditions above]
+Robustness and long-range memory draw on the same budget, ρ < 1. As N grows, every increment of certified protection is paid for in memory.
+
+Checks. [K; N ∈ {200, 400}, seven (k, l) pairs] The mixture formula matched a direct Lyapunov computation to 2.2 × 10⁻¹⁵, total memory was 1.000 in all 14 cases, and the bound held in all 14. At lag 10, the bulk supplies about one part in ten thousand of the remaining memory, or less; nearly all of it lives in the two QL modes. QL matches QLspec because, with random inputs, memory depends only on the eigenvalues. [K linear; A under tanh]
+
+Two currencies. [A] In oscillator networks, the same rescaling crowds bulk frequencies into a narrow band. The price is paid in frequency diversity rather than decay rate. We did not isolate this mechanism.
+
+
+5. RESULT 3: THE FRONTIER AND THE ESCAPE   [K; N = 200 unless noted]
+
+QL frontier. Varying the module degree k with l = 2 gives the following. Here sin Θ is the subspace rotation under perturbations of norm 0.1, and "noisy" means state noise 0.02.
+
+   k    gap     sin Θ   MC clean   MC noisy   NARMA
+   8    0.034   0.239   10.2       3.83       0.557
+   12   0.218   0.095    9.5       3.71       0.582
+   16   0.330   0.080    8.9       3.62       0.584
+   24   0.476   0.068    8.2       3.35       0.597
+
+More protection always costs memory, and the whole family sits in a low corner.
+
+Phase-gapped escape (PGd, dense). Keep e0 and e1 with the same eigenvalues. Give every other direction a rotation of modulus 0.9 at an angle drawn from [θmin, π]. The protected modes stay still while the bulk rotates.
+
+   θmin   gap     sin Θ   MC clean   MC noisy   NARMA
+   π/6    0.492   0.049   129.3      30.4       0.380
+   π/4    0.657   0.043   120.6      28.0       0.386
+   π/3    0.820   0.040   112.6      26.5       0.423
+
+PGd is better protected than any QL network and has 11–16× the clean memory and 7–9× the noisy memory. Its memory grows with size (80.4, 120.6, 142.4 at N = 100, 200, 400), while QL stays flat (8.9, 9.5, 10.2). This is an existence proof: protection itself does not cost memory, but an edge gap does.
+
+Sparse version (PGs). W = A_QL + β(D − Dᵀ), where D is a random directed graph inside each module with equal in- and out-degree. Row sums of D − Dᵀ are zero inside each module, so e0 and e1 stay exact eigenvectors. [K] The antisymmetric part rotates the bulk, the same mechanism behind antisymmetric recurrent networks (Chang et al. 2019).
+
+   β     gap     sin Θ   MC clean   MC noisy   NARMA
+   0.5   0.273   0.092   10.3       3.93       0.564
+   1.5   0.414   0.079   14.9       5.62       0.406
+
+At matched protection (QL with k = 16), PGs has 1.7× the memory and 30% lower NARMA error. At matched wiring density (QL with k = 24), it has 1.8× the memory and 32% lower error, with slightly weaker protection. The gain does not grow with size (14.0, 14.9, 15.6). Because W is non-normal here, Davis–Kahan does not apply, and PGs protection is measured, not guaranteed. [G]
+
+The wave picture. Rotation is the memory resource. Orthogonal reservoirs led every rate-network memory test we ran, consistent with White, Lee & Sompolinsky (2004). [K] In strongly phase-locked oscillator networks, QL states evolve unitarily (Scholes 2026) [K], which suggests QL dynamics may naturally belong on the phase side of this divide. [S]
+
+Figure 1 (separate image). (a) At N = 200, memory under noise versus protection. The QL family trades one for the other along a low frontier; PGs leaves it partially and PGd completely. (b) Memory versus N. QL and PGs stay flat, while PGd scales like the orthogonal reservoir.
+
+
+6. LIMITS   [G]
+
+- This work does not test or refute the QL authors' claims, which concern gate-based processing, not reservoir learning.
+- Scale was small: N ≤ 400, random regular modules, one default construction for most learning tests, 3–5 seeds.
+- Substrates were tanh reservoirs and one oscillator model. We did not test Kuramoto phase dynamics or trained recurrent networks.
+- The bound covers linear normal networks only. The tanh results agree with it empirically but are not covered by it.
+- Lemma 1 bounds the bulk only from above. A bulk near −ρ would keep memory; that is itself a phase gap at angle π, and we did not build one. [S]
+- Related work: rescaling to a common spectral radius is already known to drive reservoir trade-offs (arXiv:2609.07355), and modular reservoirs have an optimal modularity for memory (Rodriguez, Izquierdo & Ahn 2019). A spectra–capacity link has been named as an open direction (Singh et al. 2025). Our contribution is the connection to protected QL subspaces, the closed-form price, and the escape. We found no prior QL learning-substrate tests, but our search was not exhaustive.
+
+
+7. OPEN PROBLEMS AND FALSIFICATION
+
+Open problems:
+- [S] A sparse phase-gapped QL graph whose memory grows with size (candidate: signed or twisted-cycle bulk structures).
+- [S] Non-reciprocal couplings in synchronizing oscillator networks.
+- [S] Whether QL gates pay an analogous price.
+- [S] Interior-gap QL bits in signed graphs (Dickey, Vyas & Kais), to which Lemma 1 would not apply.
+
+Our claims would be wrong if any of the following held:
+1. A normal, edge-gapped QL network exceeds the Proposition 1 bound. This is exactly checkable from its spectrum.
+2. A QL reservoir beats QLspec by more than the seed-to-seed spread.
+3. The phase-gap advantage vanishes in oscillator or Kuramoto substrates, or at larger N.
+
+Code reproducing all numbers is available on request.
+
+
+REFERENCES
+
+Amati, G., & Scholes, G. D. (2025a). Quantum information with quantum-like bits. Physical Review A, 111, 062203.
+Amati, G., & Scholes, G. D. (2025b). Encoding quantum-like information in classical synchronizing dynamics. Physical Review A, 112, 032423.
+Chang, B., Chen, M., Haber, E., & Chi, E. H. (2019). AntisymmetricRNN: A dynamical system view on recurrent neural networks. ICLR.
+Cutts, E. (2026, Sept 23). Biology might not be quantum, but its math is quantumlike. Quanta Magazine.
+Davis, C., & Kahan, W. M. (1970). The rotation of eigenvectors by a perturbation. III. SIAM J. Numer. Anal., 7(1), 1–46.
+Dickey, E., Vyas, A., & Kais, S. Programmable quantum-like bits from signed regular graphs. arXiv:2507.21289.
+Effenberger, F., Carvalho, P., Dubinin, I., & Singer, W. (2025). The functional role of oscillatory dynamics in neocortical circuits. PNAS, 122(4), e2412830122.
+Friedman, J. (2008). A proof of Alon's second eigenvalue conjecture and related problems. Mem. AMS, 195(910).
+Ganguli, S., Huh, D., & Sompolinsky, H. (2008). Memory traces in dynamical systems. PNAS, 105(48), 18970–18975.
+Horn, R. A., & Johnson, C. R. (2012). Matrix Analysis (2nd ed.). Cambridge University Press.
+Jaeger, H. (2002). Short term memory in echo state networks. GMD Report 152.
+Rodriguez, N., Izquierdo, E., & Ahn, Y.-Y. (2019). Optimal modularity and memory capacity of neural reservoirs. Network Neuroscience, 3(2), 551–566.
+Saha, D., & Scholes, G. D. (2025). Multi-dimensional quantum-like resources from complex synchronized networks. Entropy, 27(9), 963.
+Scholes, G. D. (2024). Quantum-like states on complex synchronized networks. Proc. R. Soc. A, 480, 20240209.
+Scholes, G. D. (2026). Dynamics in an emergent quantum-like state space generated by a nonlinear classical network. Physica Scripta, 101, 055205.
+Scholes, G. D., & Amati, G. (2025). Quantum-like product states constructed from classical networks. PRL, 134, 060202.
+Singh, P., Sankaranarayanan, L., & Raman, B. (2025). Contraction, criticality, and capacity. arXiv:2507.18467.
+White, O. L., Lee, D. D., & Sompolinsky, H. (2004). Short-term memory in orthogonal neural networks. PRL, 92, 148102.
+Determinants of hyperparameter robustness in connectome reservoir computing (2026). arXiv:2609.07355.
