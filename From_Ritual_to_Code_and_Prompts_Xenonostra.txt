@@ -1,0 +1,440 @@
+FROM RITUAL TO CODE AND PROMPTS
+What an investigation of occult traditions taught us about programming, language models, and the limits of analogy
+
+By Xenonostra’
+September 27, 2026
+
+The inspiration for this investigation came from social media. I saw someone comparing programming with esoteric and occult traditions, and I wanted to find out whether there was anything substantive behind the comparison.
+
+That became a research question. Rituals have instructions, names, boundaries, sequences, materials, conditions, and endings. Programs have some apparently similar features. Could the resemblance lead to a useful software mechanism? And, even if it did not, could a ritual-inspired way of writing instructions help a large language model perform better?
+
+We followed both questions. We read selected historical texts and modern practitioner writings, compared proposed mechanisms with established computer science, constructed executable examples, consulted primary prompting research, and ran small model pilots. AI research agents handled literature, design, testing, and skeptical-review roles. The results were checked against conventional alternatives, including alternatives that already supplied the guarantees we wanted.
+
+[K] We found instructive structural correspondences, but no defensible new programming-language primitive or demonstrated efficiency advantage. In the later prompting pilot, ritual-labeled and conventional staged prompts both reached perfect scores. No ritual-specific accuracy advantage was demonstrated.
+
+Those findings need their limits attached. Reaching the same ceiling does not prove that two prompts are equivalent. Familiar mechanisms can still be useful. A historical prescription establishes what a text says, not that its supernatural claims are true. Our internal agent review was not external peer review or replication by a separate laboratory.
+
+Throughout this article, [K] marks a claim supported within its stated scope, [A] an assumption or authored formalization, [S] a proposed adaptation, and [?] an unresolved question. These labels distinguish textual evidence, elementary logic, finite software checks, and actual model observations.
+
+The central task was to move from resemblance to a relation we could test.
+
+Consider a circle. In a ritual, it may establish a sacred boundary. In a programming interface, a similarly named scope might delimit resources or permissions. The drawing and the name do not enforce that boundary. A software implementation must specify what is permitted, what is rejected, which effects pass through the check, and how access ends.
+
+Or consider an invocation. It may suggest activating a named operation or adopting a temporary perspective. That resemblance does not establish a shared mechanism. Calling a function, assuming a hypothesis, and addressing a spiritual entity belong to different explanatory settings. A useful adaptation has to identify the particular relation it borrows and the properties it leaves behind.
+
+This distinction became the organizing principle of the investigation: specify the objects, relations, constraints, state changes, and observable outcomes before assigning a computational interpretation to the imagery.
+
+The source material was deliberately kept differentiated. We examined selected passages from the Key of Solomon, the Goetia, Crowley’s Liber O and Liber E, Agrippa, Spare, Carroll, Hine, and other related material. We also considered Chinese divinatory and philosophical material in the Changes, geomancy attributed to pseudo-Agrippa, Trithemius’s steganography, Llull’s combinatorial and inferential work, and Iamblichus’s treatment of names. The later prompting phase added Wiccan/Pagan and Reclaiming practitioner sources. This was a selective investigation, not a worldwide survey or full-book mastery of every work cited. [1–13, 26–29]
+
+These sources cannot be treated as independent confirmations of one timeless system. Western ceremonial texts have historical relationships. Agrippa’s Christian Cabala is not a uniform account of Jewish Kabbalah. Llull’s scholastic and theological setting is distinct from later occult reception. Reclaiming is a particular feminist Witchcraft tradition, not a synonym for all Wicca. The Chinese material belongs to another historical and philosophical setting.
+
+Historical direction also matters. In his later discussion of servitors, Phil Hine explicitly uses computer-program analogies for some ideas. Returning those ideas to programming can produce a circuit from computing into occult writing and back into computing. That is an interesting history of interpretation, but it is not independent invention of a computational principle. [7]
+
+The first promising connection concerned the difference between starting, continuing, and restarting an operation.
+
+[K] The Key of Solomon distinguishes conditions surrounding commencement and recommencement. We used that distinction to ask a conventional software question: is a condition checked only when work begins, or must it remain true throughout execution? [1]
+
+[S] A proposed interface could distinguish three separate rules: an admission condition, an ongoing invariant, and a retry policy. This matters because a condition required to begin a job need not be required at every later point. In an illustrative 25-case truth table, reapplying an admission-only condition at completion produced nine false rejections.
+
+The programming principle is ordinary admission control and temporal specification. The text did not provide rollback, saved-state resumption, or idempotence. Restarting a ritual is not enough to infer any of those guarantees. The timing prescriptions also supplied no software safety proof.
+
+The Goetia suggested another distinction: permission to leave and actual departure are separate events. Its closing instructions also include conditions and prayers that cannot be discarded when describing the source. [2]
+
+[S] The software adaptation was a lifecycle in which a system requests shutdown, establishes that work has stopped, and only then releases the owning scope. That relation is recognizable in typestate, revocable capabilities, and structured concurrency. Cancellation of unfinished work, reliable completion signals, deadlines, and exception handling were our modern additions.
+
+[K] We enumerated 55,987 short lifecycle traces and compared a conventional monitor with a ritual-named facade. Both agreed with the finite reference on every checked action position. Crucially, the facade called the conventional implementation. Their equality was expected by construction; it was not evidence that ritual terminology improved execution.
+
+Intentionally weakened versions illustrated why particular checks mattered. A scope-order-only variant falsely accepted 54 action positions, while a cleanup-only variant falsely accepted 6,474. Those were ablations, not the strongest conventional competitors. The meaningful baseline already enforced the desired rules.
+
+The test was also much smaller than a production concurrency system: one active scope, synchronous revocation, and a trusted Python host. Trio’s nurseries were relevant prior art, but we did not benchmark Trio as our implementation. Our fixture rejected premature exit and repeated requests; Trio waits at scope exit and supports idempotent cancellation requests. The distinction matters. [14]
+
+The next connection concerned context.
+
+[K] Carroll describes beliefs as things that can be adopted provisionally, enacted, and relinquished. That suggested making a model or interpretation explicit when a value is used. [6]
+
+[S] A software value could carry both its ordinary type and a model identifier:
+
+    Value<ModelID, T>
+
+Operations would either require compatible model identifiers or invoke a declared conversion. Ordinary tagged values, context-oriented programming, contextual types, and effect systems already offer relevant mechanisms. Belief enactment is not itself a formal semantics; the tags and conversion laws came from the software design. [15]
+
+[K] In our finite example, ordinary runtime tags accepted 200 same-context additions and rejected 200 forbidden crossings. Untagged arithmetic accepted those crossings. Including context in cache keys prevented the mismatches seen when keys contained only the expression. Capturing a closure’s intended context likewise differed from looking up whatever context happened to be current later.
+
+This does not mean dynamic binding is always wrong. It means lexical capture and dynamic lookup implement different contracts. A test must state which contract it expects before calling an output an error.
+
+An explicit conversion created a more revealing counterexample. In arithmetic modulo 5, 1 + 4 equals 0. If we take the canonical result 0 into arithmetic modulo 7, it remains 0. If we instead take the canonical inputs 1 and 4 into modulo 7 and add them there, the result is 5.
+
+[K] The chosen conversion did not preserve addition. In the finite audit, 31 of 74 checked residue pairs failed the required preservation relation. Making a bridge visible makes it inspectable; it does not make the bridge mathematically valid. A contract must state which operations or observations the conversion preserves.
+
+Symbols and sigils raised the same issue from another direction.
+
+[K] Spare’s Book of Pleasure describes simplifying and combining letters into a visual cue, with attempts to reduce conscious association forming part of his account. Agrippa discusses name transformations, numerical substitutions, and restrictions on changing names. These passages gave us questions about representation and identity; they did not supply a demonstrated lossless programming notation. [4, 5]
+
+[A] We authored a simplified sigil-like deletion recipe for a toy test. It was not Spare’s historical algorithm. Ninety-six manifests collapsed into 44 labels, producing 80 colliding pairs. Full JSON and a full SHA-256 identifier coupled to a registry distinguished and recovered all 96 within that finite collection.
+
+The lesson is limited but concrete. A display label, a retained specification, and an identifier can be different objects. A compact label may be useful as a cue while failing as a complete representation. Keeping a registry restores information by keeping that information somewhere; its storage and lookup costs are real. No finite collision-free sample proves a hash universally injective.
+
+Ordinary programming already distinguishes spelling, symbol identity, binding context, and authority. Racket’s symbols and syntax objects are relevant examples: identical spelling need not mean identical binding, while a renamed expression may preserve binding. An extracted name or a successfully decoded string does not automatically acquire execution authority. [20]
+
+Crowley’s coordinated correspondences suggested a related design: derive several views from one explicit declaration. Liber O describes a mnemonic purpose for arranging cues around a chosen aim. [3]
+
+[S] A software system could generate execution configuration and an audit display from one immutable specification. That could reduce accidental disagreement between handwritten copies. Established configuration systems already address related problems. [16]
+
+[K] Our test also showed why agreement between views is insufficient. Across 448 declaration-and-scenario cases, coordinated changes could fool checks that only compared views or copied labels. More importantly, a shared generator bug survived regeneration by that same generator in all 64 tested declarations. An independent field check rejected it.
+
+Two outputs can agree because they inherited the same mistake. Agreement is evidence of consistency under some conditions; it is not automatically evidence of fidelity to the intended source or compliance during execution.
+
+The divination material led to a particularly compact mathematical question: what must a representation preserve?
+
+Suppose p maps a detailed state X to a representation P, and h is an observation we care about. We can recover h from p exactly when some function g satisfies:
+
+    h = g composed with p
+
+Equivalently:
+
+    If p(x) = p(y), then h(x) = h(y).
+
+[K, elementary logic] This is a familiar factorization criterion, not a new theorem. If a representation merges two states whose required observations differ, no decoder receiving only that representation can recover the distinction.
+
+We used exact finite examples to separate possible outcomes from their probabilities, and output distributions from execution traces. Two procedures can have the same possible results while assigning them different probabilities. Two different input distributions can collapse to the same output distribution. One fair bit and the parity of two independent fair bits can produce the same output law while having different trace lengths.
+
+[A] Those probabilities were stipulated in our mathematical examples. They were not recovered from historical divination practice. The inspected Changes and geomancy passages did not establish the sampling distributions a probabilistic software model would need. [8, 9, 17]
+
+One geomancy-related example made information loss tangible. Sixteen values of 13 sum to 208. Replacing the first with 15 gives 210. Their parity vectors are identical, but the totals have different residues modulo 12: 4 and 6. A representation retaining only parity cannot recover that distinction.
+
+[?] The historical referent remained unresolved: did the relevant wording concern original marks or reduced figure points? The finite counterexample applies to the stated raw-count interpretation. It does not settle that historical reading. An observer defined only from parity gives a different, valid contract.
+
+Trithemius and Llull added two further distinctions: a carrier is not its decoded message, and a generated proposition is not its justification.
+
+[K] Selected numerical material from Steganographia III, together with Reeds’s cryptanalytic account, supported a bounded decoding exercise. An arithmetic decoder and an ordinary lookup codec agreed on the declared relation. Nulls and layout could be discarded during decoding, so recovering the message did not recover the exact original carrier. A valid substitution could change a message without being detected. Successful decoding therefore did not establish integrity or security. [10, 18]
+
+Even rendering can lose distinctions: an atomic TH token and two separate T and H tokens can print the same way. Whether that is acceptable depends on which observation the representation must preserve.
+
+[K] In Llull’s Ars brevis, a worked combination is followed by an argument involving premises and a middle term. We formalized one such inference and compared a source-shaped checker with ordinary Horn inference and finite-model enumeration. They agreed wherever compared. A label-only variant accepted three of four main cases when it should not. [11, 19]
+
+Producing a candidate conclusion is different from showing that it follows from stated premises. Neither operation establishes that the premises are true. This distinction is directly relevant to generative AI: fluent production and justified acceptance are separate jobs.
+
+By this point, the programming result was clear. We had useful examples of lifecycle control, context tracking, representation loss, configuration fidelity, decoding, and inference. We had not found a new primitive or measured an efficiency gain over the strongest relevant ordinary implementation.
+
+Even occult-looking syntax had precedent. Mystical renders PostScript as magical circles and mentions Spare-inspired sigils; its documented rendering does not interpret the image back into execution. Ellison’s ceremony analysis was another relevant lead, although only its abstract was accessible in our review. Renaming established machinery or drawing it differently was not a novelty result. [21]
+
+[S] A coherent interface might still be useful. It could make the obligations visible together:
+
+    scope job
+      admit: start_condition
+      maintain: capability_valid
+      model: explicit_model_id
+      effects: declared_operations
+      close: request_stop; establish_stopped; release
+
+This is a design sketch. [A] Any isolation claim would require relevant effects to pass through an enforced interface. The Python toys did not prevent hostile mutation, unchecked callbacks, or foreign-interface bypasses. Whether this presentation improves comprehension or reduces mistakes remains unmeasured.
+
+That led to the second question. An idea need not introduce a new programming-language primitive to improve how a person gives instructions to a model. Could the procedures, perspectives, or presentation borrowed from ritual practice improve prompting?
+
+We separated three possible effects. A better procedure might improve answers. Occult presentation might add something beyond that same procedure in ordinary language. Or the presentation might help a person remember and apply the procedure. Those are different claims and require different tests.
+
+The later literature review examined methods and results from 12 core empirical prompting papers, three supplementary studies, three additional primary studies on demonstrations, retrieval, and tool interaction, and a directly relevant anthropological essay. It was a targeted search with citation follow-up, not an exhaustive systematic review.
+
+[K] Established prompting research supplied both positive findings and warnings. Plan-and-Solve reported improvements from staged instructions on its tested older models and tasks. Across six math datasets with text-davinci-003, mean accuracy was 70.4% for zero-shot chain of thought, 72.9% for planning then solving, and 76.7% for an expanded procedure. Those figures support taking ordinary staging seriously as a comparator; they do not guarantee the same gain on another model. [30]
+
+The OPRO work produced an often-discussed deep-breath instruction. On PaLM 2-L and GSM8K, that optimized instruction scored 80.2%, compared with 71.8% for a step-by-step baseline. But the ordinary instruction “Break this down” scored 79.9%. The comparison did not isolate breathing imagery, and prompt-search and selection budgets matter. An unusual winning phrase does not establish a general mechanism for its imagery. [31]
+
+The persona literature also constrained the invocation analogy. Across 162 personas, 2,410 factual questions, and several model families, a major study found no reliable general factual-accuracy benefit from adding a persona. A later study of expert personas likewise found no consistent benefit across its tested models and tasks, despite exceptions. Roles can influence what a model produces without reliably making it more correct. [32]
+
+EmotionPrompt illustrated the difference between an average effect and a selected winner. In its zero-shot Instruction Induction table, mean performance across emotional stimuli was 51.98%, compared with 51.65% for the original prompts; the selected maximum was 55.24%. Choosing the best suffix after comparing many candidates is not the same claim as saying the average emotional suffix helps. [33]
+
+Review and debate need similar care. Self-Refine reported task-dependent benefits, with its GPT-4 math result changing from 92.9% to 93.1%. Other work found that intrinsic revision can turn correct answers into incorrect ones. In one equal-response-count GSM8K comparison, self-consistency outperformed debate: 85.3% versus 83.2% with six responses, and 88.2% versus 83.0% with nine. Later correction studies provide counterevidence under different settings. The defensible conclusion is to test the feedback procedure and baseline, not to declare revision universally beneficial or impossible. [34–36]
+
+A ritual “council” would therefore need comparison with an ordinary multi-perspective procedure and an equally resourced sampling-and-aggregation method. A council acted out within one response is still one generation. Different-sounding voices are not proof of independent evidence.
+
+The broader literature also covers format sensitivity, distraction from irrelevant information, demonstrations, and reduced gains from explicit chain-of-thought instructions on some reasoning models. Giving the plain baseline a command not to think, while permitting the elaborate prompt to reason, would manufacture an unfair comparison. [37–40]
+
+For factual work, actual access to source material changes the information available. For calculations or programs, an executed check can supply external feedback. Retrieval-augmented generation and ReAct study systems with evidence access or real action-and-observation loops; their findings cannot be credited to more emphatic wording alone. An invoked persona or sigil does not supply new external evidence, an independent verifier, or extra permissions. A role cue might elicit knowledge already represented by the model, but its accuracy effect remains an empirical question. [41]
+
+The search also found The Magical Power of Words in Large Language Models, an anthropological essay published in July 2026 and updated in August. It treats clarity, context, and sequencing as ritual-like linguistic practice and discusses staged software cases. That was direct prior discussion of the analogy, but not a controlled ritual-versus-neutral accuracy experiment. [42]
+
+[?] We found no convincing controlled demonstration that occult framing adds reliable LLM accuracy beyond an operationally matched ordinary procedure at comparable resources. This is a bounded search finding, not proof that such an effect is impossible. Human prompt-authoring memorability was not comprehensively reviewed or measured.
+
+Wiccan/Pagan and Reclaiming sources broadened the design possibilities. Vibra Willow’s ritual structure includes preparation, a circle, directions, invocation, central work, sharing, and an ending. Selena Fox’s account of creating stone circles asks about purpose, users, resources, responsibilities, upkeep, and deactivation. Starhawk’s release-and-birthing ritual includes reviewing choices, relinquishing something, and committing to nurturing change. [27–29]
+
+[S] Those relations can inspire a bounded task, an executable brief, differentiated review, and deliberate closure. The measurable acceptance condition of a software task is our addition. Fox’s text concerns a physical sacred site, not an LLM workflow. Religious imagery does not independently verify a revised answer.
+
+Three reusable prototypes followed. They are modern adaptations, not historical quotations or validated recipes, and the later pilot did not test these complete prototypes.
+
+The ceremonial sequence makes five responsibilities explicit:
+
+    Intention: Complete {task} for {audience}. Success means {criteria}.
+    Circle: Use {provided evidence}. Preserve {constraints}. Mark missing facts.
+    Working: Produce the deliverable while tracking its requirements.
+    Discernment: Check each requirement and each source-dependent claim.
+    Closure: Return {format}, identifying unresolved issues.
+
+Its matched ordinary version changes the headings to Objective, Scope, Produce, Check, and Final while keeping the instructions. The proposed benefit from the procedure and the proposed benefit from its names are separate questions.
+
+The chaos-inspired version treats explanations provisionally:
+
+    For {problem}, consider hypotheses {A, B, C} separately as temporary assumptions.
+    For each, give one prediction and one observation that would count against it.
+    Compare those predictions with {evidence}. Keep hypothetical conclusions conditional.
+    Return the best-supported explanation, its decisive evidence, and what remains unknown.
+    Do not force a winner when the evidence cannot distinguish the hypotheses.
+
+Labels such as Invoke, Examine, and Release could be compared with Assume, Test, and Finish. A request to release a frame does not erase the context window. This remains one model response unless actual separate calls are made.
+
+The Wicca/Reclaiming-inspired review uses explicitly defined perspectives:
+
+    Review {proposal} in four passes.
+    Air: evidence and assumptions.
+    Earth: implementation and resources.
+    Water: affected people’s needs.
+    Fire: alternatives and failure modes.
+    Give one material finding per pass, or say “no supported finding.”
+    Apply the most consequential supported revision, if any.
+    Do not invent evidence or defects merely to fill a category.
+
+Those element-to-task associations are our mnemonic invention, not something the sources teach about programming. The neutral comparator uses Evidence, Implementation, People, and Alternatives with the same instructions. Neither four elements nor four checklist entries guarantee complete coverage. Allowing “no supported finding” matters because compulsory criticism can encourage manufactured defects.
+
+The empirical pilot tested a narrower question: whether ritual labels added accuracy to a fixed staged prompt.
+
+[K] Four conditions received the same 24-task bundle. A used a practical-routine heading with no added scaffold. B used a ceremonial-ritual heading with otherwise identical content. C added five ordinary stages: Prepare, Bound, Solve, Check, Finish. D used Purify, Circle, Invoke, Discern, Close with the same operational instruction bodies as C.
+
+The tasks covered integer and list tracing, constrained scheduling, evidence propagation, and record selection and aggregation. They included negative arithmetic, impossible schedules, contradictory evidence, unsupported inference cycles, deleted records, and empty selections. Plain prompts were allowed normal private reasoning, and every condition had the same final-answer contract.
+
+Two fresh-context administrations were allocated to each condition: eight attempted responses in total. Each response contained all 24 tasks. Before any respondent launch, the skeptic caught a design problem: the initial random order would have placed all ritual conditions in one execution wave and all neutral conditions in the other. We changed the allocation before freezing it to two balanced blocks, B–A–D–C and C–D–A–B. No task, prompt, or answer key changed in response to model outcomes.
+
+The answer key was independently derived before the skeptic inspected the test author’s key. All 24 answers matched. The materials and scoring rules were fixed before collection. Answers had to be complete JSON; there was no answer repair, partial-item credit, feedback, or replacement of failed attempts.
+
+[K] Seven responses completed. Every one scored 24 out of 24 and satisfied the format requirements. One minimal-ritual attempt was interrupted by a user steering event before producing a final answer. It remained in the record as 24 missing answers and was not retried.
+
+The results were:
+
+    Plain prompt, A: 48/48 correct across two completed responses.
+    Ritual heading only, B: 24/48 across both allocated attempts;
+        24/24 among completed responses, with one missing final.
+    Ordinary staged prompt, C: 48/48 across two completed responses.
+    Ritual staged prompt, D: 48/48 across two completed responses.
+
+[K] The primary comparison, D minus C, was zero percentage points. Both conditions reached the ceiling. C minus A was also zero. B’s lower all-attempt score was entirely due to the interrupted administration; it cannot be interpreted as evidence that ritual wording damaged task solving.
+
+The skeptic independently rescored every saved reply against the separately derived key and reproduced all eight score records. That confirms the stated observations and scoring. It does not turn this into a large or decisive study.
+
+There were eight attempted bundled administrations, not 192 independent trials. The 168 correct completed item slots were repeated answers to the same 24 tasks, not 168 distinct tasks. With two administrations per main condition and a ceiling on every completed response, the test could not establish equivalence, a small stable effect, or general superiority.
+
+[A] Comparability also relied on the shared inherited model runtime being sufficiently stable across launches. Exact model identity and snapshot, sampling seeds, token usage, hidden reasoning resources, and complete tool activity were unavailable. Fresh contexts and no-tools instructions were used, but tool and filesystem access were not technically removed. The final answers do not show whether respondents actually followed the requested stages. Equal word counts would not establish equal inference cost.
+
+The earlier investigation had already encountered ceiling results in two much smaller model pilots. Two respondents each answered six lifecycle questions correctly; two more each diagnosed and repaired three cases correctly. Those were four administrations in total, with one respondent per vocabulary in each pilot. They supplied no evidence of equivalence or absence of a vocabulary effect. The later 24-task study expanded the task families, but again failed to create headroom above the conventional baseline.
+
+That is a limitation of our instrument. It is not a reason to rewrite the successful answers, choose favorable tasks afterward, or count software verification as additional model evidence.
+
+The independent skeptic changed more than the wording of our conclusions. Strong conventional implementations replaced weak competitors. Historical conditions were restored when an analogy had simplified them away. Restart was separated from rollback, encoding from authority, and an explicit conversion from a law-preserving conversion. Repeated clones and answer-revealing cues were removed from earlier instruments. Valid alternative repairs received credit. Missing replies remained visible. A shared checker defect in an archive audit was corrected and recorded.
+
+The surviving result is a set of useful distinctions and testable design proposals. No new primitive emerged merely from renaming a known mechanism. Sigils were not shown to be lossless or token-efficient programs. Correspondence tables were not formal isomorphisms. A generated conclusion was not a proof. A decoded message was not permission to execute it. A perfect-score tie was not proof of equivalence.
+
+[S] Ritual structures may still offer a useful interface for human attention: define an intention, make boundaries visible, perform a procedure, check it, and close it. Chaos-inspired provisional hypotheses may help organize competing explanations. Symbolic labels may help some people remember a checklist.
+
+[?] Those human benefits remain unmeasured here. A person may prefer a ritual presentation without producing more accurate work. Evocative language could also increase confidence without improving correctness. Preference, recall, omission rates, independent transfer, and calibration would need their own study. Better performance by a person working with AI must also be distinguished from what that person can later do without assistance.
+
+If the performance question is pursued further, the first step should be calibration on separate development tasks where a strong ordinary prompt sometimes fails. Tasks should not be chosen because the ritual version wins. Untouched instances and held-out templates could then compare a task-tuned ordinary prompt, the same instructions with ritual presentation, and a non-occult thematic control. Model versions, resources, stopping rules, and scoring would need to be explicit, with enough independently randomized administrations to support the intended inference.
+
+The broader hypothesis-comparison prototype deserves a separate experiment against an identical neutral procedure and an equally resourced independent-sampling baseline. The human-interface hypothesis deserves a separate usability study. Neither was settled by changing stage labels on this fixed bundle.
+
+The social-media comparison was therefore useful as a question generator. It led us to concrete problems about context, authority, representation, lifecycle, justification, and evaluation. The defensible outcome is a research narrative with working examples and clear boundaries on what they show. The appeal of an analogy can motivate the next test; the test has to earn the conclusion.
+
+
+Technical record. The following details preserve the substantive numerical results and evidence limits from both reports without treating every checkpoint as an independent experiment.
+
+The earlier report covered 14 completed checkpoints, including reading, instrument development, audits, deterministic calculations, and the two small model pilots. The later prompting study is a separate completed investigation. This article does not silently treat the earlier cutoff as a report of every intervening historical checkpoint. It introduces no recurring research schedule.
+
+1. Lifecycle and context. The lifecycle enumeration covered lengths 0–6 over six actions: 55,987 traces and 324,726 action positions, with zero disagreements for either complete implementation. Weakened scope-only and cleanup-only variants falsely accepted 54 and 6,474 positions. Context tests accepted 200 same-model additions and rejected 200 forbidden crossings. Full-context cache keys had zero mismatches in 400 queries; expression-only keys had 200 provenance/result mismatches, 170 also numeric. Lexical capture had zero mismatches in 40 closure cases; dynamic lookup had 20 provenance mismatches, 10 numeric, under the stated lexical contract. These are correctness examples, not speed measurements.
+
+2. Conversion, labels, and phases. The specified conversion failed addition preservation on 31/74 checked residue pairs. Ninety-six manifests produced 44 simplified labels and 80 colliding pairs. Full JSON and full SHA-256 plus registry distinguished/recovered all 96 in this finite collection. The 25-case phase supplement produced nine false rejections when an admission-only condition was applied at completion. Its expected predicate was assigned directly, so it was an illustrative truth table, not an independent implementation comparison.
+
+3. Shared declarations. Sixty-four declarations across seven scenarios produced 448 cases. All 64 coordinated changes with stale labels fooled view-agreement or copied-label checks but failed source checks. A shared generator bug was accepted by same-generator regeneration in all 64 cases and rejected by an independent field check. The fixture examined declaration fields, not actual scheduler behavior or runtime compliance.
+
+4. Observation and information loss. Exact rational examples showed equal support with unequal probability laws, different three-symbol laws mapping to the same (1/2, 1/2) output law, and identical output laws with trace lengths one and two. No random sampling occurred. The conditional geomancy example preserved parity while changing raw sums 208 to 210 and residues 4 to 6 modulo 12; an authored parity-derived observer returned 4 in both cases. Full counts, the retained residue, or the pair of required observations recover the specified information. Historical raw-count interpretation remains conditional.
+
+5. Codec. Known decoded answers included IOANNES. Checks covered 16,276 payloads of lengths 0–3, 1,001 singleton carriers, 400 short carriers, 208 null insertions, seven malformed carriers, and nine malformed payloads. Required comparator and round-trip checks had zero failures; all malformed cases were rejected. Of 400 carriers, 360 changed and 40 remained under canonicalization. Null-threshold, index, and reading-order ablations failed in distinct ways. This establishes a bounded codec relation, not security, exact recovery of discarded carrier details, or a new decoding advantage.
+
+6. Inference. Over 16 Boolean assignments, the four main premise sets—none, minor, universal, both—had 16, 8, 9, and 3 satisfying models, and 8, 4, 3, and 0 countermodels to the conclusion. Three additional queries had countermodel counts 1, 0, and 3 among 3, 3, and 6 models. Seven queries across 16 assignments produced 112 evaluations with zero checker disagreements wherever compared. The source-specific checker covered the four main cases; ordinary Horn closure and finite enumeration covered all seven. All examined theories had models. This was one modern formalization of one inference, not a complete implementation of Llull’s Art or an adversarial proof kernel.
+
+7. Instruments and integrity. An early instrument checked two six-entry fixtures in both vocabularies: four presentations normalized correctly and an intentionally swapped mapping was detected, but evaluative readiness failed and there were no participants. A later instrument used six distinct traces and twelve forms, with two valid traces and first errors at rows 2, 3, 4, and 5; all forms and keys matched, and a selected label swap failed normalization. A bookkeeping audit checked 21 result-claim groups against saved JSON. Its false-prefix propagation bug was corrected; actual saved inputs still passed. These were instrument and record checks, not model-performance observations.
+
+8. Early model pilots. The first used two fresh-context respondents, one per vocabulary. Both achieved 6/6 exact answers and 30/30 components. The second used two more respondents, both scoring 3/3 diagnosis, 3/3 repair, and 3/3 joint outcomes. Its repair oracle evaluated all twelve offered edits: six valid and six invalid, with all valid alternatives receiving credit. Both respondents chose B, C, C, deleting the first illegal command in each case; the answers do not show that they evaluated every alternative. The second ceiling triggered the declared stopping rule for that branch. These four administrations were not eighteen independent participants, and no human retention or transfer was measured.
+
+9. Documentary limits. The SemFix inventory contained six requirement records: four unresolved, one partial, and one uninspected. Its validator returned NOT_READY; two synthetic records behaved as specified. No historical cp subject program or repair engine was executed, and the roughly 10.4 GB author-linked VM was not downloaded. A later naming inquiry deliberately produced no new executable because the broader preservation/authorization claim lacked a testable contract. The earlier report identified Scideator as an unread next-step lead, not a demonstrated result. This article makes no new claim from it. [23, 24]
+
+10. Partial reproduction of modern Llull-related work. Zhao and colleagues’ 2025 study and linked repository were inspected at commit fc669fba90ea550babe604414f8334c296db2d12. Replaying the notebook’s lexical block and an independent Counter implementation reproduced a saved Top corpus of 100 titles, 1,014 words, and 217 unique tokens: 217/1014, rounded to 0.21. A saved corpus named diversity contained 100 titles, 1,105 words, and 455 unique tokens: 7/17, rounded to 0.41. Mapping that second corpus to the published Random row remained provisional. A cleaning ablation changed the counts to 1,019/218 and 1,108/456; literal-space splitting counted an empty token on a double-space edge. These are preprocessing and lexical-replay results, not semantic diversity, title quality, or scientific-quality measurements. [22]
+
+Missing baseline/reference files and per-paper reconstruction outputs prevented full replay. Notebook model, sampling, loader, and aggregation details did not straightforwardly establish the historical run described by the prose. Best-of-five token-overlap reconstruction was not semantic inversion or a mathematical bijection. Release dates do not prove uncontaminated training. The gaps do not establish misconduct or that the method is useless.
+
+11. Later prompting pilot. Task seed: 20260927. Allocation seed: 20260928. The eight run scores in allocated order were B1: no final, A1: 24, D1: 24, C1: 24, C2: 24, D2: 24, A2: 24, B2: 24, each out of 24. Every completed response scored 6/6 in each of the four families and passed the JSON contract. The interrupted B1 had 24 missing, zero wrong, and zero malformed items. It scored zero under the all-attempt rule but was not a demonstrated task-solving error.
+
+All-attempt D−C, C−A, and D−A were zero percentage points and zero mean items per response. B−A was −50 percentage points, or −12 mean items, solely because of the missing final. Completed-only B−A was zero with only one B administration. These views are both retained; the smaller completed-only denominator does not replace the full record.
+
+The plain prompts each had 1,455 whitespace-separated words, and the staged prompts each had 1,530. C had 11,064 characters and D had 11,066; these are not token counts. B changed one heading, whereas D changed the heading and five labels, so an interaction between framing and staging would compare different cue packages. C was a strong generic comparator, not a separately optimized best-known prompt.
+
+The scorer checked whole items, rejected malformed or duplicate-key JSON, and did not repair outputs. Independent answer derivation matched all 24 items; software validation included six hand controls and 17 parser/scorer controls. All 14 prospectively frozen artifact hashes remained intact. This was an internal prospective freeze, not external preregistration. Fixed attempts were not replaced. Reviewer scripts received a disclosed path-only portability adaptation after outcomes; the original prelaunch derivation and all frozen experiment files were preserved.
+
+12. Source-reading limits. Chinese-language verification of the Changes was unavailable. Spare’s transcription omitted figures and included clearly marked transcriber material; we did not attribute that interpolation or our toy deletion recipe to Spare. Agrippa’s Latin printed pages 227–229 were inspected locally, qualifying an English rendering of mentem as “force,” but this was not a complete edition collation. The geomancy witness verified wording without resolving its referent. Reeds supplied the cryptanalytic key for Trithemius, while primary tables corroborated selected cells; editions were not fully collated. Iamblichus was read in translation without Greek collation. The Key of Solomon’s material preparations, adept exceptions, and parchment alternatives do not support a universal freshness or linear-consumption rule. Agrippa’s cosmological tables include grouped entries and do not supply a mathematical bijection. Iamblichus argues for preserving names and prayers against losses under translation; his religious account does not provide a compiler-correctness oracle. Hine’s descriptions also distinguish resident behavior from complete shutdown and should not be converted into one universal servitor lifecycle. These limits do not turn inaccessible evidence into negative historical facts.
+
+Crowley’s Liber E prescribed recording exercises and conditions and comparing unseen-card guesses with actual cards while considering chance and sensory leakage. That is a supported textual observation, not a claim that the text supplies modern preregistration or formal experimental blinding. Liber O also gives god-form enactment instructions while warning against assuming the objective reality of its named entities; a model persona is our selective adaptation, not identity transfer. Crowley’s coordinated reminders and Spare’s attempts to reduce conscious association can also point in different directions; neither should be treated as the single occult method. [3, 5, 26]
+
+The Wicca-related addition read three substantive practitioner texts and supporting descriptions. It did not examine a Gardnerian or Alexandrian Book of Shadows. Failed attempts to access full Valiente and Lipp pages were excluded from the reading count. The already fixed pilot was not retrospectively labeled a Wiccan-specific experiment.
+
+13. Remaining prompting evidence. The review also considered the contested self-correction literature, self-consistency and debate, prompt-format sensitivity, irrelevant-context effects, recent expert-persona tests, demonstrations, retrieval, and action/observation loops. EmotionPrompt’s BIG-Bench normalized score was 10.16 for original prompts, 10.61 averaged over stimuli, and 11.92 for the selected maximum; these are not percentage-point accuracy gains. GPT-3’s TriviaQA figures in the few-shot study were 64.3%, 68.0%, and 71.2% for zero-, one-, and few-shot settings, with different patterns on other tasks. ReAct’s PaLM-540B comparison showed FEVER accuracy of 60.9% versus 56.3% for chain of thought, but HotpotQA exact match of 27.4% versus 29.4%. Task, model, evidence access, and resource changes must stay attached to such figures. [33, 35–41]
+
+Eccentric optimized prompts and a preliminary conceptual-metaphor prompting study were useful hypothesis sources. Small selected test sets, task-aligned rubrics, and model-based judgments limit what they establish about general reasoning or ritual-specific effects. The complete contemporary study list appears below; no unmeasured token, compute, human-learning, or supernatural gain is inferred. [43]
+
+The preserved research materials contain source notes, protocols, executable code, exact inputs and outputs, response records, and skeptical reviews. Saved-output scoring and finite calculations can be repeated. Model sampling cannot be reconstructed bit-for-bit without the unexposed model and sampling details. Some earlier scripts depend on sibling files or predecessor archives, and a pinned third-party fetch depends on those inputs remaining available. Checksums establish artifact consistency, not scientific truth or external authentication. This article is a synthesis of that record rather than a substitute for its code and data.
+
+
+Sources and reading record. Section and table references above identify the parts supporting the discussion. These are the inspected sources and relevant comparison literature from the two reports; an item marked as a limited or unread lead is not treated as completed evidence.
+
+[1] Key of Solomon, Book II, chapters 1–2 and 17.
+https://www.esotericarchives.com/solomon/ksol2.htm
+
+[2] Goetia, welcome, licence to depart, and following closing instruction.
+https://www.esotericarchives.com/solomon/goetia.htm
+
+[3] Aleister Crowley, Liber O, especially I.2, II.1–5, and III.1–2.
+https://sacred-texts.com/oto/libero.htm
+
+[4] Heinrich Cornelius Agrippa, Three Books of Occult Philosophy, II.7 and III.x–xii; 1533 Latin witness, printed pages 227–229.
+https://www.esotericarchives.com/agrippa/op2.htm
+https://esotericarchives.com/agrippa/agrippa3.htm
+https://www.e-rara.ch/download/pdf/1373395.pdf
+
+[5] Austin Osman Spare, The Book of Pleasure, “Sigils. Belief with Protection.” Transcription with the qualifications described above.
+https://brainwashed.com/nww/words/pleasure.html
+
+[6] Peter J. Carroll, “Pandaemonaeon / Principia Chaotica,” author-hosted discussion, July 2, 2014.
+https://specularium.org/magic/pandaemonaeon
+
+[7] Phil Hine, “On Agency and other matters,” December 18, 2023, especially “Non-Explanations and Servitors”; and “Some reflections on a statement,” 2022.
+https://enfolding.org/on-agency-and-other-matters/
+https://enfolding.org/some-reflections-on-a-statement/
+
+[8] James Legge’s translation of the Changes, Great Appendix I.IX, sections 51 and 54 and translator’s note.
+https://sacred-texts.com/ich/icap3-1.htm
+
+[9] Pseudo-Agrippa, Of Geomancy, Robert Turner’s 1655 translation; inspected facsimile wording and its interpretive limits.
+https://www.princeton.edu/~ezb/geomancy/agrippa.html
+https://en.wikisource.org/wiki/Page:Fourth_Book_of_Occult_Philosophy,_1655.djvu/32
+
+[10] Johannes Trithemius, Steganographia III; Jim Reeds, 1998 cryptanalytic study, especially pages 309–310.
+https://www.esotericarchives.com/tritheim/stegano3.htm
+https://gwern.net/doc/cs/cryptography/steganography/1998-reeds.pdf
+
+[11] Ramon Llull, Ars brevis, Latin II.3–4, III, and VI; Dambergs translation, Part 6, page 12.
+https://www.ramonllull.net/sw_studies/l_br/t_ars.html
+https://lullianarts.narpan.net/ArsBrevis.pdf
+
+[12] Iamblichus, On the Mysteries, VII.4–5, Thomas Taylor translation, 1895 reprint, pages 289–298.
+https://www.gutenberg.org/files/72815/72815-h/72815-h.htm
+
+[13] Selena Fox, “Intro to Wicca,” supporting description of diversity within Wicca.
+https://www.circlesanctuary.org/teachings/Intro-to-Wicca
+
+[14] Strom and Yemini, “Typestate: A Programming Language Concept for Enhancing Software Reliability”; Trio’s core reference on nurseries and cancellation.
+https://research.ibm.com/publications/typestate-a-programming-language-concept-for-enhancing-software-reliability
+https://trio.readthedocs.io/en/stable/reference-core.html
+
+[15] Context-oriented programming and contextual modal types for effects and handlers.
+https://www.jot.fm/issues/issue_2008_03/article4/
+https://arxiv.org/abs/2103.02976
+
+[16] CUE configuration concepts and Dhall configuration validation.
+https://cuelang.org/docs/concept/how-cue-enables-configuration/
+https://docs.dhall-lang.org/howtos/How-to-validate-a-configuration-file.html
+
+[17] Dexter Kozen, probabilistic semantics; Staton and colleagues, probabilistic-programming semantics; Pyro trace/replay documentation; complete abstract interpretation.
+https://www.cs.cornell.edu/~kozen/Papers/ProbSem.pdf
+https://www.cs.ox.ac.uk/people/samuel.staton/papers/lics2016.pdf
+https://pyro.ai/examples/effect_handlers.html
+https://www.math.unipd.it/~ranzato/papers/mfcs98.pdf
+
+[18] Rendel and Ostermann, bidirectional syntax descriptions; RFC 4648, especially sections 3.3, 3.5, and 12.
+https://www.informatik.uni-marburg.de/~rendel/unparse/rendel10invertible.pdf
+https://www.rfc-editor.org/rfc/rfc4648.html
+
+[19] Theorem Proving in Lean 4, “Propositions and Proofs.” Documentation read; Lean was not executed in these tests.
+https://lean-lang.org/theorem_proving_in_lean4/Propositions-and-Proofs/
+
+[20] Racket reference: symbols, syntax objects, and binding comparisons. Documentation read; Racket was not executed here.
+https://docs.racket-lang.org/reference/symbols.html
+https://docs.racket-lang.org/reference/stxops.html
+https://docs.racket-lang.org/reference/stxcmp.html
+
+[21] Mystical, PostScript rendered as magical circles; Carl Ellison’s ceremony-analysis paper, abstract only in this review.
+https://suberic.net/~dmm/projects/mystical/README.html
+https://eprint.iacr.org/2007/399
+
+[22] Zhao and colleagues, modern Llull-related title-generation study, arXiv:2508.19200v3; linked repository inspected at the commit specified in the technical record.
+https://arxiv.org/html/2508.19200v3
+https://github.com/colinzhaoust/ramon_llull_public
+
+[23] SemFix/Angelix artifact inquiry: incomplete evidence inventory recorded in the earlier report. No repair-engine execution or new result is attributed to that inquiry.
+
+[24] Scideator, arXiv:2409.14634. Identified but unread lead at the earlier report’s cutoff; not used as evidence in this article.
+https://arxiv.org/abs/2409.14634
+
+[25] Conventional families also considered: session types, capabilities, macros/staging, contextual domain-specific languages, transactions, and property testing. This was not an exhaustive review or execution of every framework.
+
+[26] Aleister Crowley, Liber E, I.1–9 and II.1–5, collected scan, printed pages 368–369.
+https://keepsilence.org/the-equinox/book4/3/liber-e-vel-exercitiorum_low.pdf
+
+[27] Vibra Willow, “Structure of a Ritual,” Reclaiming Collective, stages 1–7, 1999–2000.
+https://reclaimingcollective.wordpress.com/ritual-structure/
+
+[28] Selena Fox, “Creating Stone Circles,” “Intention & Plan” through “Development & Upkeep.”
+https://www.circlesanctuary.org/Creating-Stone-Circles
+
+[29] Starhawk, “What Must We Lose to the Night?”, December 20, 2017, “A Ritual for Release & Birthing.”
+https://www.starhawk.org/blog-archive/what-must-we-lose-to-the-night
+
+[30] Wang and colleagues, Plan-and-Solve Prompting, ACL 2023.
+https://aclanthology.org/2023.acl-long.147/
+
+[31] Yang and colleagues, Large Language Models as Optimizers (OPRO), ICLR 2024.
+https://arxiv.org/html/2309.03409v3
+
+[32] Zheng and colleagues, When “A Helpful Assistant” Is Not Really Helpful, Findings of EMNLP 2024; Basil and colleagues, Playing Pretend: Expert Personas Don’t Improve Factual Accuracy, 2025 report.
+https://aclanthology.org/2024.findings-emnlp.888/
+https://arxiv.org/abs/2512.05858
+
+[33] Li and colleagues, Large Language Models Understand and Can Be Enhanced by Emotional Stimuli (EmotionPrompt), technical report.
+https://arxiv.org/html/2307.11760v7
+
+[34] Madaan and colleagues, Self-Refine, NeurIPS 2023.
+https://arxiv.org/html/2303.17651v2
+
+[35] Huang and colleagues, Large Language Models Cannot Self-Correct Reasoning Yet, ICLR 2024; Liu and colleagues, Large Language Models Have Intrinsic Self-Correction Ability, December 2024 version.
+https://arxiv.org/html/2310.01798v2
+https://arxiv.org/html/2406.15673v2
+
+[36] Wang and colleagues, Self-Consistency Improves Chain of Thought Reasoning in Language Models, ICLR 2023; Smit and colleagues, Should We Be Going MAD? A Look at Multi-Agent Debate Strategies for LLMs, ICML 2024.
+https://arxiv.org/html/2203.11171v4
+https://arxiv.org/html/2311.17371v3
+
+[37] Sclar and colleagues, Quantifying Language Models’ Sensitivity to Spurious Features in Prompt Design, ICLR 2024.
+https://arxiv.org/html/2310.11324v2
+
+[38] Mirzadeh and colleagues, GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in Large Language Models, 2024.
+https://arxiv.org/html/2410.05229v2
+
+[39] Meincke and colleagues, The Decreasing Value of Chain of Thought in Prompting, 2025 report.
+https://arxiv.org/abs/2506.07142
+
+[40] Brown and colleagues, Language Models are Few-Shot Learners, 2020.
+https://arxiv.org/pdf/2005.14165
+
+[41] Lewis and colleagues, Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks, NeurIPS 2020; Yao and colleagues, ReAct: Synergizing Reasoning and Acting in Language Models, ICLR 2023.
+https://papers.nips.cc/paper/2020/file/6b493230205f780e1bc26945df7481e5-Paper.pdf
+https://arxiv.org/html/2210.03629v3
+
+[42] Timothy de Waal Malefyt and Matt Artz, “The Magical Power of Words in Large Language Models,” Journal of Business Anthropology 15(1), 2026. Published July 9; updated August 4.
+https://doi.org/10.22439/jba.v15i1.7813
+
+[43] Battle and Gollapudi, The Unreasonable Effectiveness of Eccentric Automatic Prompts, 2024 preprint; Oliver Kramer, Conceptual Metaphor Theory as a Prompting Paradigm for Large Language Models, 2025 preprint. Qualified supplementary evidence, not ritual-specific performance demonstrations.
+https://arxiv.org/html/2402.10949v2
+https://arxiv.org/html/2502.01901v1
