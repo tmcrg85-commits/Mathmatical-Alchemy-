@@ -1,0 +1,484 @@
+PERSISTENT CONTACTS, COMPLEMENTARY COMPUTATIONS
+
+Memory, mixing and developmental topology in a toy cellular reservoir
+
+Xenonostra Research Notes
+
+
+HOW TO READ THE TAGS
+
+[K] Known. Established in the cited literature, or true by construction.
+[T] Toy result. Measured in the simulations reported here. Seeds are fixed and the code is available.
+[A] Assumed. A modelling choice or premise that was not tested.
+[S] Speculative. A conjecture.
+[G] Gap. Something this work does not cover.
+
+
+ABSTRACT
+
+This note starts from a simple idea. Put very simple cell-like agents in a virtual world, let forces push them to stick together into multicellular bodies, and use those bodies as a computer that improves as it grows.
+
+The idea was tested in a toy world over five rounds of experiments. It did not survive in its original form, and a critical review of the first draft showed that two of our own explanations were wrong as well. Five results remain.
+
+First, contact turnover takes memory out of a fixed readout's reach without removing it from the world. In a freely moving world a fixed readout recovered 0.1 of a possible 100. A decoder trained for a single moment of a replayed movement history recovered 10.9, against 12.4 for the same kind of world frozen. The same decoder used one step later recovered 1.7 [T].
+
+Second, clumping added nothing beyond contact persistence in the comparisons we ran, and in the aggregation experiments no aggregate beat an ordinary random reservoir of the same size [T].
+
+Third, with the local rules used here, worlds that mix and worlds that hold still were good at different tasks. Majority-finding succeeded only where cells mixed, and it also failed on stationary networks that were fully connected [T].
+
+Fourth, in bodies grown by cell division, the depth of the body is an upper bound on memory. How much of the bound is reached depends on where the input enters, how wide the body is and how noisy the cells are [T]. A filament, which is a delay line, held two to two and a half times the memory of the best-tuned ordinary reservoir and matched an engineered ring [T]. Growth is a way of building such wiring. A network assembled with the same wiring computes the same thing [K].
+
+Fifth, a world that is half frozen and half free ran a memory task and a majority task together when each cell sorted its contacts by age. A router that was simply told each cell's type did exactly as well, and so did splitting the cells into two separate worlds [T]. Contact age is a local stand-in for a label. It did not add performance.
+
+
+1. THE IDEA WE STARTED WITH
+
+The starting picture was embodied computation. Simple single-cell-like agents live in a simulated world. Simulated forces make them chain together into multicellular agents or constructs. The emergent structure does computation that we want, and the whole thing is scaled up.
+
+Three claims are packed into that picture. The first is that aggregation produces computation. The second is that the computation is superior to what we already have. The third is that it scales. Each one can be tested, and each one was.
+
+
+2. WHAT ALREADY EXISTS
+
+The base version of the idea is not new, and a paper that claimed otherwise would be wrong.
+
+Digital multicellularity. The DISHTINY platform gives simple cell-like organisms the ability and the incentive to unite into higher-level individuals [K, ref 1]. In an evolutionary model by Colizzi and colleagues, cells that search along a weak, noisy chemical gradient evolve into aggregates because the group follows the gradient better than single cells do [K, ref 2]. In Avida, digital organisms evolved division of labour on logic tasks, solving harder tasks from simpler results passed along by neighbours [K, ref 3].
+
+Grown networks. Neural Developmental Programs grow a neural network through a developmental process guided by a second network that uses only local communication [K, ref 4]. Neural cellular automata trained by gradient descent have been reported as promising and efficient on abstract grid tasks, in a paper that also notes the leading results came from language-model methods [K, ref 5].
+
+Structure without a fitness function. Random, non-replicating programs placed in an environment with no explicit fitness landscape tend to give rise to self-replicators [K, ref 6]. Against that, artificial life systems such as Tierra and Avida produce rich diversity early and then stop producing novelty [K, ref 7], and it has been argued that the shortfall is not only a lack of computing power [K, ref 8].
+
+Reservoir computing. A reservoir computer is a fixed dynamical system with a trained linear readout. Its memory capacity is the summed accuracy with which past inputs can be reconstructed from the present state [K, ref 9]. Cellular automata have been used as reservoirs [K, ref 10]. A simple deterministic ring performs comparably to standard random reservoirs, and for linear rings the memory capacity can be brought arbitrarily close to the proved optimum [K, ref 11]. That optimality result is for linear rings and does not carry over automatically to noisy nonlinear ones.
+
+Two results on structure and memory need care. Networks of threshold-like units have an optimal amount of modularity for memory, but the same study found no such effect for linear or tanh units, where modular structure restricted information flow [K, ref 12]. And in a Fisher-information measure of memory, which rates signal-to-noise and is not the reconstruction score used here, no network of N units exceeds N, chain-like networks reach a value proportional to N, and saturating units limit it to about the square root of N [K, ref 13].
+
+Moving agents as reservoirs. A swarm of simulated agents has been used as a reservoir, with the finding that the naive implementation is very inefficient because the agents are interchangeable [K, ref 14]. Driven active matter has an optimal computing regime just below critical damping, and the authors describe the area as being in its infancy [K, ref 15].
+
+Liquid and solid brains. Systems whose parts move and have no persistent connections, such as ant colonies and immune systems, have been called liquid brains, in contrast to solid brains with fixed architecture. What each kind can and cannot compute is posed as an open question [K, refs 16, 17]. Mobile agents solve consensus problems more effectively than similar stationary systems [K, ref 18]. Animal groups with persistent modular structure sit between the two [K, ref 19].
+
+Plasticity. A recurrent network with three local plasticity rules performs much better on prediction tasks than fixed random networks, and all three rules are needed [K, ref 20].
+
+Agents that bond. In the theory of population protocols, identical finite-state agents that meet at random compute exactly the semilinear predicates, a small class [K, ref 21]. In the network constructor model the same kind of agents can also switch pairwise connections on and off, and protocols exist that build a spanning line and use it to simulate a Turing machine [K, ref 22]. A stronger result needs further assumptions: an interaction network that starts out connected, nodes that can detect when their degree equals a small constant, and either a unique leader or the ability to detect a common neighbour. Under those assumptions the model computes, with termination, any symmetric predicate that a Turing machine decides in space proportional to the square of the population [K, ref 23]. Bond switching alone is not the stated sufficient condition.
+
+Two ways to become multicellular. Biology distinguishes coming together, where independent individuals aggregate, from staying together, where offspring do not separate after reproduction [K, ref 24].
+
+The original idea was a coming-together idea. Sections 4 to 7 test it. Section 8 looks at staying together.
+
+
+3. THE TOY WORLD
+
+World. N cells sit on a square grid with wrap-around edges at a density of 0.25. All cells are updated in parallel. On each step a cell attempts a hop with probability q times (1 - p) raised to the number of its occupied neighbours, where q is 0.5 unless stated. It picks one of the four directions at random and moves only if that site was empty at the start of the step. If several cells pick the same empty site, one is chosen at random and the others stay.
+
+The number p is adhesion. At p = 0 the cells are a free gas. At p = 1 a cell that touches another never moves again. For sequential updates this is a lattice gas with nearest-neighbour attraction, which condenses near p = 0.83 by Onsager's exact solution and the standard lattice-gas mapping [K, ref 25]. Updates here are parallel, so that value is a reference line and not a prediction for this code [A].
+
+Signals. Each cell carries one number. All cells hear the same input u(t), drawn uniformly between -1 and 1. A cell's next state is
+
+x_i(t) = tanh( sum over touching cells j of W_ij x_j(t-1) + v_i u(t) ) + noise.
+
+The pairwise weights W_ij are a fixed random table with standard deviation 0.5, the input weights v_i are uniform between -0.3 and 0.3, and the noise has standard deviation 0.001 [A]. Cells talk only when adjacent. Nothing in the world rewards computation: movement ignores the signals.
+
+Readout. A linear ridge readout over all cell states, with a separate weight for each cell, is trained on 4,000 steps for worlds of up to 1,000 cells and on four steps per cell above that, then tested on the next 1,500 steps. Ridge strength is picked from six values on the last fifth of the training steps and the readout is then refitted on all of them.
+
+Memory score. For each delay k from 1 to 100, the score is the predictive R squared on the test steps, meaning 1 minus the squared error divided by the variance of the target. It is not a squared correlation. Negative values are set to zero. Memory capacity is the sum over delays. When the targets are taken from an unrelated input sequence, this score comes out between 0.00 and 0.03, so the clipping adds almost nothing (Table 4E).
+
+Nonlinear score. NARMA-10 error, with the target y(t+1) = tanh( 0.3 y(t) + 0.05 y(t) [y(t) + ... + y(t-9)] + 1.5 s(t-9) s(t) + 0.1 ) and s(t) = 0.25 (u(t) + 1). The tanh is added so the target cannot diverge. Lower is better.
+
+Contact survival. The fraction of touching pairs at a reference time that are touching again a given number of steps later. A pair that separated and came back counts as surviving. Contact age, used in section 8, is stricter: the number of consecutive steps the same partner has been adjacent.
+
+Conditions. Live: the world keeps moving during the task. Frozen: the geometry is frozen after a burn-in of 10,000 steps. Scrambled: the frozen contact graph with degree-preserving edge swaps, which keeps each cell's number of links and changes everything else about the wiring. Ordinary random reservoir: a sparse random network of the same size with ten inputs per unit, scaled to spectral radius 0.9 and not tuned further.
+
+All results are means over 3 to 10 seeds, with the count stated where it matters. Seed counts are small, so differences are reported with standard errors where the design pairs runs by seed, and a difference that was not detected is not a demonstration that two things are equal. The numbers behind every result are in four data tables, placed after sections 4, 7 and 8.
+
+
+4. CONTACT TURNOVER TAKES MEMORY OUT OF A FIXED READOUT'S REACH
+
+With 400 cells, live memory capacity was 0.1 to 0.2 out of 100 for every adhesion up to 0.7. It rose to 0.9 at p = 0.8, 2.9 at 0.85, 5.5 at 0.9, 8.9 at 0.95, 10.6 at 0.98, and 15.5 at p = 1, where the world has stopped moving [T, 5 seeds].
+
+That looks like a jump at the aggregation transition. Aggregation is not what causes it. Freezing the dispersed, non-sticky world gave 13.5, so the cells did not lack capacity [T]. With no adhesion at all and cells that simply hopped less often, live memory came back along a similar curve [T].
+
+At the base setting we measured the fraction of contacts that survive the readout's whole lifetime of 5,700 steps. Sticky worlds kept 15, 41 and 61 percent of their frozen capacity at contact survival of 0.16, 0.58 and 0.80. Slow non-sticky worlds kept 9, 19 and 38 percent at survival of 0.05, 0.14 and 0.37 [T, 4 seeds]. The comparison was repeated at a stronger coupling and at a higher density, with survival measured over 1,000 steps. Where the two routes overlapped in contact survival, no additional advantage for the sticky route was detected in any of the three settings [T]. These runs are not paired and no equivalence test was done.
+
+The share kept is not one universal curve. Near a contact survival of 0.57, a random network with no space kept 28 percent and the clumped world 41 percent, while the dispersed slow world kept 38 percent at a survival of only 0.37 [T]. That ordering suggests that turnover costs more in more connected worlds [S].
+
+The readout is fragile to very slow change. In a random network with no space at all, redrawing each link with probability one in ten thousand per step cut capacity from 22.5 to 6.2 [T, 4 seeds]. Re-fitting the readout every 100 steps on the previous 1,200 recovered only part of the loss, 12.1 against a frozen value of 22.4 at p = 0.95 [T]. That re-fitting window itself spans changing geometry, so it does not tell us where the memory went.
+
+Is the memory gone, or only unreadable?
+
+The first draft of this note said that movement destroys the memory. That went beyond the measurement. A low score can mean that past inputs leave no recoverable trace. It can also mean the trace is there, but its relation to the individual cell states changes faster than a trained readout can follow.
+
+To separate the two, one movement history was replayed with 3,000 independent input sequences. A decoder was trained across those repetitions for one single moment and tested on repetitions it had not seen. It asks whether the information exists at that moment, given complete knowledge of how the world moved [T, 4 seeds, delays of 1 to 40 steps].
+
+The freely moving world scored 10.9. The same kind of world frozen scored 12.4. Clumps at p = 0.9 and 0.95 that were still moving scored 19.4 and 21.5, and frozen clumps at p = 0.95 scored 21.5.
+
+So a moving world holds about as much of its input history as a still one. What it loses is a stable code. The decoder trained for one moment and applied one step later recovered 1.7 in the freely moving world, and 0.6 five steps later. In moving clumps at p = 0.95 it recovered 19.4 after one step, 16.5 after five and 8.9 after fifty. In frozen worlds it did not decay.
+
+This decoder is a diagnostic and not a usable readout, because it needs the same movement history replayed thousands of times. The practical statement is narrower than the one we first made: contact turnover puts memory out of reach of any readout that has to keep working for longer than the contacts last.
+
+Clumping does add something when stillness is equal. Frozen clumps at p = 0.95 scored about 22 against 13.5 for frozen dispersed cells, with about three links per cell instead of one [T].
+
+DATA TABLE 1. ROUND ONE (400 cells unless stated, mean of 5 seeds)
+
+1A. Memory capacity against adhesion p. Columns: live with fixed readout, live with re-fitted readout, frozen, frozen with scrambled wiring.
+
+p = 0.00: 0.13, 0.25, 13.5, 13.4
+p = 0.20: 0.19, 0.31, 15.4, 13.3
+p = 0.40: 0.10, 0.38, 15.9, 14.3
+p = 0.60: 0.06, 0.68, 16.7, 15.8
+p = 0.70: 0.18, 1.33, 16.8, 15.7
+p = 0.80: 0.85, 4.15, 18.5, 17.0
+p = 0.85: 2.89, 7.09, 20.9, 18.4
+p = 0.90: 5.51, 9.63, 18.8, 17.4
+p = 0.95: 8.94, 12.10, 22.4, 20.0
+p = 0.98: 10.62, 12.64, 19.4, 17.0
+p = 1.00: 15.49, 13.87, 15.5, 14.5
+
+1B. What the world is doing at each adhesion. Columns: neighbours per cell, largest clump as a fraction of all cells, fraction of contacts surviving 50 steps, fraction surviving 1,000 steps.
+
+p = 0.00: 0.98, 0.03, 0.04, 0.00
+p = 0.20: 1.10, 0.04, 0.06, 0.00
+p = 0.40: 1.25, 0.05, 0.09, 0.01
+p = 0.60: 1.59, 0.07, 0.25, 0.01
+p = 0.70: 1.84, 0.12, 0.46, 0.03
+p = 0.80: 2.36, 0.24, 0.77, 0.24
+p = 0.85: 2.71, 0.31, 0.89, 0.51
+p = 0.90: 2.90, 0.21, 0.94, 0.70
+p = 0.95: 2.91, 0.15, 0.98, 0.86
+p = 0.98: 2.72, 0.14, 0.99, 0.94
+p = 1.00: 1.57, 0.04, 1.00, 1.00
+
+1C. The slow route: no adhesion, cells attempt a hop with probability q per step. Columns: fraction of contacts surviving 50 steps, live memory, frozen memory.
+
+q = 0.5: 0.04, 0.15, 13.8
+q = 0.1: 0.16, 0.21, 13.3
+q = 0.02: 0.46, 0.55, 13.1
+q = 0.005: 0.77, 0.99, 14.1
+q = 0.001: 0.94, 2.86, 14.7
+q = 0 (never moves): 1.00, 13.67, 13.8
+
+1D. Scaling with world size. Columns: ordinary random reservoir, frozen clumps (p = 0.95), frozen clumps with scrambled wiring, frozen dispersed cells (p = 0), live clumps, live dispersed cells.
+
+100 cells: 18.5, 14.2, 13.6, 8.6, 4.3, 0.30
+200 cells: 22.1, 16.3, 15.7, 11.4, 7.1, 0.25
+400 cells: 26.2, 19.5, 17.6, 13.7, 7.9, 0.17
+800 cells: 27.0, 24.9, 20.5, 15.0, 8.9, 0.18
+1,600 cells: 33.4, 26.7, 22.1, 17.2, 11.4, 0.12
+
+
+5. IN THE AGGREGATION EXPERIMENTS, NOTHING BEAT AN ORDINARY RESERVOIR
+
+Across eight parameter settings with eight seeds each, paired by seed, an ordinary random reservoir scored higher on average than frozen clumps in every setting. In five settings the paired difference was 3.3 to 11.4 points and more than twice its standard error. In the other three it was 0.3 to 2.8 points and less than one and a half standard errors, which is a failure to detect a difference and not evidence that the two are equal. Clumps were never ahead [T, Table 2C].
+
+Scaling was sublinear for everything. From 100 to 1,600 cells, frozen clumps went from 14 to 27 and the ordinary reservoir from 18.5 to 33. Sixteen times the cells bought about twice the memory. The live dispersed world stayed near zero at every size [T, 5 seeds]. Larger worlds are also harder to fit with the same amount of data. At 800 cells, four times as many training steps raised scores by 3 to 11 percent (Table 4E), so limited training explains a small part of the flattening at that size. It was not checked at 1,600 cells [G].
+
+Clumps scored higher than the same contact graph after degree-preserving scrambling in seven of eight settings, by 1.5 to 6.8 points, and not at the weakest coupling [T, Table 2C]. We do not know why. The first draft put this down to modularity and cited ref 12. That was a misreading. The cited benefit is for threshold-like units, and for tanh units like ours that study found no such benefit. Scrambling also changes loops, path lengths and the number of separate pieces all at once, so this control cannot isolate any one of them [G].
+
+
+6. LETTING STICKINESS DEPEND ON THE SIGNAL DID NOT HELP
+
+If random change is harmful, perhaps change driven by the signal is useful. Each cell tracked the running strength of the signal it received from its neighbours and set its stickiness from it. Three rule families were fixed in advance: keep contacts that carry signal, keep contacts that are quiet, and keep contacts when the received signal is near a target. The target rule was run with two targets, which makes four variants. Each variant was run at two coupling strengths, giving eight combinations. Each was compared with a control in which every cell read some other cell's signal, and with the whole family of blind adhesion values.
+
+Of the eight combinations, seven sat on or below the curve traced by blind worlds with similar contact survival, and one sat about two points above it. None came near the fully stuck blind world. At the weaker coupling the best rule scored 9.4 live, the blind world at p = 0.98 scored 9.8, and the blind world at p = 1 scored 14.5. At the stronger coupling the best rule scored 9.4 and the fully stuck blind world scored 14.8 [T, 5 seeds]. The best live world was always the one that had stopped moving.
+
+This does not show that signal-driven structure is useless. In fixed networks, three plasticity rules had to act together before the network outperformed random ones [K, ref 20]. Our rules were single and simple. One hint was not followed up. The target rule with the higher target was the combination that sat above the blind curve, and when its structure was frozen after growing it scored 23.8 and 19.0 at the two couplings, against about 20 and 15.5 for blind structures, a lead of one to two standard deviations [T] [G].
+
+
+7. WORLDS THAT MIX AND WORLDS THAT HOLD STILL COMPUTE DIFFERENT THINGS
+
+The memory task favours fixed wiring. A second task was chosen to favour mixing. Each cell holds an opinion, 55 percent start with the majority opinion, and each cell adds the opinions of the cells it touches into a counter clipped at plus and minus 5 and takes the counter's sign. The score is the fraction of cells holding the true majority after 3,000 steps. The opinion and the memory signal are separate state variables that do not affect each other.
+
+In the liquid world every one of ten runs reached the true majority. At p = 0.4, nine of ten did. At p = 0.7, one of ten. At p = 0.8 and above, none, and the final fraction stayed between 0.58 and 0.70. Slow non-sticky worlds also failed within the time allowed [T, 10 seeds].
+
+A stationary world could fail for a duller reason. Frozen clumps are separate pieces, and the largest clump at p = 0.95 holds only 15 percent of the cells, so no rule could spread an opinion across them. To check, the same rule was run on two stationary networks in which every cell is connected to every other by some path: a fully occupied lattice, and a random network with four links per cell. None of ten runs on either reached the true majority, and the final fraction stayed between 0.60 and 0.70 [T, Table 4B]. With this rule, cells that keep the same neighbours lock into local agreement. Mixing is what lets a cell sample the population. This is a statement about this rule. Other protocols may solve majority on stationary connected networks [G].
+
+So the same knob moves the world from one kind of computation to the other, and no adhesion setting did both. Memory that a fixed readout can use switched on over the same range in which majority-finding switched off.
+
+A fair objection is that the memory readout has a separate weight for every cell, which a liquid cannot support. Two alternatives were tried, with the square of past inputs as the target. A readout given each cell's state and squared state, still with a separate weight per cell, recovered a one-step echo worth 0.67 in the liquid, against 5.6 for frozen clumps. A readout given only two population averages, the only one of the three that is blind to cell identity, recovered 0.05 [T, 5 seeds]. Section 4 gives the more direct answer: the information is present in the moving world, and none of these fixed readouts can follow it. Readouts built on spatial density fields, as used in swarm reservoirs [K, ref 14], were not tried [G].
+
+DATA TABLE 2. ROUNDS TWO AND THREE (400 cells)
+
+2A. One knob, two tasks. Columns: live memory capacity (5 seeds), fraction of cells holding the true majority after 3,000 steps, runs out of 10 that reached at least 95 percent.
+
+p = 0.00: 0.13, 1.00, 10 of 10
+p = 0.40: 0.10, 0.90, 9 of 10
+p = 0.70: 0.18, 0.78, 1 of 10
+p = 0.80: 0.85, 0.66, 0 of 10
+p = 0.85: 2.89, 0.70, 0 of 10
+p = 0.90: 5.51, 0.66, 0 of 10
+p = 0.95: 8.94, 0.65, 0 of 10
+p = 0.98: 10.62, 0.63, 0 of 10
+p = 1.00: 15.49, 0.58, 0 of 10
+
+2B. Memory kept against contacts kept. Each entry is the fraction of contacts surviving the readout's lifetime of 5,700 steps, then the share of frozen memory that the live world kept.
+
+Sticky clumps, about 3 links per cell: 0.16 and 15 percent, 0.58 and 41 percent, 0.80 and 61 percent.
+Dispersed cells with rare hops, about 1 link per cell: 0.05 and 9 percent, 0.14 and 19 percent, 0.37 and 38 percent.
+Random network with links redrawn, 3 links per cell in one web: 0.003 and 6 percent, 0.18 and 15 percent, 0.57 and 28 percent.
+
+The random network scored 22.5 with no turnover. With each link redrawn at a rate per step of 0.0001, 0.0003, 0.001 and 0.003 it scored 6.2, 3.4, 1.3 and 0.4.
+
+2C. Eight parameter settings, frozen bodies, 8 seeds each. Columns: ordinary random reservoir, clumped, clumped with scrambled wiring, dispersed.
+
+Base: 25.2, 21.9, 18.3, 13.1
+Coupling 0.35: 25.2, 13.8, 14.2, 9.3
+Coupling 0.7: 25.2, 19.7, 15.3, 15.0
+Input scale 0.1: 28.2, 25.4, 18.5, 11.6
+Input scale 1.0: 14.2, 13.9, 12.4, 10.8
+Density 0.15: 25.3, 21.0, 17.6, 12.1
+Density 0.4: 24.7, 20.7, 18.3, 16.5
+Noise 0.01: 19.2, 17.7, 15.4, 9.1
+
+Paired differences within seed, mean and standard error, in the same order of settings.
+
+Ordinary reservoir minus clumped: +3.3 (1.1), +11.4 (0.6), +5.5 (2.3), +2.8 (2.2), +0.3 (0.2), +4.3 (0.9), +4.1 (0.7), +1.5 (1.2).
+Clumped minus scrambled: +3.6 (1.3), -0.4 (0.3), +4.3 (2.0), +6.8 (2.4), +1.5 (0.6), +3.3 (0.6), +2.4 (0.8), +2.3 (1.0).
+
+2D. State-dependent adhesion against blind adhesion, live memory, 5 seeds. Each entry is the fraction of contacts surviving 1,000 steps, then memory capacity.
+
+Coupling 0.5, blind adhesion at p = 0.8, 0.9, 0.95, 0.98, 1.0: 0.24 and 1.1, 0.70 and 5.2, 0.86 and 7.3, 0.93 and 9.8, 1.00 and 14.5.
+Coupling 0.5, keep signalling contacts: 0.94 and 9.4. Same rule with the signal shuffled: 0.78 and 7.6.
+Coupling 0.5, keep quiet contacts: 0.65 and 4.0. Shuffled: 0.56 and 4.0.
+Coupling 0.5, low target: 0.51 and 3.0. Shuffled: 0.41 and 2.7.
+Coupling 0.5, high target: 0.76 and 7.9. Shuffled: 0.60 and 4.9.
+
+Coupling 1.0, blind adhesion at p = 0.8, 0.9, 0.95, 0.98, 1.0: 0.24 and 0.0, 0.70 and 0.4, 0.86 and 2.6, 0.93 and 5.6, 1.00 and 14.8.
+Coupling 1.0, keep signalling contacts: 0.99 and 9.4. Shuffled: 0.92 and 6.4.
+Coupling 1.0, the other three rules and their shuffled controls: survival 0.22 to 0.28, memory 0.0.
+
+
+8. WHAT SURVIVES: THREE RULES, EACH NARROWER THAN FIRST CLAIMED
+
+Rule 1. Use local growth to build persistent, directed signal paths.
+
+Bodies were grown from one cell. A daughter stays attached to its parent, and signals pass one way, from parent to child, with a gain of 0.99 and a random sign. Every cell also hears the input, with weights between -0.1 and 0.1. Three growth rules were compared. In a filament, only the newest cell divides. In a disc, cells with a free side divide. In a bush, any cell divides. Baselines were a blob, which is the same disc-shaped body with all touching cells coupled both ways, an engineered ring, and an ordinary random reservoir at two spectral radii. The blob and the random reservoirs were scaled globally to the stated spectral radius. Delays up to 800 steps were scored.
+
+Depth is a bound. Depth here means the number of parent-to-child links on the longest chain. In a noiseless linear version of such a body, the state is x(t) = A x(t-1) + b u(t), and because signals only travel away from the root, A applied D + 1 times gives zero for a body of depth D. The state is then a sum of A^k b u(t-k) for k from 0 to D, so no input older than D steps leaves any trace [K, by construction]. Whether the inputs inside that window can be told apart depends on noise, saturation, where the input enters, and how well separated the vectors b, Ab, A^2 b and so on are.
+
+In the grown bodies the bound was nearly reached. Discs had mean depths of about 12, 16, 21, 29 and 41 links at sizes of 100, 200, 400, 800 and 1,600, and capacities of 10.8, 15.0, 20.2, 27.2 and 37.5. Bushes had mean depths of about 9 to 15 and capacities of 8.3 to 14.4. Capacity was 92 to 97 percent of depth [T, 4 seeds]. A disc's depth grows roughly as the square root of its size and a bush's as the logarithm, so in these runs the growth rule set how capacity scaled.
+
+Depth alone does not fix memory. With depth held at 20 links, capacity ranged from 0.0 to 19.9. Input delivered only to the last layer gave nothing. Input to the first layer, or to every cell, gave 17.5 to 19.9 at low noise. With cell noise raised to 0.05 a body one cell wide scored 3.8 and a body twenty cells wide scored 9.6, with input to every cell [T, Table 4D]. The first draft said memory equals depth. The supported statement is that depth caps it.
+
+The filament scored 63, 88, 109, 125 and 141 at the five sizes. The best-tuned ordinary reservoir scored 25, 35, 44, 54 and 69. The filament was ahead by a factor of 2.0 to 2.5 at every size [T]. With cell noise raised tenfold and fiftyfold, it stayed ahead by a factor of 2.3 to 3.1 [T, 3 seeds]. The blob stayed flat near 16.
+
+Four qualifications. The filament is a delay line and its advantage is the advantage of a chain. It matched the engineered ring baseline, which scored 74 to 144, and did not beat it. Its capacity fell far short of its depth and did not grow in proportion to size. More training data moved its score by 4 percent at 800 cells, so the flattening is not mainly a fitting problem at that size. On the nonlinear task the filament, the ring and the ordinary reservoir scored about the same at low noise, with errors of 0.36 to 0.40, and bushes and blobs were worse.
+
+What growth does and does not contribute. A network assembled by any other means with the same final connections, weights, input weights and starting state computes exactly what the grown one does [K, by construction]. Growth is a local procedure for building a useful wiring pattern, and that is the whole of the claim. The growth experiments also used a different signalling rule from the contact worlds of sections 4 to 7: one-way links with a fixed gain instead of two-way links with random weights, input weights of 0.1 instead of 0.3, and delays scored to 800 instead of 100. Comparisons inside each experiment are matched. The two experiments cannot be compared with each other, and nothing here shows that a grown body out-computes an assembled one. The one matched comparison of signalling schemes is inside the same disc-shaped bodies: one-way parent-to-child signalling scored 10.8, 15.0, 20.2, 27.2 and 37.5, and two-way signalling between all touching cells scored 15.7, 15.9, 16.2, 16.9 and 16.7. One-way signalling was lower below 400 cells and higher above [T].
+
+Rule 2. Keep the wiring still for as long as the readout has to last.
+
+This is section 4 turned into a rule. A moving world still holds the input history, but a readout trained on it goes stale within a step or two when cells move freely and within tens of steps when clumps rearrange slowly [T, Table 4A]. In every comparison the best live world for a fixed readout was the one whose contacts had become permanent [T].
+
+Rule 3. Contact age can stand in for a cell-type label.
+
+Each cell tracks how long each of its contacts has lasted. Memory signals pass only over contacts at least 200 steps old. Opinions are taken only from contacts younger than 20 steps. Old contacts act as wiring and new contacts act as samples of the population. The two tasks use separate state variables and do not interact. Each cell stores up to four contact ages, a counter and an opinion in addition to its signal value, and that storage is part of the cost.
+
+The first trial used a frozen core with 25 percent free cells. Routing protected the core's memory, 13.9 against 7.2 without routing and 15.4 when fully frozen. Majority-finding was unreliable: three of five runs reached the true majority and two settled on the wrong one [T, 5 seeds]. The free fraction was then raised to 50 percent. Because that choice was made after seeing results, it was run on ten fresh seeds.
+
+In that run, the routed half-frozen, half-free world held a memory capacity of 12.4, which is 86 percent of the 14.5 it scored when fully frozen. It found the true majority in six of ten runs by step 3,000 and nine of ten by step 5,700. Nine of ten is encouraging and not precise: the 95 percent interval for the underlying rate runs from about 60 to 98 percent. The same world without routing scored 5.4 and zero of ten. The all-liquid world scored 0.2 and ten of ten. The all-frozen world scored 15.4 and zero of ten [T, 10 seeds].
+
+Three controls show what contact age is and is not doing [T, Table 4C, same ten seeds]. A router that was told which cells are frozen and which are free scored the same: a memory of 12.4, with a paired difference of 0.01 and a standard error of 0.02, and the true majority in six of ten runs by step 3,000 and ten of ten by step 5,700. So contact age adds nothing beyond the partition that was designed into the world. It recovers that partition from local information, without any cell knowing its partner's type. When the ages were shuffled among each step's contacts, so that the same number of links were admitted but the wrong ones, memory fell to 2.2 and majority-finding to one of ten. It matters which links are used, and not how many. And when the same 400 cells were split into two separate worlds, 200 frozen cells alone held a memory of 12.4 and 200 free cells alone found their majority in nine of ten runs by step 3,000. The shared world gained no performance over that split and was slower on the majority task. What it adds is that the frozen cells are counted in the vote and learn the result.
+
+Routing is not a cure for churn. In worlds made only of sticky cells whose clumps keep rearranging, it changed memory from 9.6 to 10.1 [T]. The core has to be truly frozen.
+
+DATA TABLE 3. ROUND FOUR
+
+3A. Bodies grown by division, memory capacity at 100, 200, 400, 800 and 1,600 cells (4 seeds).
+
+Filament, only the newest cell divides: 63.5, 88.0, 109.3, 124.8, 141.0
+Engineered ring baseline: 74.1, 98.5, 114.7, 128.7, 143.7
+Ordinary random reservoir, spectral radius 0.99: 25.1, 35.1, 43.5, 53.9, 69.4
+Ordinary random reservoir, spectral radius 0.9: 19.9, 25.6, 29.3, 32.7, 38.7
+Disc, surface cells divide: 10.8, 15.0, 20.2, 27.2, 37.5
+Blob, touching cells coupled both ways: 15.7, 15.9, 16.2, 16.9, 16.7
+Bush, any cell divides: 8.3, 10.4, 11.8, 12.3, 14.4
+
+With noisier cells (3 seeds), at 400 and 1,600 cells. Noise 0.01: filament 80.6 and 110.0, disc 17.0 and 34.9, ordinary reservoir 26.4 and 44.9. Noise 0.05: filament 26.4 and 39.9, disc 10.3 and 20.0, ordinary reservoir 10.1 and 17.1.
+
+3B. Memory against body depth, at the same five sizes. Each entry is mean depth, then memory capacity.
+
+Disc: 11.8 and 10.8, 16.2 and 15.0, 21.2 and 20.2, 29.2 and 27.2, 40.5 and 37.5.
+Bush: 8.5 and 8.3, 11.0 and 10.4, 12.5 and 11.8, 12.8 and 12.3, 15.0 and 14.4.
+
+3C. Both tasks in one world, 400 cells, 10 fresh seeds. Columns: live memory capacity, runs that found the true majority by step 3,000, runs that found it by step 5,700.
+
+All liquid: 0.2, 10 of 10, 10 of 10
+All frozen: 15.4, 0 of 10, 0 of 10
+Half frozen and half free, no routing: 5.4, 0 of 10, 0 of 10
+Half frozen and half free, contact-age routing: 12.4, 6 of 10, 9 of 10
+
+The half-frozen world scored 14.5 when fully frozen. The routed value of 12.4 is 86 percent of that and 80 percent of the all-frozen world's 15.4.
+
+DATA TABLE 4. ROUND FIVE (added after review)
+
+4A. Time-specific decoder. 400 cells, one movement history replayed with 3,000 independent input sequences, delays of 1 to 40 steps, 4 seeds. The first number is a decoder trained and tested at the same moment. The six numbers after it are the same decoder applied 1, 2, 5, 10, 20 and 50 steps later.
+
+Freely moving, p = 0: 10.9, then 1.7, 1.3, 0.6, 0.5, 0.3, 0.3
+Dispersed and frozen: 12.4, then 12.4, 12.3, 12.4, 12.3, 12.4, 12.3
+Clumps at p = 0.9, moving: 19.4, then 12.2, 11.0, 8.7, 8.5, 6.8, 5.8
+Clumps at p = 0.95, moving: 21.5, then 19.4, 17.4, 16.5, 13.5, 10.9, 8.9
+Clumps at p = 0.95, frozen: 21.5, then 21.5, 21.4, 21.5, 21.4, 21.4, 21.5
+
+4B. Majority-finding on stationary connected networks. 400 cells, 10 seeds, 5,700 steps.
+
+Fully occupied lattice: final fraction between 0.60 and 0.70 in every run, 0 of 10 reached 95 percent.
+Random network with four links per cell: between 0.61 and 0.70, 0 of 10.
+
+4C. Routing controls in the half-frozen, half-free world. 400 cells, the same 10 seeds in every row. Columns: live memory, runs that found the majority by step 3,000, runs that found it by step 5,700, and the paired memory difference from the contact-age router with its standard error.
+
+Contact-age router: 12.4, 6 of 10, 9 of 10
+Router given the cell-type labels: 12.4, 6 of 10, 10 of 10, difference 0.01 (0.02)
+Contact-age router with ages shuffled among contacts: 2.2, 0 of 10, 1 of 10, difference -10.2 (0.7)
+No routing: 5.4, 0 of 10, 0 of 10, difference -7.0 (0.4)
+
+The same 400 cells as two separate worlds: 200 frozen cells alone held a memory of 12.4. 200 free cells alone found their majority in 9 of 10 runs by step 3,000, and the tenth run agreed on the wrong answer.
+
+Approximate 95 percent intervals for the underlying success rate (Wilson): 0 of 10 gives 0 to 28 percent, 6 of 10 gives 31 to 83 percent, 9 of 10 gives 60 to 98 percent, 10 of 10 gives 72 to 100 percent.
+
+4D. Depth held at 20 links. Layered one-way bodies, 4 seeds. Columns: input delivered to every cell, to the first layer only, to the last layer only.
+
+Low noise (0.001), 1 cell per layer: 17.5, 19.1, 0.0
+Low noise, 5 cells per layer: 17.7, 19.7, 0.0
+Low noise, 20 cells per layer: 19.6, 19.9, 0.0
+High noise (0.05), 1 cell per layer: 3.8, 0.6, 0.0
+High noise, 5 cells per layer: 5.8, 1.4, 0.0
+High noise, 20 cells per layer: 9.6, 3.6, 0.0
+
+4E. Score checks at 800 cells, 3 seeds. Columns: memory with 16,000 training steps, with 4,000 training steps, and the null score when the targets come from an unrelated input sequence.
+
+Frozen clumps: 27.0, 24.4, 0.00
+Ordinary random reservoir, spectral radius 0.9: 30.3, 29.5, 0.00
+Filament: 130.8, 125.8, 0.00
+Ordinary random reservoir, spectral radius 0.99: 55.2, 53.5, 0.03
+
+
+9. WHAT WE GOT WRONG ALONG THE WAY
+
+We expected the jump in memory near the aggregation point to be caused by aggregation. It was caused by contacts lasting.
+
+We then said that movement destroys memory. It does not. The information stays in the moving world and the readout loses track of it.
+
+We expected spatial clumps to add nothing over scrambled wiring. They added a few points in seven of eight settings. We then explained that with a modularity result that does not apply to our kind of unit.
+
+We said memory equals body depth. Depth is a ceiling, and input placement, width and noise decide how close a body gets.
+
+We expected a filament's memory to grow in proportion to its length. It flattened.
+
+We expected a disc to overtake a filament when cells were noisier, by loose analogy with a square-root limit that belongs to a different measure of memory [K, ref 13]. It did not, at the two noise levels tried.
+
+We expected contact-age routing to rescue churning clumps. It did not. We then presented it as a source of gain. A router given the labels did the same, and so did two separate worlds.
+
+The first two-cell-type setting returned the wrong majority in two of five runs.
+
+We called an engineered ring the known optimum and described a network-constructor theorem without its assumptions. Both statements have been corrected in section 2.
+
+
+10. WHAT THIS DOES NOT SHOW
+
+It does not show that growing a body is computationally better than assembling one. The same wiring computes the same thing however it was built.
+
+It does not show emergence. The rules were designed. Nothing in these runs evolved or learned a growth rule or a routing rule [G].
+
+It does not show superiority. In the aggregation experiments nothing beat an ordinary reservoir, and the best grown body matched a ring baseline [T].
+
+It does not show linear scaling. Every curve was sublinear over the range of 100 to 1,600 cells [T].
+
+It does not show that the two computations help each other. They ran side by side on separate state variables [T].
+
+The statistics are thin. Seed counts are 3 to 10, most comparisons across conditions are unpaired, and no equivalence tests were run. Words like "matched" and "the same" mean that no difference was detected at this sample size.
+
+It covers one family of worlds, one readout type, small sizes and two tasks [G]. Majority-finding was scored on a fixed time budget and with one local rule [G].
+
+Active-matter reservoirs compute with moving agents by reading positions and velocities [K, refs 14, 15]. Our statements about liquid worlds apply to contact signalling with the readouts tried here, not to liquids in general [G].
+
+Novelty is not established. The hybrid of liquid and solid organisation is in the literature [K, refs 16, 19]. In a limited search we did not find the time-specific decoder comparison for moving contact networks, or contact age used to separate two computations [G].
+
+The link to network constructors is an analogy. Their results concern exact discrete computation by hand-written protocols, under a random scheduler and with the extra assumptions listed in section 2 [K, refs 22, 23]. Ours concern analog memory in a spatial world.
+
+
+11. PREDICTIONS THAT WOULD FALSIFY THE CLAIMS
+
+P1. In a contact-signalling world, a decoder trained for a single moment recovers most of the memory of the frozen world, and the same decoder loses most of its score within a number of steps set by contact turnover. It fails if the time-specific decoder also scores near zero in a moving world, which would mean the information itself is lost.
+
+P2. With a fixed readout, the share of frozen capacity that survives rises with contact survival. No additional advantage from clumping was detected at matched survival in the tested comparisons. This weaker claim fails if a properly paired test finds that clumped worlds keep a clearly larger share.
+
+P3. In a body with one-way parent-to-child signalling, memory capacity does not exceed depth. It fails if such a body scores above its depth by more than the uncertainty of the estimate.
+
+P4. Where the frozen and mobile parts of a world differ sharply in contact lifetime, a contact-age router performs like a router given the cell-type labels. It fails if the two differ. Ignoring young contacts was sufficient in the one case tested. It was not shown to be necessary.
+
+P5 [S]. A growth rule placed under selection for a memory task will move toward deeper bodies with input reaching the early layers. Untested.
+
+P6 [S]. A readout that is re-estimated faster than contacts turn over can use a moving world. The sliding re-fit in section 4 was too slow to test this cleanly. Untested.
+
+
+12. CONCLUSION
+
+The idea that cells gathered by force will compute, and compute better as more are gathered, did not survive a toy test. Gathering was not the active ingredient.
+
+What the experiments support is narrower. A world of signalling cells keeps a record of its recent input whether it moves or not. A trained readout can only use that record while the contacts hold still. Worlds that mix can do a population-sampling task that worlds with fixed neighbours could not do under the same rule. Depth caps the memory of a one-way body, and a growth rule is one local way to build depth. Contact age lets a cell tell wiring from passing encounters without being told which is which, and that is all it was shown to do.
+
+None of this is shown to be emergent, superior or scalable in the sense the original idea hoped for.
+
+
+CODE AND DATA
+
+Code, fixed seeds and raw results for all five rounds accompany this note. Round five was added after a critical review of the first draft. Each table is regenerated by one command:
+
+Round 1: python3 aggregating_reservoir_toy.py --seeds 5 --out results.json
+Round 2: python3 round2_tests.py round2_results.json, then python3 round2_survival_check.py
+Round 3: python3 round3_consensus.py round3_results.json, and python3 round3_popcode.py round3b_results.json
+Round 4: python3 round4_salvage.py round4_results.json
+Round 5: python3 round5_review_tests.py round5_results.json
+
+
+REFERENCES
+
+References marked with an asterisk are standard results cited from general knowledge and were not re-checked against the source during this study. For the others, volume and page details are given only where they were checked.
+
+1. Moreno, M. A., and Ofria, C. (2019). Toward open-ended fraternal transitions in individuality. Artificial Life 25(2), 117-133.
+
+2. Colizzi, E. S., Vroomans, R. M. A., and Merks, R. M. H. (2020). Evolution of multicellularity by collective integration of spatial information. eLife 9, e56349.
+
+3. Goldsby, H. J., Dornhaus, A., Kerr, B., and Ofria, C. (2012). Task-switching costs promote the evolution of division of labor and shifts in individuality. Proceedings of the National Academy of Sciences.
+
+4. Najarro, E., Sudhakaran, S., and Risi, S. (2023). Towards self-assembling artificial neural networks through neural developmental programs. arXiv:2307.08197.
+
+5. Xu, K., and Miikkulainen, R. (2025). Neural cellular automata for ARC-AGI. arXiv:2506.15746.
+
+6. Aguera y Arcas, B., Alakuijala, J., Evans, J., Laurie, B., Mordvintsev, A., Niklasson, E., Randazzo, E., and Versari, L. (2024). Computational life: how well-formed, self-replicating programs emerge from simple interaction. arXiv:2406.19108.
+
+7. Standish, R. K. Open-ended artificial evolution. arXiv:nlin/0210027.
+
+8. Hintze, A. (2019). Open-endedness for the sake of open-endedness. Artificial Life.
+
+9. * Jaeger, H. (2002). Short term memory in echo state networks. GMD Report 152.
+
+10. * Yilmaz, O. (2014). Reservoir computing using cellular automata. arXiv:1410.0162.
+
+11. Rodan, A., and Tino, P. (2011). Minimum complexity echo state network. IEEE Transactions on Neural Networks, 131-144.
+
+12. Rodriguez, N., Izquierdo, E., and Ahn, Y.-Y. (2019). Optimal modularity and memory capacity of neural reservoirs. Network Neuroscience 3(2), 551-566.
+
+13. Ganguli, S., Huh, D., and Sompolinsky, H. (2008). Memory traces in dynamical systems. Proceedings of the National Academy of Sciences.
+
+14. Lymburn, T., Algar, S. D., Small, M., and Jungling, T. (2021). Reservoir computing with swarms. Chaos.
+
+15. Gaimann, M. U., and Klopotek, M. (2025). Robustly optimal dynamics for active matter reservoir computing. arXiv:2505.05420.
+
+16. Sole, R., Moses, M., and Forrest, S. (2019). Liquid brains, solid brains. Philosophical Transactions of the Royal Society B 374(1774), 20190040.
+
+17. Pinero, J., and Sole, R. (2019). Statistical physics of liquid brains. Philosophical Transactions of the Royal Society B 374.
+
+18. Vining, W. F., Esponda, F., Moses, M. E., and Forrest, S. (2019). How does mobility help distributed systems compute? Philosophical Transactions of the Royal Society B 374.
+
+19. Kao, A. B., and Couzin, I. D. (2019). Modular structure within groups causes information loss but can improve decision accuracy. Philosophical Transactions of the Royal Society B 374.
+
+20. Lazar, A., Pipa, G., and Triesch, J. (2009). SORN: a self-organizing recurrent neural network. Frontiers in Computational Neuroscience 3.
+
+21. * Angluin, D., Aspnes, J., Eisenstat, D., and Ruppert, E. (2007). The computational power of population protocols. Distributed Computing 20.
+
+22. Michail, O., and Spirakis, P. G. (2016). Simple and efficient local codes for distributed stable network construction. Distributed Computing 29(3), 207-237.
+
+23. Michail, O., and Spirakis, P. G. (2017). Connectivity preserving network transformers. Theoretical Computer Science 671, 36-55.
+
+24. Tarnita, C. E., Taubes, C. H., and Nowak, M. A. (2013). Evolutionary construction by staying together and coming together. Journal of Theoretical Biology 320, 10-22.
+
+25. * Onsager, L. (1944). Crystal statistics. I. A two-dimensional model with an order-disorder transition. Physical Review 65.
