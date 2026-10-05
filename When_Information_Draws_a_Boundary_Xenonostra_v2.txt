@@ -1,0 +1,1029 @@
+WHEN INFORMATION DRAWS A BOUNDARY
+
+Attention, recurrence, and the formation of temporary computational individuals
+
+Xenonostra Research Notes
+October 4, 2026
+Version 2: second-pass audit, added derivations, and a first planted run
+
+
+ABSTRACT
+
+What if an informational system did not begin with a fixed division between itself and its surroundings? What if a temporary individual became identifiable when a changing collection of processes maintained consequential internal interactions and made information available for use elsewhere?
+
+This note develops that intuition into a finite, testable model. We replace a literally boundaryless information field with an open network whose candidate functional boundaries are not specified in advance. Attention is represented as a changing allocation of gain. Recurrent causal dependence, useful broadcasting, the link between them, and persistence are measured separately. A candidate boundary is supported only when declared criteria are met; there may be several candidates or none. [A]
+
+The underlying ideas have substantial precedents: the dynamic core hypothesis, Integrated Information Theory, global workspace models, informational individuality, adaptive networks, Markov blanket approaches, causal-strength measures, and weakest-cut cores of directed networks. This note does not claim priority for emergent boundaries, changing workspace membership, the recurrence measure, or the hierarchy of units it uses. [K; R1-R10, R13, R16-R22]
+
+A second pass changed the picture in four ways. In the model as specified, the one-step recurrence measure is exactly a weakest cut of attention-gated connectivity and cannot register saturation; seen through a finite-precision readout, the same quantity can fall by orders of magnitude and stops being monotone in gain. Under an additive cut measure the candidate units form a nested, non-overlapping hierarchy that needs no enumeration of subsets, a known result we adopt. Recurrence and broadcasting can both pass while being unrelated, so a linking test is added. And the controller first specified has only uniform or single-winner attractors: in a small run on hand-planted structure it mostly failed to hold a coalition, while a support-plus-surprise score held one and moved it on cue. [D; T]
+
+Our contribution is an explicit synthesis, exact counterexamples, one planted toy run, and a proposed experimental protocol. Nothing here establishes consciousness, autonomous agency, spontaneous self-organization, or an advantage over existing computational architectures. [D; T; G]
+
+
+HOW TO READ THE CLASSIFIERS
+
+[K] Supported knowledge: a checked source, standard result, or accurate description of what a cited theory proposes. A theory's existence is established; its account of consciousness may remain disputed.
+
+[A] Assumption: a modeling choice, operational definition, intervention convention, or experimental design decision.
+
+[D] Deduction: a mathematical consequence of stated assumptions. This is conditional reasoning, not empirical confirmation or a claim of mathematical novelty.
+
+[T] Toy result: an outcome actually measured in a computational experiment. Section 11 reports the only ones, from a small run on hand-planted structure. No experiment on unplanted adaptive networks is reported.
+
+[S] Speculation: a proposed explanation, connection, or prediction still requiring tests.
+
+[G] Gap: a limitation, missing mechanism, or unresolved question.
+
+[?] Unchecked: a claim whose evidence or priority has not been established.
+
+The numerical examples below are evaluations of closed-form equations, checked computationally. They remain [D], not evidence that a network spontaneously organized itself. Numerical checks of deductions are listed in the Appendix and do not change a claim's tag.
+
+Notation is deliberately plain text. An underscore denotes a subscript, ^ means a power, sum means summation, and E means expectation. All logarithms are natural unless specified otherwise; information quantities using them are measured in nats. Reference labels such as [R3] point to the bibliography.
+
+
+1. THE ORIGINAL QUESTION
+
+This project began with an idea during an otherwise uneventful work shift on October 3, 2026. An initial AI-assisted discussion developed it into a sketch: patterns form among information-bearing processes; attention changes their interactions; the resulting organization may acquire a boundary even though no particular inside was designated beforehand.
+
+The useful question is:
+
+Under what conditions does part of an interacting system become a defensible computational unit, and when does that unit cease to exist as such?
+
+Imagine many processes exchanging signals. Some begin to influence one another repeatedly. They preserve information across several updates. Their outputs become useful to several other processes. A temporary coalition can then be investigated as a unit, even while remaining physically connected to its surroundings. [S]
+
+The word "object" here names an organized process, not a new substance. Information must be represented in states of some specified substrate. We are not proposing disembodied information or a mechanism outside ordinary physical implementation. [A]
+
+Three boundaries must be distinguished:
+
+Physical boundary: a material interface, such as a membrane.
+
+Statistical boundary: a conditional-independence relation among selected variables.
+
+Functional boundary: a division that helps explain a particular computation or intervention outcome.
+
+These can coincide, but their equivalence requires an argument. This note primarily investigates functional boundaries. [A]
+
+
+2. WHAT THE PRELIMINARY SKETCH NEEDS TO CORRECT
+
+First, "no fixed functional boundary" does not mean "an infinite space," "a noncompact space," or "a manifold without boundary." A sphere is compact and has no manifold boundary; a closed interval is compact and has endpoints. Topological boundary, extent, and computational membership are different properties. Nothing in the proposal yet requires differential geometry. [D]
+
+Second, IIT is not simply a theory that assumes a permanently fixed system. IIT 4.0 evaluates candidate substrates and uses maximal system integrated information, phi_s, with exclusion to identify complexes. Its separate quantity, capital Phi, sums the integrated information of the distinctions and relations in the unfolded cause-effect structure; it should not be treated as an interchangeable generic coherence score. The preliminary assertion that changing boundaries conflict with IIT was too strong. [K; R1]
+
+Third, global broadcasting does not automatically identify a unique individual. A useful signal can travel through a feedforward system. A workspace theory and a rule for selecting its exact substrate are related questions, not identical ones. [D; R2]
+
+Fourth, synchrony does not establish integration. Two processes can fluctuate together because the same external signal drives both. Cutting a nonexistent interaction between them changes nothing. Section 9 gives an exact example. [D]
+
+Finally, attention is not time itself. Time indexes change; attention is one state or control variable that changes with time. Nor does naming a gain parameter "attention" establish that it implements human attention. [A]
+
+The revised proposal is therefore narrower:
+
+A functional boundary may be supported when a subset exhibits robust recurrent causal dependence, useful access to its contents, and a demonstrated link between the two, with continuity over a declared interval. [S]
+
+Whether this combination predicts anything beyond its component measurements is an empirical question.
+
+
+3. WHERE THIS SITS IN THE LITERATURE
+
+This was a targeted literature search conducted on October 4, 2026, using primary papers, publisher records, author repositories, and arXiv. It included searches for IIT/GNW comparisons, informational individuality, emergent boundaries, adaptive networks, Markov blankets, and 2025-2026 workspace formalisms. A second pass the same day added causal-strength measures, weakest-cut network cores, and self-reinforcing allocation. It is not an exhaustive systematic review or a certification of novelty. [G]
+
+Integration and dynamic organization
+
+IIT 4.0 connects consciousness to intrinsic cause-effect structure and supplies a substrate-selection procedure. Our operational quantities below do not implement that formalism. Consequently, none is labeled phi_s or Phi. [K; R1]
+
+The earlier dynamic core hypothesis already approached consciousness through integrated and differentiated neural processes rather than a simple list of privileged anatomical parts. This is a historical precedent for asking what organization a process has. [K; R4]
+
+Global access
+
+Mashour and colleagues describe the Global Neuronal Workspace hypothesis in terms of recurrent amplification, sustained representation, and availability to other processors. GWT is the broader architectural family; GNW is a neural account. Neither should be reduced to a signal merely reaching many destinations. [K; R2]
+
+Informational individuality
+
+Krakauer and colleagues formalize individuals through information propagated from past to future and distinguish forms with different dependence on their environments. Inferring an individual from temporal organization, rather than assuming it beforehand, is therefore established prior work. [K; R3]
+
+Informational closure
+
+Chang and colleagues propose a theory based on non-trivial informational closure at particular scales. They explicitly discuss why informational closure need not imply the corresponding causal dependence. This distinction matters whenever predictability is interpreted as autonomy. Their identification of such processes with consciousness remains a theoretical proposal. [K; R8]
+
+Adaptive networks
+
+Gross and Blasius review systems in which node dynamics and network structure change together. The state-and-coupling feedback in our model belongs to this established family. Coevolution alone does not guarantee a useful computational individual. [K; R5]
+
+Markov blankets
+
+Palacios and colleagues study hierarchical self-organization under specified generative assumptions. Their simulations provide a precedent for emergent statistical interfaces, not a theorem that any interacting collection inevitably acquires an organism-like boundary. Bruineberg and colleagues analyze the additional assumptions required when statistical blankets are interpreted as physical or metaphysical boundaries. [K; R6, R7]
+
+Causal strength and cut-based integration
+
+Measuring an interaction by the divergence between a system and a copy of it with selected influences removed is established practice. Janzing and colleagues quantify the strength of causal arrows by cutting them, feeding the cut ends independent copies of their inputs, and taking the KL divergence from the original distribution. Ay and Polani define information flow through interventions. Oizumi, Tsuchiya, and Amari place mutual information, transfer entropy, stochastic interaction, and an integrated-information measure in one family, each defined by which influences are disconnected. The directed-cut divergence of Section 5 is an interventional member of this family with a zero-reference cut. It is not a new kind of measure. [K; R16, R17, R18]
+
+Bidirectional cores
+
+Kitazono, Kanai, and Oizumi give an exact, polynomial-time search for network cores that repeatedly splits a system at its weakest cut. Kitazono, Aoki, and Oizumi define the strength of a bidirectional connection as the smaller of the two directed sums across a split, take its minimum over all splits, and call a subnetwork a complex when that minimum exceeds the value for every larger subnetwork containing it. Complexes are nested, and the search needs only N-1 cut evaluations. They applied it to an anatomical mouse connectome and named activity-dependent networks, where the location of bidirectional interaction changes over time, as the next step. Taguchi and colleagues have since extracted such cores from directed networks estimated from human fMRI activity. [K; R20, R21, R22]
+
+In the additive regime of Section 5 our recurrence measure is their min-cut weight with interventional capacities in place of connection weights, and our candidate units are their complexes. What this note adds on that axis is correspondingly narrow: capacities gated by an endogenous allocation, access tests applied to the resulting units, and tracking of units over time. [D]
+
+Self-reinforcing allocation
+
+A softmax that feeds on its own output obeys the self-consistency equation of the mean-field Potts model, whose ordering transition is discontinuous whenever there are more than two states. Section 4 uses this to characterize the allocation controller. [K; R23]
+
+Machine learning implementations
+
+VanRullen and Kanai propose a shared latent workspace connecting specialized representations. Goyal and colleagues implement a bandwidth-limited shared workspace with competition among modules. These are direct precedents for computational access and coordination. They also supply relevant comparison architectures. [K; R9, R10]
+
+Transformer attention is another mechanism for weighted information routing. Its mathematical use of the word "attention" does not make it identical to cognitive attention or a complete workspace. [K; R11; D]
+
+Recent evidence and nearby proposals
+
+The 2025 COGITATE adversarial collaboration tested preregistered predictions associated with IIT and GNW in 256 human participants using several recording methods. The authors report support for some predictions and challenges to central claims of both theories. This does not validate a hybrid of them. [K; R12]
+
+Kanai's August 16, 2026 preprint is the closest formal precedent found for the access side: open subnetworks, shared input-output routes, and context-dependent coalitions. It shows that a set combining good receivers with good broadcasters, but with no internal route between them, can imitate a workspace; Section 6 applies that lesson to our own criteria. It states that the framework does not choose its own candidate size or system boundary. The first pass also recorded endogenous attention among its stated open problems; the second pass did not re-locate that passage. Changing workspace membership is not our innovation. This source is a preprint. [K; R13; ?]
+
+A July 2026 preprint by Lubashevskiy and Lubashevsky proposes attention-dependent localization and broadcasting in a dynamical GNW model. Its indexed author abstract was inspected; its full mathematical development was not audited here. It is relevant prior art for attention-controlled threshold proposals, not evidence supporting our model. [K; R14; G]
+
+A September 29, 2026 preprint by Galus and Starzyk compares GNW with an alternative architecture and emphasizes that shared functional signatures do not establish a unique mechanism. We inspected its abstract and bibliographic record, not its full comparative analysis. [K; R15; G]
+
+The defensible status of this note is a research synthesis with a testable model and one planted toy run. The recurrence measure and the hierarchy of units are established constructs. Whether the combination of gated capacities, access and linking tests, tracking, and the experimental protocol is novel remains unchecked. [?]
+
+
+4. THE MINIMAL DYNAMICAL MODEL
+
+Let V = {1, ..., N} be a declared pool of processors. Each has a scalar state x_i(t). Vector-valued processors are a possible extension.
+
+Let W(t) be a directed coupling matrix: w_ij carries influence from processor j to processor i. Let a_j(t) be an allocation weight, u(t) an external input vector, b_i a bias, and U the input-coupling matrix. [A]
+
+We impose:
+
+0 <= a_i(t) <= 1
+sum_i a_i(t) = 1
+0 < rho <= 1
+
+and define the relative gain:
+
+gamma_j(t) = N*a_j(t)
+
+Uniform allocation gives every processor gain 1, and the gains always sum to N. [A]
+
+One possible update is:
+
+x_i(t+1) = (1-rho)*x_i(t) + rho*tanh(z_i(t))
+
+z_i(t) = b_i + sum_j w_ij(t)*gamma_j(t)*x_j(t)
+         + sum_l U_il*u_l(t) + sigma*xi_i(t)
+
+Here xi_i(t) are independent standard Gaussian innovations. Noise is inside tanh in this bounded model. rho controls the update rate. All quantities are dimensionless model variables. [A]
+
+The first draft used a_j itself as the gain. That is the same model with W divided by N, but it makes a 16-processor network at uniform allocation sixteen times weaker than its weights suggest, and it hides the regime described under Scaling below.
+
+If every initial x_i lies in [-1,1], every later x_i also lies there: the update is a convex combination of two values in that interval. This is boundedness, not a proof of convergence or intelligent behavior. [D]
+
+Allocation can itself evolve:
+
+p_i(t) = exp(s_i(t)/T) / sum_j exp(s_j(t)/T)
+
+a_i(t+1) = (1-eta)*a_i(t) + eta*p_i(t)
+
+with T > 0 and 0 < eta <= 1. Lower T concentrates allocation on higher scores; eta controls adjustment speed. Starting on the probability simplex keeps a(t) on that simplex. [A; D]
+
+The score first specified was:
+
+s_i(t) = kappa*abs(x_i(t)-x_i(t-1)) + omega*a_i(t)
+
+with kappa, omega >= 0 and x(-1) = x(0). The first term rewards recent change. We described the second as creating persistence in allocation; the analysis below shows it is a rich-get-richer rule. This novelty-and-inertia controller is kept as a comparison condition. The first draft warned that it may reward noise or get stuck. Both can now be stated precisely. [A; G]
+
+What the inertia term does
+
+Let the states stop changing, or set kappa = 0. The allocation map becomes
+
+a(t+1) = (1-eta)*a(t) + eta*softmax(beta*a(t)),  with beta = omega/T
+
+and its fixed points satisfy a_i = exp(beta*a_i)/Z. This is the self-consistency equation of the mean-field Potts model with N states. [D; K; R23]
+
+Uniform allocation is stable exactly when beta < N: the linearized map multiplies any zero-sum perturbation of the uniform state by (1-eta) + eta*beta/N. [D]
+
+A fixed point takes at most two distinct values, because a*exp(-beta*a) rises and then falls. Suppose two or more processors share the larger value m and the rest hold l < m. The fixed-point condition gives beta = log(m/l)/(m-l), which exceeds 1/m, and the perturbation that shifts allocation between two of the winners is multiplied by (1-eta) + eta*beta*m, which exceeds 1. Every shared-winner state is unstable. The only attractors of the inertia term are uniform allocation and single-winner states. [D]
+
+For N > 2 the single-winner branch appears before the uniform state loses stability. For N = 16 it exists for beta above about 5.19, so between 5.19 and 16 both attractors coexist and history decides which is reached. [D]
+
+A reciprocal loop needs shared gain. The gain around a cycle through processors j_1, ..., j_k is proportional to the product gamma_j1*...*gamma_jk, which for a fixed total is largest when the members share equally and goes to zero when any one member's gain does. The allocations that support recurrence are the ones the inertia term cannot hold. [D]
+
+The novelty term has its own limit. A coalition that holds a state still earns nothing from it, while noise and the decay of a fading memory both count as change. [D] Section 11 measures the consequences.
+
+Two replacement scores
+
+Write the recurrent part of the drive and the rest of it as
+
+r_i(t) = sum_j w_ij(t)*gamma_j(t)*x_j(t)
+e_i(t) = sum_l U_il*u_l(t) + sigma*xi_i(t)
+
+so that z_i = b_i + r_i + e_i. Both are quantities processor i already receives. Two scores built from them are:
+
+support plus novelty:   s_i(t) = kappa_r*abs(r_i(t)) + kappa_n*abs(x_i(t)-x_i(t-1))
+support plus surprise:  s_i(t) = kappa_r*abs(r_i(t)) + kappa_e*abs(e_i(t))
+
+The support term rewards a processor for being driven by attended neighbours, so allocation can spread along attended connections and be shared within a reciprocally connected group. The surprise term rewards drive that the attended recurrence does not account for, which in this model is external input plus noise. Neither score contains a candidate set S. Both are design choices, not derived principles, and neither knows anything about task relevance. [A; G]
+
+Scaling
+
+The quantity sum_j abs(w_ij)*gamma_j equals the row sum of abs(W) at uniform allocation and can reach N*max_j abs(w_ij) when allocation concentrates on the strongest source. If w_max < 1, the network at uniform gain is a contraction (Section 8) and nothing outlasts the leak. If N*max abs(w_ij) < 1, that holds for every allocation and attention cannot create persistence at all. The regime of interest lies between: w_max < 1 < N*max abs(w_ij), quiet without attention and able to sustain activity where gain concentrates. [D]
+
+Coupling
+
+An optional slow coupling rule is:
+
+W(t+1) = Proj_CW[(1-delta)*W(t)
+               + eta_w*v(t)*v(t)^T]
+
+v_i(t) = gamma_i(t)*x_i(t)
+
+C_W = {W: w_ii = 0 and sum_j abs(w_ij) <= w_max for every i}
+
+Proj_CW is Euclidean projection onto this closed convex constraint set. Let 0 <= delta <= 1, eta_w >= 0, and w_max > 0. The projection bounds incoming coupling; the activity product is a simple associative rule. It is not a learning theorem. Set delta = eta_w = 0 and initialize W in C_W for a fixed-coupling baseline. [A]
+
+This gives a feedback loop: allocation changes state interactions, states change allocation, and optional plasticity changes later interactions. None of these equations contains the candidate boundary S. That omission prevents a chosen membership set from being directly installed by the detector. It does not prevent the architecture or learning rule from biasing what can emerge. [A]
+
+The complete dynamical state includes x(t), x(t-1), a(t), and W(t). Attention has not been placed outside the mechanism as an unexplained observer. But its global normalization still spans V. A small coalition may therefore depend on an outside controller. [G]
+
+The chosen measurement pool V is a real modeling boundary. "No predetermined boundary" means no predetermined candidate S inside that pool. It does not mean analysis without a substrate, variables, or a scale.
+
+
+5. MEASURING RECURRENT CAUSAL DEPENDENCE
+
+We need to ask what actually changes when internal communication is interrupted. Correlation is insufficient.
+
+Choose a candidate S with at least two processors. Split it into a nonempty subset A and its complement B = S minus A. A directed cut A -> B replaces messages from A to B with a declared reference value, here zero, while preserving the remaining mechanisms. It does not clamp every outgoing connection from A everywhere. [A]
+
+Let p_S(x' | do(x), c) be the intact one-step transition density. x is an experimentally assigned state of S; c specifies the outside state, current allocation, and coupling parameters held fixed during the probe. Let p_cut be the transition density after the directed cut. Average over a declared intervention distribution q(x,c):
+
+D(A -> B) = E_q[KL(p_S(. | do(x),c) || p_cut(. | do(x),c))]
+
+R(S) = min over all nonempty proper A in S of D(A -> S minus A)
+
+KL(p || q) = integral p(z)*log(p(z)/q(z)) dz
+
+R asks whether there is an internal direction whose removal makes little difference. Both directions of every bipartition are considered because A ranges over all nonempty proper subsets. R is a weakest-directed-cut diagnostic. [A]
+
+This is not IIT's integrated information. It tests one restricted form of recurrent causal dependence, not a complete cause-effect structure, semantic integration, synergy, or consciousness. [A]
+
+The cut convention matters. Replacing a message by zero, independent noise, or a context-matched sample asks different questions. The intervention ensemble matters too: a probe near the operating state can disagree with a probe across the full accessible range. Both must be reported.
+
+An exactly solvable case
+
+Consider a separate linear-Gaussian model:
+
+X'_S = M_SS*X_S + M_SE*c + epsilon
+
+epsilon ~ Normal(0, sigma^2*I)
+X_S under q ~ Normal(0, I)
+
+Assume sigma > 0, independent noise, and the same fixed external state c in both conditions. The first draft called this an analytical surrogate for the bounded tanh network. For one-step R it is more than that, as shown below. [A]
+
+Equal-covariance Gaussian distributions have:
+
+KL = ||intact mean - cut mean||^2 / (2*sigma^2)
+
+Write DeltaM for the matrix containing only the cut connections. Since E_q[X_S*X_S^T] = I:
+
+D(A -> B) = ||M_BA||_F^2 / (2*sigma^2)
+
+R(S) = min_A [sum_(i in B, j in A) M_ij^2] / (2*sigma^2)
+
+The squared Frobenius norm ||M_BA||_F^2 is the sum of its squared entries. These identities follow by averaging a quadratic form. [D]
+
+For a nonidentity intervention covariance Q and output-noise covariance Sigma, the corresponding expression is:
+
+D(A -> B) = (1/2)*trace(Sigma^(-1)*DeltaM*Q*DeltaM^T)
+
+provided the means are centered and the covariances are positive definite as needed. Consistent changes of units leave the KL unchanged, but changing perturbation scales or the noise model changes the experiment. R is not a protocol-independent measure of intrinsic existence. [D]
+
+In the isotropic case, R(S) > 0 exactly when the directed graph of nonzero internal coefficients is strongly connected. To see why, every proper subset must have an outgoing edge. If the graph is not strongly connected, a sink component supplies a cut with no outgoing edge. Conversely, strong connectivity supplies an outgoing edge across every such cut. [D]
+
+This transparent limitation is useful: the linear diagnostic measures noise-scaled recurrent connectivity. It does not somehow extract a deeper ontology from a matrix.
+
+In the linear-Gaussian case D(A -> B) is half the summed signal-to-noise ratio of the messages crossing the cut, so r_0 = 3 nats asks the weakest directed cut for a ratio of at least 6. R is not an amount of transmitted information, and it grows without limit as the noise vanishes. [D]
+
+The same construction under another name
+
+Write C_ij = M_ij^2/(2*sigma^2) for the capacity of the edge from j to i. Then R(S) is the minimum, over all two-way splits of S, of the smaller of the two directed sums of capacity across the split. That is the min-cut weight of bidirectional connection strength defined by Kitazono, Aoki, and Oizumi for anatomical networks. We arrived at it from interventions and they from connection weights; the object is the same. [K; D; R21]
+
+One-step R in the Section 4 model: exact, and blind to saturation
+
+In Section 4 the noise enters before the tanh. For an assigned state x, the map from the noisy pre-activation to the next state is strictly increasing in every coordinate, and KL divergence is unchanged when one invertible map is applied to both distributions. The one-step divergence between intact and cut dynamics therefore equals the divergence between two Gaussians in pre-activation space, with equal variance sigma^2 and means that differ by the removed message:
+
+D(A -> B) = E_q[ sum_(i in B) ( sum_(j in A) w_ij*gamma_j*x_j )^2 ] / (2*sigma^2)
+
+This holds exactly for every rho, bias, and external input. For a zero-mean product probe with E[x_j^2] = q_j:
+
+D(A -> B) = sum_(i in B, j in A) (w_ij*gamma_j)^2*q_j / (2*sigma^2)
+
+The probe must stay inside [-1,1]: independent random signs give q_j = 1, and a uniform probe gives q_j = 1/3. [D]
+
+So the linear-Gaussian case is the exact answer for the tanh network, with M_ij = w_ij*gamma_j. Two consequences follow. Computed this way, R is a weakest cut of attention-gated wiring; nothing about the state dynamics enters it. And it cannot register saturation: a processor pinned near +1, which barely responds to anything, counts as fully responsive. Section 8 notes that a small Jacobian and a small KL divergence are different claims. Here the difference decides what the boundary detector can see. [D]
+
+Seeing saturation requires a readout
+
+Let whatever reads the next state see it through additive Gaussian noise of standard deviation tau. By the data-processing inequality the observed divergence cannot exceed the expression above. To leading order in small noise, a removed message m into processor i then contributes
+
+m^2 / ( 2*( sigma^2 + tau^2*cosh^4(z_i)/rho^2 ) )
+
+As tau goes to zero this returns the saturation-blind value. As sigma goes to zero the contribution becomes exactly
+
+rho^2*( tanh(z_i) - tanh(z_i - m) )^2 / (2*tau^2)
+
+for a message of any size. [D]
+
+For a small probe of size s around the operating state, with the cut reference set to the operating-state message instead of zero, the second form is additive over edges with capacities J_ij^2*s^2/(2*tau^2), where J is the off-diagonal part of the state Jacobian of Section 8. Locally, readout-limited R is the weakest directed cut of the squared Jacobian. [D]
+
+That gives three recurrence measures, which ask different questions of the same coalition:
+
+R_gate: is the gated wiring recurrent? Internal noise only; blind to saturation.
+R_J: does a small disturbance propagate? Local probe, finite readout.
+R_obs: does removing a message visibly change the next state? Zero-reference cut, finite readout.
+
+Sections 8 and 11 show them disagreeing by a factor of several hundred on a single attractor. A boundary claim has to say which one it used, with its noise and readout model. [D; T]
+
+These probes freeze allocation and plasticity. They characterize the active processor layer conditional on its controller. A stronger claim about an autonomous whole would require interventions on the controller and learning dynamics as well. [G]
+
+
+6. BROADCASTING MUST BE USEFUL TO SOMETHING
+
+Before searching for S, declare K reader modules and their tasks. Use the same readers when comparing candidate boundaries. They may be external evaluation modules; they are not a preinstalled central workspace. "Global" will mean broad access across this specified collection, not universal reach. [A]
+
+For reader k, measure loss on intact trials and on trials where the candidate's outgoing messages are jointly shuffled across otherwise matched trials. The shuffle preserves their marginal amplitude and within-message structure while breaking their relationship to the correct trial. Keep reader parameters fixed. [A]
+
+Delta_k(S) = E[loss_k with shuffled messages]
+             - E[loss_k with intact messages]
+
+B_use(S) = (1/K)*sum_k 1{Delta_k(S) > d_k}
+
+Here d_k > 0 is a prespecified task-relevant margin. The indicator is 1 when the condition holds and 0 otherwise. With finite data, replace the population comparison by a prespecified uncertainty criterion, such as a lower confidence bound above d_k. [A]
+
+B_use is high when several readers genuinely benefit from the candidate's information. Sending a large signal everywhere is insufficient. Readers with duplicated tasks are not independent evidence of broad functional diversity; report the task set and the individual Delta_k values. [A]
+
+A message intervention can still create an unrealistic operating condition. Use context-matched shuffles, amplitude-matched controls, and checks for generic performance collapse. Without such controls, the result may measure disruption rather than selective information use. [G]
+
+Broadcasting need not involve receiving and transforming information. For an open linear subsystem:
+
+z(t+1) = A*z(t) + B*u(t)
+y(t) = C*z(t)
+
+Mediated response terms include C*A^l*B for l >= 0. Nonzero B and C can occupy disconnected directions, making every product zero. This control-theoretic distinction informs the close precedent [R13]. [K; D]
+
+For a full workspace claim, useful content access, receiving, transformation, and outgoing effects would all require testing. B_use alone establishes only the declared form of usable broadcasting. [G]
+
+Recurrence-dependent use
+
+B_use asks whether readers rely on what S sends. It does not ask whether what S sends depends on what S does internally. For a declared horizon of h updates, define
+
+Lambda_k(S) = E[loss_k with every message internal to S replaced
+                by the reference value for the h updates before readout]
+              - E[loss_k with intact messages]
+
+C_use(S) = (1/K)*sum_k 1{Lambda_k(S) > d_k}
+
+with outgoing channels and reader parameters left unchanged. [A]
+
+C_use is the link between the two halves of the proposal. It is high only when the content the readers use is something the internal interactions of S sustain. The close precedent makes the corresponding point about receiving and broadcasting: separate input and output capacities do not make a mediator unless an internal route connects them. [K; R13] Example F in Section 9 shows a unit that passes R and B_use while its recurrence contributes nothing to what the readers use.
+
+Lambda removes all internal messages at once. It measures total dependence on recurrence, where R measures the weakest directed cut. Section 8 shows the two differing by orders of magnitude on one coalition.
+
+
+7. TURNING DIAGNOSTICS INTO A BOUNDARY
+
+Let C be a candidate family fixed before evaluation. In a small simulation it can contain every subset of V with 2 <= |S| <= k_max. Larger searches require a stated approximation.
+
+Define the eligible family at time t:
+
+F_t = {S in C: R_t(S) >= r_0, B_use,t(S) >= b_0,
+       and C_use,t(S) >= c_0}
+
+r_0, b_0, and c_0 are declared thresholds, not universal constants of nature. In practice the quantities are estimated over specified local windows or repeated matched trials, not from a single observed state. [A]
+
+F_t is allowed to be empty. It is allowed to contain overlapping candidates. A largest score is not enough: every finite list has a maximum even if every candidate is poor.
+
+Which eligible sets to report
+
+The first draft suggested reporting inclusion-minimal eligible sets when compactness is the question. For the recurrence criterion that rule fragments. In a clique of n processors with equal capacity u on every edge, each k-subset has R = (k-1)*u. The inclusion-minimal sets with R >= r_0 are then all the subsets of one particular size: for n = 6 and r_0 = 2*u, twenty overlapping triples and never the clique. [D]
+
+Maximal sets behave better. Call the cut measure additive when D(A -> B) is a sum of non-negative edge capacities, as it is in Section 5 for zero-mean product probes and for the local Jacobian form.
+
+Proposition (nested, non-overlapping units). Under an additive cut measure, for any threshold r the inclusion-maximal sets with R >= r are pairwise disjoint, and raising r can only shrink or split them. [D]
+
+Reason: suppose S and T overlap and each has R >= r. Any split of their union into two non-empty parts must split S or split T: if each lay wholly on one side, their shared processors would put them on the same side and leave the other side empty. The edges crossing the split of S, or of T, are among the edges crossing the split of the union, and capacities are non-negative. So the union also has R >= r, and two overlapping maximal sets must be the same set. Nesting follows because a set that passes a higher threshold passes every lower one.
+
+This is the hierarchy of complexes described by Kitazono and colleagues, who also give an exact procedure: split the pool at its weakest cut, split each side at its weakest cut, and continue down to single processors. Every unit is among the N-1 sets visited. [K; R20, R21]
+
+We therefore report, for the recurrence criterion, the maximal sets at every threshold as a tree, and apply the access tests to the members of that tree. A threshold r_0 then selects a level of the tree; it does not manufacture the units. If hierarchical organization is the question, retain the whole tree. This reduces observer dependence without removing it: the capacities still depend on the probe, the noise and readout model, and the scale. No reporting rule supplies an observer-independent unique individual. [A; G]
+
+Additivity can fail. With correlated probes, or with zero-reference cuts through a saturating nonlinearity when messages of opposite sign cancel, removing two messages can change less than removing one. The proposition is then not guaranteed, and the search must be declared: exhaustive over small candidates, or recursive splitting used as a heuristic and checked against enumeration. [D; G]
+
+Persistence
+
+For a sequence of units S_t, define membership continuity over L >= 2 observations:
+
+P_L = (1/(L-1))*sum_s J(S_s, S_(s-1))
+
+J(A,B) = |A intersection B| / |A union B|
+
+The sum runs over the L-1 successive pairs in the observation window. To form sequences, link each unit at time t to the unit at t-1 with which it has the largest overlap J, provided that overlap is at least a declared j_0. An operational object episode is a linked track that remains eligible and satisfies P_L >= p_0. Tracks end when eligibility fails. Because a high average can conceal abrupt replacement, also treat zero-overlap transitions as track breaks unless an independently tested state-transfer mechanism supports continuity. When two units link to the same predecessor or successor, record a split or a merger. Ties, mergers, and splits should be retained rather than forced into one story. [A]
+
+This definition separates four questions:
+
+R: Do internal directed interventions matter across every split?
+B_use: Do other modules use the information?
+C_use: Does what they use depend on the internal interactions?
+P_L: Does the selected membership persist?
+
+P_L is not a memory-capacity measure. A frozen cluster can have perfectly stable membership and do nothing useful. Smoothing a detector can also inflate P_L without changing the network. Report persistence both before and after any smoothing. [D; G]
+
+If processors are replaced over time, membership overlap may underestimate continuity of the computation. Then a separate criterion is needed, such as preservation of a learned input-output map together with causal transfer of state to replacement processors. Similarity of outputs by itself does not prove the same individual continued. [S; G]
+
+Differentiation and dependence remain separate
+
+To detect collapse toward a single fluctuating mode, one optional diagnostic is:
+
+D_eff = (sum_i lambda_i)^2 / sum_i lambda_i^2
+
+where lambda_i are the nonnegative eigenvalues of a state covariance matrix in fixed, declared units. Set D_eff = 0 when all variances vanish. For nonzero covariance, 1 <= D_eff <= |S|. Perfect common-mode variation gives D_eff = 1. [A; D]
+
+Independent noise can produce high D_eff, so it must be assessed with task performance and perturbation responses. It is not the number of useful concepts or experiences in the system.
+
+Likewise, the predictive-closure condition
+
+I(X_S(t+1); X_E(t) | X_S(t)) = 0
+
+says that the observed exterior adds no predictive information after conditioning on the observed interior. It does not establish causal independence. For example, if an external persistent bit is continuously copied by a processor, knowing the processor can already reveal the external bit even though the exterior drives every update. [D; R8]
+
+A computational coalition can be open and useful without being autonomous. To investigate autonomy, intervene on external drives and allocation mechanisms, and measure which capabilities and internal processes survive. Complete isolation is not a sensible universal requirement for an information-processing system. [A]
+
+
+8. ATTENTION CAN CHANGE A BOUNDARY, BUT NEED NOT IMPROVE IT
+
+In the tanh model, freezing a and W gives the state Jacobian:
+
+J_ij = (1-rho)*delta_ij
+       + rho*sech^2(z_i)*w_ij*gamma_j
+
+delta_ij is 1 for i=j and 0 otherwise; sech(z) = 1/cosh(z). [D]
+
+Increasing gamma_j strengthens the explicit gain factor but may also drive tanh toward saturation, where sech^2(z_i) becomes small. Therefore more allocation does not universally mean more effective causal influence or better performance. [D]
+
+For two trajectories with the same imposed a(t), W(t), inputs, and noise realization, suppose:
+
+max_i sum_j abs(w_ij(t))*gamma_j(t) <= c < 1 for every t
+
+Because tanh is 1-Lipschitz:
+
+||x(t+1)-x_tilde(t+1)||_infinity
+<= [(1-rho)+rho*c]*||x(t)-x_tilde(t)||_infinity
+
+The trajectories contract under these conditions. This is a sufficient statement about the driven state dynamics. Once a and W react differently to the two trajectories, it does not prove stability of the joint adaptive system. That requires analysis of the complete update. [D; G]
+
+This identifies a real tension: very rapid contraction can erase useful history, while long persistence can amplify noise or impede adaptation. An intermediate allocation or coupling regime might best support a particular task, but that is a task-dependent hypothesis, not a universal criticality law. [S]
+
+A small Jacobian and a small KL divergence are different claims. An ideal invertible transformation, including tanh before any rounding, preserves KL between transformed input distributions. Claims about information lost through saturation therefore need an appropriate output-noise or measurement-precision model. Section 5 shows that with noise inside the tanh the consequence is exact: one-step R cannot see saturation at all. [D]
+
+Gain helps, then hurts: a clique at its attractor
+
+Take k processors connected all-to-all with the same effective coupling g = w*gamma on every edge and no input. For (k-1)*g > 1 the symmetric state x* = tanh((k-1)*g*x*) is an attractor of the noise-free dynamics, and its stability requires the local loop slope (k-1)*g*sech^2((k-1)*g*x*) to be below 1. The weakest directed cut removes one processor's message from the other k-1.
+
+For k = 4, rho = 0.5, sigma = 0.1, and tau = 0.05, evaluated at the attractor:
+
+g = 0.36: x* = 0.457; slope 0.854; R_gate = 4.06; R_obs = 1.64.
+g = 0.45: x* = 0.786; slope 0.516; R_gate = 18.8; R_obs = 3.49.
+g = 0.60: x* = 0.933; slope 0.234; R_gate = 47.0; R_obs = 2.17.
+g = 0.80: x* = 0.982; slope 0.085; R_gate = 92.6; R_obs = 0.64.
+g = 1.00: x* = 0.995; slope 0.031; R_gate = 148; R_obs = 0.15.
+
+R_gate rises without limit. R_obs peaks at 3.49 nats near g = 0.45 and then collapses: each processor is held near saturation by its remaining inputs, so losing one of them hardly moves it. At g = 1.00, removing every internal message at once changes the readout by about 107 nats. [D]
+
+Three things follow. A stable memory is locally insensitive by construction, so a locally probed measure such as R_J will look weak on it. Robustness to the loss of one member and a high weakest-cut score pull in opposite directions, because the redundancy that provides the first destroys the second. And under a readout-limited measure the eligible region for a coalition is a band of gain, with an upper edge as well as a lower one: with r_0 = 2 this clique qualifies only for g between about 0.37 and 0.61. [D]
+
+Whether trained, heterogeneous networks show such a band, and whether it matters for any task, is an empirical question. [S]
+
+
+9. EXACT EXAMPLES: THE PROPERTIES COME APART
+
+Example A: correlation without internal causal organization
+
+Let U, e_1, and e_2 be independent, centered random variables with:
+
+Var(U) = 1
+Var(e_1) = Var(e_2) = 0.01
+
+X_1 = U + e_1
+X_2 = U + e_2
+
+Then:
+
+Corr(X_1,X_2) = 1/1.01 = 0.990099...
+
+Suppose each update is produced this way, with no edges between processors 1 and 2. Every internal cut leaves their update mechanism unchanged, so R({1,2}) = 0. Strong correlation has not created recurrent causal dependence. [D]
+
+Example B: an internally recurrent pair
+
+Let:
+
+x_1(t+1) = g*x_2(t) + epsilon_1(t)
+x_2(t+1) = g*x_1(t) + epsilon_2(t)
+
+with independent epsilon_i ~ Normal(0, sigma^2). Under the independent unit-variance interventions of Section 5:
+
+R({1,2}) = g^2/(2*sigma^2)
+
+Set g = 0.8 and sigma = 0.2:
+
+R = 8 nats
+
+Now disconnect all outgoing channels to readers. B_use = 0. The pair passes the recurrent-dependence test and fails the broadcasting test. [D]
+
+At stationarity the equal-time correlation between x_1 and x_2 is exactly zero: Cov(x_1(t+1), x_2(t+1)) = g^2*Cov(x_1(t), x_2(t)), whose only stationary solution is zero. The dependence is entirely lagged, with Cov(x_1(t+1), x_2(t)) = g*sigma^2/(1-g^2) = 0.0889. Together with Example A this is a double dissociation between equal-time correlation and R. [D]
+
+Example C: usable broadcast
+
+Under an independent probe, let the content be:
+
+c = (x_1+x_2)/sqrt(2)
+
+Because the intervention assigns independent standard Gaussian x_1 and x_2, c is standard Gaussian. Each of three readers receives:
+
+y_k = h*c + nu_k
+nu_k ~ Normal(0, s^2), independently
+
+Reader 1 estimates c using squared error. Reader 2 estimates -c using squared error. Reader 3 classifies whether c > 0. These are three declared uses of one scalar, not three independent informational dimensions. [A]
+
+For the regression readers the optimal intact coefficient has magnitude:
+
+w = h/(h^2+s^2)
+
+Keep that coefficient fixed when c in the message is replaced by an independent standard Gaussian c_tilde. The correct target remains the original c. Direct expansion of squared error gives:
+
+L_intact = s^2/(h^2+s^2)
+L_shuffled = 1 + h^2/(h^2+s^2)
+Delta_regression = 2*h^2/(h^2+s^2)
+
+For h >= 0, the optimal sign reader uses the sign of y. Its intact error is:
+
+L_sign = arccos(h/sqrt(h^2+s^2))/pi
+
+The formula follows from the angular sign-disagreement probability for a centered bivariate Gaussian. After independent shuffling the error is 1/2:
+
+Delta_sign = 1/2 - L_sign
+
+At h = 0.6 and s = 0.2:
+
+L_intact = 0.1
+L_shuffled = 1.9
+Delta_regression = 1.8
+L_sign = 0.102416...
+Delta_sign = 0.397584...
+
+Take d_1 = d_2 = 0.2 and d_3 = 0.05. Every reader passes its margin, so B_use = 1. [D]
+
+These large loss differences are not a percentage gain: a fixed decoder confidently using the wrong shuffled content can be worse than a decoder that ignores all input. The intervention measures reliance on useful content. It does not measure the best possible retrained system in each condition.
+
+Example D: broadcasting without recurrence
+
+Replace the reciprocal pair by a one-way chain:
+
+x_1(t+1) = epsilon_1(t)
+x_2(t+1) = g*x_1(t) + epsilon_2(t)
+
+The cut from processor 2 toward processor 1 removes no edge, so R = 0. The same content probe and readout channels can still give B_use = 1. [D]
+
+Consequently:
+
+High R does not imply high B_use.
+High B_use does not imply high R.
+High correlation does not imply high R.
+High R does not imply high correlation.
+
+A one-way processor can still compute usefully. Our recurrence requirement excludes it from the particular class being defined; it does not prove that feedforward computation is inferior or unconscious. [A]
+
+Example E: persistent dynamics and their cost
+
+In the reciprocal pair, the symmetric mode z = (x_1+x_2)/sqrt(2) obeys:
+
+z(t+1) = g*z(t) + epsilon_z(t)
+
+For 0 < g < 1, an initial perturbation decays as g^k after k updates. Its decay time in updates is:
+
+tau_memory = -1/log(g)
+
+Independent noise accumulates to stationary variance:
+
+Var(z) = sigma^2/(1-g^2)
+
+At sigma = 0.2:
+
+g = 0.80: tau_memory = 4.4814; stationary variance = 0.1111.
+g = 0.98: tau_memory = 49.4983; stationary variance = 1.0101.
+
+Increasing recurrence lengthens the impulse lifetime but also increases stationary variance. These are exact properties of this linear stochastic system, not a universal trade-off curve for brains. Impulse persistence is also not a measurement of total task memory capacity. [D]
+
+Example F: both tests pass and the recurrence is idle
+
+Combine Examples B and C. The reciprocal pair with g = 0.8 broadcasts c = (x_1+x_2)/sqrt(2), computed from the assigned state. R = 8 nats and B_use = 1, so the pair passes both tests for any r_0 up to 8. But cutting its internal edges leaves every reader's loss unchanged: Lambda_k = 0 for all three readers and C_use = 0. The readers use the state the experimenter assigned, not anything the reciprocal interaction did. The pairs of Section 10 have the same property. [D]
+
+Now let the message be sent after l updates, and let a reader estimate the symmetric mode z(0) that was assigned. The intact message is h*z(l) + nu, where z(l) is g^l*z(0) plus accumulated noise of variance sigma^2*(1-g^(2*l))/(1-g^2). With the internal edges cut during the delay, z(l) is fresh noise of variance sigma^2. Fit the squared-error decoder to the intact system and hold it fixed. For l = 3 and the parameters of Examples B and C:
+
+L_intact = 0.4242
+L_internal_cut = 1.1911, so Lambda = 0.7670
+L_shuffled = 1.5758, so Delta = 1.1517
+
+Here the content the reader uses exists only because the pair kept exchanging it. The same wiring passes or fails the linking test depending on whether the task needs what the recurrence sustains. Passing R and B_use together does not show that one serves the other. [D]
+
+
+10. AN ATTENTION-CONTROLLED CHANGE OF BOUNDARY
+
+Consider two disconnected candidate pairs, S_A = {1,2} and S_B = {3,4}. This is an intentionally constructed example, not a spontaneously developed network.
+
+Give the pairs allocation weights a_A and a_B with:
+
+a_A + a_B = 1
+
+In a simplified gate model, set each pair's gains to:
+
+g(a) = 0.8*a
+h(a) = 0.6*a
+sigma = s = 0.2
+
+This uses coalition-level allocation to make the calculation transparent. For the recurrence half it is exact for the Section 4 state equation: with N = 4, reciprocal weights of 0.4 inside each pair, allocation split equally inside a pair, independent random-sign probes, and sigma = 0.2, Section 5 gives R = 8*a^2 for a pair holding allocation a. The broadcast half remains a simplified gate. Each pair is probed under the same reader protocol, with the other pair held at its reference state and each regression reader refitted at each allocation. A reader fitted once at a = 1 and never refitted gives loss differences of 0.18, 0.90, and 1.62 at the three allocations below, and the same pattern of passes. [A; D]
+
+Then:
+
+R(a) = 8*a^2
+
+Using the margins from Example C:
+
+a = 0.1: R = 0.08; B_use = 1/3.
+a = 0.5: R = 2.00; B_use = 1.
+a = 0.9: R = 6.48; B_use = 1.
+
+Declare r_0 = 3 and b_0 = 2/3. [A]
+
+At allocations (a_A,a_B) = (0.9,0.1), only S_A is eligible.
+At allocations (0.1,0.9), only S_B is eligible.
+At allocations (0.5,0.5), neither pair is eligible.
+
+Because the pairs are disconnected, their union has a zero directed cut and is ineligible as well. The reader boundary remains fixed across these comparisons. [D]
+
+In this constructed case, a pair crosses the recurrence threshold when:
+
+a >= sqrt(3/8) = 0.612372...
+
+The example establishes a limited possibility: fixed physical processors can support changing functional membership under a fixed operational criterion. A period of divided allocation can also leave no qualifying coalition. [D]
+
+It does not establish a physical phase transition. The gains vary continuously; the boundary label changes abruptly because we applied a threshold. Demonstrating a dynamical bifurcation would require identifying a change in attractors or stability in the underlying equations. [G]
+
+Likewise, no endogenous selection is demonstrated in this example. We supplied the allocation. Section 11 reports a first test with an endogenous controller, on planted structure. [G]
+
+The example also depends on which recurrence measure is used. With the saturation-blind form used here, more allocation can only help a pair. Under a readout-limited form, Section 8 shows an upper edge as well: a coalition can be given too much gain to count. [D]
+
+
+11. A FIRST PLANTED RUN
+
+This section is the only use of the [T] tag. It is a constructed existence test. The coalitions were wired in by hand, the coupling was fixed, and the task needs only recency, not relevance. It says nothing about spontaneous organization.
+
+Design
+
+N = 16, rho = 0.5, sigma = 0.1, eta = 0.2, T = 1, zero biases, no plasticity. Two planted quads, G1 = {1, 2, 3, 4} and G2 = {5, 6, 7, 8}, are connected all-to-all with weight 0.25. Every other weight is drawn from Normal(0, 0.015^2), and networks are redrawn until every row sum of absolute weights is at most 0.95. The network at uniform gain is therefore a contraction, while a quad holding nearly all the allocation has loop gain close to 3. [A; D]
+
+After 10 quiet steps a random sign is injected into G1 for 5 steps at amplitude 2. Sixty silent steps follow. A second random sign is then injected into G2 for 5 steps, followed by 60 more silent steps. A sign counts as held if, at the end of its delay, the quad's mean state has the correct sign and magnitude above 0.5. [A]
+
+Four controllers were compared: fixed uniform allocation; the novelty-and-inertia score first specified; support plus novelty; and support plus surprise (Section 4). Parameter grids were run on 50 selection seeds. The results below come from 200 further seeds used for no choice of any kind. Each seed sets a new network, new noise, and new signs. Predictions for the first and third grids were written before those grids were run. [A]
+
+Holding and switching
+
+Held-out rates for the first and second sign [T]:
+
+Uniform allocation: 0% and 0%. Sign accuracy was 53%, which is chance.
+Novelty and inertia, best of nine cells (kappa = 64, omega = 8): 27% and 21%.
+Support plus novelty (kappa_r = 2, kappa_n = 32): 89.5% and 59%.
+Support plus surprise (kappa_r = 2, kappa_e = 4): 100% and 100%.
+
+With support plus surprise, 99% of the allocation sat on the cued quad at each readout, and the first sign was released after the second cue in every trial.
+
+The prediction for the specified controller was a rate near zero in every cell. Seven of its nine cells did give 0% on the selection seeds, and with omega = 24, above the threshold N*T = 16 of Section 4, allocation collapsed onto a single processor in every selection trial. But the prediction was wrong for the best cell. At very high novelty gain the decay of a memory is itself a change; it attracts allocation and slows the decay. [T]
+
+For support plus novelty, a second grid toward weaker support and stronger novelty found nothing better than the cell above. More novelty gain made switching likelier and holding worse, because noise-driven change scatters the allocation. [T]
+
+For support plus surprise the prediction was specific: a new input captures the allocation when kappa_e times its amplitude exceeds the incumbent's support score, about 2.9*kappa_r in this design. All nine grid cells behaved as predicted, six switching in every selection trial and three in none. On 200 further seeds with kappa_r = 2 and kappa_e = 4, where the predicted threshold amplitude is 1.45, a second input of amplitude 1.0 or less never displaced the held sign, 1.25 displaced it in 1% of trials, 1.5 in 99.5%, and 1.75 or more in all. Both rates stayed at 100% for sigma between 0.05 and 0.3. [T]
+
+Lesions
+
+With support plus surprise on the held-out seeds, zeroing the twelve internal edges of G1 during the first delay, outgoing channels intact, left the first sign held in 0% of trials, with sign accuracy 50% and G1's share of allocation back at 24%. Zeroing the twelve internal edges of the unattended, identically wired G2 over the same steps left it held in 100%. This is the linking test of Section 6 passing against a matched control. [T]
+
+Boundaries
+
+Using gated capacities and recursive splitting of the whole pool (Section 7), the top unit at the first readout was exactly G1 in 200 of 200 trials, and exactly G2 at the second readout in 200 of 200. With static squared weights it was G1 in 51.5% of trials and G2 in 48.5%: the wiring cannot say which quad is active. Recomputed at every step in 60 trials, the top unit was exactly G1 at every step of the first delay in 56 of them, membership continuity P_L over that delay was 0.9997, and the top unit became G2 a median of 4 steps after the second cue began, with range 4 to 6. [T]
+
+The three recurrence measures of Section 5 disagreed about the same quad at the same instant. Medians over the held-out trials at the first readout: R_gate = 131.8 nats; R_obs = 0.145 nats at tau = 0.05; R_J = 0.00004 with probe size equal to tau; local loop slope 0.032. A coalition that carries the whole memory, and whose internal lesion abolishes it, would be ineligible under any readout-limited weakest-cut threshold above 0.15. [T]
+
+What this run does not show
+
+The boundary detector reported nothing that the allocation vector did not: the top unit was the quad holding the gain. Whether the diagnostics predict anything beyond allocation and wiring is Claim 1 of the next section, and it needs unplanted, heterogeneous networks. The surprise term lets the strongest recent input win and knows nothing of relevance. No reader was trained, no coupling changed, and every number is conditional on one wiring family. [G]
+
+
+12. WHAT WOULD COUNT AS A REAL TEST?
+
+The next stage should test the proposal against alternatives, not just generate attractive moving clusters.
+
+A proposed first experiment
+
+Use N = 16 processors and three reader modules. Fix the observation scale, the recurrence measure with its noise and readout model, and the candidate family before examining outcomes. For an additive recurrence measure, build the full unit tree by recursive splitting; it has at most N-1 = 15 members and needs no size limit. For a non-additive measure, search every candidate of size 2, 3, or 4: there are 120 + 560 + 1820 = 2,500 candidates. Where both can be computed, report where they disagree. [A; D]
+
+Present two independent streams of randomly generated payload bits plus a relevance cue. The cue identifies which stream matters. Remove the payloads, introduce distractors, and ask the readers to use the selected bit after a delay. One reader reports it, another combines it with a local bit, and another updates a small register. Generate correct targets from the stimulus generator, independently of the network. [A]
+
+Include unexpected cue changes and delays not used to train the readers. These held-out conditions test retention, selection, and transfer rather than merely fitting the original examples. Include distractor inputs at graded amplitudes: for the support-plus-surprise controller, Section 11 found a sharp amplitude below which a held coalition ignores them.
+
+Run the novelty-and-inertia controller and the support-plus-surprise controller of Section 4 as separate conditions, each with the Section 4 coupling rule, and choose weights in the regime w_max < 1 < N*max abs(w_ij). Train identical-capacity readers under identical budgets. If a more capable learned controller is later introduced, evaluate it as a separate model with matched training and parameter budgets; do not silently credit its improvements to emergent boundaries. [A]
+
+Networks initialized with a deliberately embedded recurrent group can check the detector; Section 11 is a first check of that kind. Separately use unplanted initial networks to ask whether useful organization develops. Recovering a group that was put there by hand is not evidence of spontaneous self-organization.
+
+Necessary comparison conditions
+
+1. The same network with fixed uniform allocation and fixed coupling.
+2. Changing allocation with fixed coupling.
+3. Changing coupling with fixed allocation.
+4. The full proposed adaptive model.
+5. A shared-workspace architecture motivated by [R9, R10], matched as closely as possible for parameters, computation, and training.
+6. Candidate selection using static connectivity, state correlation, or a size-matched random set.
+7. Candidate selection from the allocation vector alone: the processors holding the most gain. In the planted run this trivial rule did as well as the boundary detector.
+8. A mediation-based candidate detector from the close precedent [R13], if implementing and validating its stated estimator is feasible.
+
+Architectural comparisons should report any budget differences that cannot be matched. A boundary detector must not receive task answers or privileged simulator access unavailable to the alternatives without that advantage being disclosed. [A]
+
+Measurements
+
+Measure held-out task loss, recovery after cue changes, robustness to distractors, and performance after targeted interventions. Record each recurrence measure used (R_gate, R_J, R_obs) with its noise and readout model, every Delta_k and Lambda_k, B_use, C_use, membership persistence, and dimensionality separately. Report input and controller dependence rather than folding it into an unexplained scalar.
+
+Use a causal model known from the simulator or actual controlled interventions for causal claims. A fitted observational predictor can be useful, but fitting it does not automatically turn its coefficients into intervention effects. [A]
+
+Selection must be separated from evaluation. Fit readouts on training trials; set thresholds and search conventions on validation trials; identify candidate sets on separate probe trials; assess predictions on untouched trials and novel conditions. When searching many candidates, calibrate false discoveries against the best candidate found in each matched null network, not only against a typical null candidate. [A]
+
+For uncertainty, use multiple independent network initializations and stimulus seeds, with paired comparisons between conditions. An initial feasibility run might use 20 independent networks, but that number is a design suggestion, not a power calculation. Time samples from one trajectory are not 20 independent systems. [A]
+
+Four falsifiable research claims
+
+Claim 1: the combined boundary diagnostics identify units whose disruption harms held-out transfer more than disruption of equally sized, similarly weighted comparison sets. [S]
+
+Failure: they predict only the task losses already used to define B_use and C_use, or offer no additional prediction beyond static connectivity, the allocation vector, and mediation measures. With the saturation-blind R_gate the recurrence half reduces to allocation times wiring by construction, so this claim can only be tested with a state-dependent measure.
+
+Claim 2: endogenous allocation supports useful boundary reconfiguration after a context change under matched computational budgets. [S]
+
+Failure: apparent reconfiguration is equally common with shuffled cues, depends on manual scheduling, follows the strongest or most recent input instead of the relevant one, or does not improve any independent task outcome.
+
+Claim 3: adaptive coupling produces capabilities that allocation alone cannot reproduce under the tested budgets. [S]
+
+Failure: fixed-coupling networks match it, or gains disappear when additional training, weights, and computation are controlled.
+
+Claim 4: under a readout-limited measure, coalitions that carry task content occupy an intermediate band of gain, and coalitions driven above it keep their content while losing weakest-cut integration. [S]
+
+Failure: no upper edge appears in trained, heterogeneous networks, or it disappears when noise and readout precision are varied over a declared range.
+
+These are deliberately stronger than "a subset satisfied our definition." They can fail even when a detector finds beautiful, persistent boundaries.
+
+One essential double dissociation
+
+Interrupt internal recurrent paths while preserving outgoing channels. Separately interrupt or shuffle outgoing messages while preserving internal recurrence. Evaluate the already selected candidate as well as rerunning the detector afterward; silently changing the candidate after every lesion can conceal a failed prediction. The planted run of Section 11 performed the first of these on hand-wired structure, with a matched control.
+
+The analytical examples show that these interventions can dissociate R and B_use. Whether they produce the expected behavioral differences in an unplanted adaptive network remains an experiment. [D; S]
+
+No outcome of these computational tests would, by itself, establish subjective experience.
+
+
+13. WHAT REMAINS OPEN
+
+The origin of useful attention. The controller first specified rewards change and reinforces itself; in the planted run it mostly failed to hold a coalition. The support-plus-surprise score held one and released it for a stronger new input, but that is recency and strength, not relevance. A task-trained replacement may work better, but then its objective and supervision are part of the explanation. [T; G]
+
+Integration against robustness. A coalition that survives the loss of any one member is, for that reason, weakly dependent on each member. Once the measure can see saturation, the weakest-cut criterion and robust memory pull apart, and the planted quad shows the gap at full size. Whether a unit should be required to be irreducible, robust, or some declared mixture is unresolved. A total-dependence measure cannot draw a boundary by itself: a larger set has at least as many internal messages to remove, so under an additive measure the total never decreases when processors are added. [D; T; G]
+
+The origin of useful structure. Associative coupling can reinforce common input, noise, or a rigid attractor. It does not guarantee differentiated computation. The model must be allowed to fail. [G]
+
+Dependence on scale. Changing the sampling interval, processor granularity, candidate sizes, or reader tasks can change the selected boundary. A coarse-grained state z(t) = f(x(t)) need not have Markov dynamics even if the full state does. An apparently self-contained macro-object may require hidden history. The noise and readout model belongs on the same list: Sections 5, 8, and 11 show it changing the verdict on one coalition by orders of magnitude. [D; G]
+
+Computational cost. For additive measures the full unit tree needs N-1 weakest-cut computations. [K; R20, R21] For non-additive measures there are 2^N possible subsets before size restrictions, and each nontrivial candidate can require many cuts and many intervention trials. A submodular search has been reported to find the weakest partition almost perfectly for some non-submodular integration measures, which is encouraging but is not a guarantee for ours. [K; R19] A heuristic search that misses the relevant set has not shown that no such set exists. [D; G]
+
+Identity through change. Stable membership, preserved function, and causal continuity are different criteria. A theory of persistent individuals must say which it requires and how to handle fission, fusion, and replacement. Our episode definition supplies only a modest starting point. [G]
+
+Agency. A useful recurrent broadcaster need not choose goals, maintain its own resources, or act to preserve its organization. To investigate agency, add explicit actions, environmental consequences, objectives, and tests of closed-loop control. Calling the existing model an organism would outrun its specification. [G]
+
+Consciousness. Nothing here maps a computed boundary to a felt experience. The conjunction of two quantities inspired by different theories does not reconcile their philosophical commitments or establish either theory. A consciousness claim would need additional premises and independently discriminating evidence. [G]
+
+Novelty and advantage. The ingredients and several nearby combinations already exist in the literature, and the second pass found that the recurrence measure and the unit hierarchy are established constructs. This note offers an explicit formulation to investigate. It has not demonstrated a new law, an empirically superior architecture, or a priority claim. [?; G]
+
+
+14. THE PROPOSAL WE CAN ACTUALLY DEFEND
+
+The original intuition survives as a question about organization:
+
+Can a changing open system produce temporary collections of processes that are best understood as computational units because of what their internal interactions sustain and what their information enables elsewhere?
+
+We have made one interpretation precise:
+
+Candidate unit = a member of the recurrence tree that also passes declared useful-access and linking tests.
+
+Object episode = a temporally continuous track of qualifying subsets.
+
+Attention = a modeled allocation mechanism that can change the interactions supporting those subsets. [A]
+
+The exact examples establish that the defining properties are distinct, that the choice of noise and readout model can reverse the verdict on a single coalition, and that allocation can move, remove, or leave ambiguous an operational boundary. The planted run shows one endogenous controller forming, holding, and moving a hand-wired unit, and the controller first specified mostly failing to do so. Neither establishes that an adaptive mechanism discovers useful units in practice. [D; T; G]
+
+The next contribution must come from a comparison that could disappoint us: does the combined account predict or produce something that matched simpler systems do not?
+
+A boundary, in this research program, is a hypothesis about where a computation holds together. The task is to test what that hypothesis explains.
+
+
+APPENDIX: MATHEMATICAL AND NUMERICAL AUDIT
+
+All calculations were checked on October 4, 2026. A companion script, boundary_audit_and_toy.py, reproduces every number in this note. Checks of deductions concern algebra and arithmetic. Only Section 11 reports experimental outcomes, and only on planted structure.
+
+First pass
+
+For the directed-cut identity, a 4-by-4 coefficient matrix was generated using NumPy's default_rng with seed 20261004, with entries equal to 0.15 times standard normal samples. All 14 nonempty proper directed source subsets were tested at sigma = 0.2.
+
+An equally weighted intervention ensemble consisting of the 2N vectors +sqrt(N)*e_i and -sqrt(N)*e_i has mean zero and covariance I. Since the conditional Gaussian KL is quadratic in the assigned state, averaging its directly evaluated mean-shift expression over this ensemble reproduces its Gaussian expectation. The largest discrepancy from the squared-coefficient cut formula was approximately 4.44e-16.
+
+The regression example was checked by direct squared-error evaluation on a symmetric ensemble with the same joint second moments as three independent standard normal variables c, c_tilde, and standardized readout noise. It gave intact loss 0.1, shuffled loss 1.9, and loss difference 1.8 to floating-point precision.
+
+The sign-reader values were evaluated from the stated arccos expression; no classification simulation or empirical error estimate is claimed.
+
+The reciprocal pair's covariance was checked against its stationarity equation:
+
+V = M*V*M^T + sigma^2*I
+
+with M having zero diagonal and both off-diagonal entries g. The diagonal solution is sigma^2/(1-g^2). A strictly one-way acyclic coefficient matrix was also checked to have a zero minimum directed cut.
+
+The first pass reported no simulation of the tanh network. The second pass adds the planted run of Section 11. No result for learned attention, unplanted changing membership, or task superiority is reported; those remain the proposed experiments of Section 12.
+
+Second pass
+
+Saturation. The one-step KL of Section 5 was integrated numerically over the output variable, with the change-of-variables densities written out, for a removed message of 0.3 at sigma = 0.2 and base drives of 0, 1, 2, and 3. All four gave 1.125000 nats, equal to m^2/(2*sigma^2), while sech^2 of the drive ranged from 1 to 0.0099. With tau = sigma = 0.05 and a removed message of 0.05, numerical convolution gave 0.0994, 0.0196, 0.00057, and 0.000011 nats at the same four drives, against 0.0999, 0.0196, 0.00057, and 0.000011 from the leading-order formula. In the sigma -> 0 form with tau = 0.05, a message of 0.8 gave 22.05 nats at drive 0 and 0.00078 at drive 3, a ratio of about 28,000. The local-probe form converged to the squared-Jacobian expression: the ratio of the two was 0.987, 0.999, and 1.000 as the probe shrank from 0.2 to 0.0125 at drive 0.
+
+Unit hierarchy. In 300 random weighted directed graphs with five to eight nodes, R was computed for every subset. Maximal sets at each threshold were pairwise disjoint and nested across thresholds in every graph, and the family they form coincided in every graph with the units selected from the sets visited by recursive weakest-cut splitting. For a six-node clique with unit capacities, R of a k-subset was k-1, and thresholds of 1, 2, and 3 gave 15 pairs, 20 triples, and 15 quadruples as inclusion-minimal sets, against the whole clique as the single maximal set. One target with two sources of opposite sign under a perfectly correlated probe gave cut values of 0.5 for one source and 0 for both, in units of 1/sigma^2.
+
+Controller. For N = 2, 4, and 16 the largest eigenvalue of the softmax map on zero-sum perturbations of the uniform state equalled beta/N. For N = 16 every symmetric fixed point with one to four winners was located at beta = 10, 14, 20, and 40; all those with two or more winners were unstable, with leading eigenvalue beta*m. The single-winner branch began at beta = 2.746, 3.219, 4.250, and 5.189 for N = 3, 4, 8, and 16. From 200 random starts at N = 16 the map ended uniform in every run at beta = 8, in 97 runs at beta = 12, and at a single winner in every run at beta = 15, 17, and 24. From 200 starts with allocation shared by a pair it ended at a single winner in every run at beta = 12, 20, and 40.
+
+Examples. The reciprocal pair's stationary covariance was iterated to convergence: diagonal entries 0.1111, off-diagonal 0, lag-one cross-covariance 0.0889. The delayed-readout losses of Example F were confirmed by simulation with two million samples: 0.4234, 1.1898, and 1.5746 against 0.4242, 1.1911, and 1.5758. The sign-reader error of Example C, evaluated in the first pass only from its formula, was confirmed by simulation with four million samples: 0.10248 against 0.10242. The clique values of Section 8 use the numerical KL with sigma = 0.1 and tau = 0.05; the peak was 3.49 nats at g = 0.453, and R_obs stayed at or above 2 for g between 0.369 and 0.614.
+
+Planted run. Section 11 states the design. Selection seeds were 0 to 49, evaluation seeds 1000 to 1199, and robustness seeds 2000 to 2199; each seed sets the network, the noise, and the two signs. The companion script prints every grid cell, including the cells where the controller first specified did best, and prints each prediction before the run it concerns.
+
+
+REFERENCES
+
+Sources were checked on October 4, 2026. Publisher and author records support the descriptions above. Access varied: where only an abstract or indexed primary-source text was available, the account is limited accordingly. The recent preprints are not presented as established empirical conclusions.
+
+A second pass on the same day re-confirmed the arXiv records of [R13], [R14], and [R15] and, in passing, the bibliographic records of [R1], [R2], [R8], [R9], and [R10]. [R3]-[R7], [R11], and [R12] were not re-checked. [R16]-[R23] were added in the second pass; each entry states what was inspected.
+
+[R1] Albantakis, L., et al. (2023).
+Integrated information theory (IIT) 4.0: Formulating the properties of phenomenal existence in physical terms.
+PLOS Computational Biology, 19(10), e1011465.
+https://doi.org/10.1371/journal.pcbi.1011465
+Full-text source; substrate selection and exclusion sections inspected.
+
+[R2] Mashour, G. A., Roelfsema, P., Changeux, J.-P., and Dehaene, S. (2020).
+Conscious Processing and the Global Neuronal Workspace Hypothesis.
+Neuron, 105(5), 776-798.
+https://doi.org/10.1016/j.neuron.2020.01.026
+https://pubmed.ncbi.nlm.nih.gov/32135090/
+Primary abstract, figure descriptions, and indexed text inspected.
+
+[R3] Krakauer, D., Bertschinger, N., Olbrich, E., Flack, J. C., and Ay, N. (2020).
+The information theory of individuality.
+Theory in Biosciences, 139, 209-223.
+https://doi.org/10.1007/s12064-020-00313-7
+Full-text source; abstract and individuality formalism inspected.
+
+[R4] Tononi, G., and Edelman, G. M. (1998).
+Consciousness and complexity.
+Science, 282(5395), 1846-1851.
+https://doi.org/10.1126/science.282.5395.1846
+https://pubmed.ncbi.nlm.nih.gov/9836628/
+Primary abstract and author publication record inspected.
+
+[R5] Gross, T., and Blasius, B. (2008).
+Adaptive coevolutionary networks: a review.
+Journal of the Royal Society Interface, 5(20), 259-271.
+https://doi.org/10.1098/rsif.2007.1229
+https://arxiv.org/abs/0709.1858
+Primary abstract, indexed text, and publication records inspected.
+
+[R6] Palacios, E. R., Razi, A., Parr, T., Kirchhoff, M., and Friston, K. (2020).
+On Markov blankets and hierarchical self-organisation.
+Journal of Theoretical Biology, 486, 110089.
+https://doi.org/10.1016/j.jtbi.2019.110089
+https://discovery.ucl.ac.uk/id/eprint/10089189/
+Primary abstract, indexed text, and institutional record inspected.
+
+[R7] Bruineberg, J., Dolega, K., Dewhurst, J., and Baltieri, M. (2022; online 2021).
+The Emperor's New Markov Blankets.
+Behavioral and Brain Sciences, 45, e183.
+https://doi.org/10.1017/S0140525X21002351
+Publisher abstract and bibliographic record inspected.
+
+[R8] Chang, A. Y. C., Biehl, M., Yu, Y., and Kanai, R. (2020).
+Information Closure Theory of Consciousness.
+Frontiers in Psychology, 11, 1504.
+https://doi.org/10.3389/fpsyg.2020.01504
+Full-text source; informational closure, causality, and limitations sections inspected.
+
+[R9] VanRullen, R., and Kanai, R. (2021; preprint first posted 2020).
+Deep learning and the Global Workspace Theory.
+Trends in Neurosciences, 44(9), 692-704.
+https://doi.org/10.1016/j.tins.2021.04.005
+https://arxiv.org/abs/2012.10390
+Author abstract, version history, and indexed publication record inspected.
+
+[R10] Goyal, A., et al. (2022; preprint first posted 2021).
+Coordination Among Neural Modules Through a Shared Global Workspace.
+ICLR 2022.
+https://arxiv.org/abs/2103.01197
+https://openreview.net/pdf?id=XzTtHjgPDsT
+Full-text source; architecture, experimental overview, and conference status inspected.
+
+[R11] Vaswani, A., et al. (2017).
+Attention Is All You Need.
+Advances in Neural Information Processing Systems.
+https://arxiv.org/abs/1706.03762
+https://research.google/pubs/attention-is-all-you-need/
+Author abstract and research publication record inspected.
+
+[R12] COGITATE Consortium, et al. (2025).
+Adversarial testing of global neuronal workspace and integrated information theories of consciousness.
+Nature, 642, 133-142.
+https://doi.org/10.1038/s41586-025-08888-1
+https://pubmed.ncbi.nlm.nih.gov/40307561/
+Indexed primary abstract and institutional records inspected; a complete methods reanalysis was not performed.
+
+[R13] Kanai, R. (2026).
+A Control-Theoretic Formulation of Global Workspace Theory.
+arXiv:2608.15926v1, submitted August 16, 2026. Preprint.
+https://arxiv.org/abs/2608.15926
+https://arxiv.org/html/2608.15926v1
+Full-text source; formalism, changing coalitions, and limitations sections inspected. Second pass: abstract, Sections 1-7, and the candidate-size and boundary limitation of Section 10.6 re-read; the passage on endogenous attention was not re-located.
+
+[R14] Lubashevskiy, V., and Lubashevsky, I. (2026).
+A Non-Hermitian Potential Well Formalism for Conscious--Preconscious--Subliminal Processing.
+arXiv:2607.08302, submitted July 9, 2026. Preprint.
+https://arxiv.org/abs/2607.08302
+Indexed author abstract inspected; full-text retrieval was unavailable in this search.
+
+[R15] Galus, W. L., and Starzyk, J. A. (2026).
+Does Global Neuronal Workspace Theory Explain Phenomenal Consciousness? The Motivated Emotional Mind Challenge.
+arXiv:2609.38495v1, submitted September 29, 2026. Preprint.https://arxiv.org/abs/2609.38495
+Author abstract and version record inspected; full analysis not audited.
+
+[R16] Janzing, D., Balduzzi, D., Grosse-Wentrup, M., and Schoelkopf, B. (2013).
+Quantifying causal influences.
+The Annals of Statistics, 41(5), 2324-2358.
+https://doi.org/10.1214/13-AOS1145
+https://arxiv.org/abs/1203.6502
+Publisher record and abstract inspected; the cut-and-feed definition is summarized from general knowledge of the paper and was not re-read in this pass.
+
+[R17] Ay, N., and Polani, D. (2008).
+Information flows in causal networks.
+Advances in Complex Systems, 11(1), 17-41.
+Bibliographic record confirmed through two citing reference lists; the paper itself was not inspected in this pass.
+
+[R18] Oizumi, M., Tsuchiya, N., and Amari, S. (2016).
+Unified framework for information integration based on information geometry.
+Proceedings of the National Academy of Sciences, 113(51), 14817-14822.
+https://doi.org/10.1073/pnas.1603583113
+https://arxiv.org/abs/1510.04455
+Abstract and indexed record inspected.
+
+[R19] Kitazono, J., Kanai, R., and Oizumi, M. (2018).
+Efficient Algorithms for Searching the Minimum Information Partition in Integrated Information Theory.
+Entropy, 20(3), 173.
+https://www.mdpi.com/1099-4300/20/3/173
+https://arxiv.org/abs/1712.06745
+Abstract and indexed text inspected.
+
+[R20] Kitazono, J., Kanai, R., and Oizumi, M. (2020).
+Efficient search for informational cores in complex systems: Application to brain networks.
+Neural Networks, 132, 232-244.
+Bibliographic record from the authors' publication list; its algorithm is described here as summarized in [R21]. The paper itself was not inspected.
+
+[R21] Kitazono, J., Aoki, Y., and Oizumi, M. (2023; online 2022).
+Bidirectionally connected cores in a mouse connectome: towards extracting the brain subnetworks essential for consciousness.
+Cerebral Cortex, bhac143.
+https://doi.org/10.1093/cercor/bhac143
+https://www.biorxiv.org/content/10.1101/2021.07.12.452022.full.pdf
+Preprint full text inspected: definitions of bidirectional strength, min-cut weight, complex, and hierarchical partitioning, and the limitations section.
+
+[R22] Taguchi, T., Kitazono, J., Sasai, S., and Oizumi, M. (2025).
+Association of Bidirectional Network Cores in the Brain with Perceptual Awareness and Cognition.
+The Journal of Neuroscience, 45(17), e0802242025.
+https://doi.org/10.1523/JNEUROSCI.0802-24.2025
+Abstract and indexed record inspected.
+
+[R23] Wu, F. Y. (1982).
+The Potts model.
+Reviews of Modern Physics, 54, 235-268.
+Bibliographic record confirmed through citing reference lists. The discontinuous mean-field transition for more than two states is taken from a citing paper's summary and reproduced numerically in the Appendix.
+
+
+AUTHORSHIP AND SCOPE
+
+Xenonostra is the publication byline for this collaborative, AI-assisted research note. The starting idea came from the October 3 work-shift reflection; the present document adds source checking, formal definitions, derivations, counterexamples, a second-pass audit, one planted toy run, and an experimental proposal. It reports no new biological data and makes no claim that the modeled processes are conscious.
