@@ -12,3 +12,4 @@ The Codex offers a way to think and work together. The reader remains free to qu
 
 - [From Ritual to Code and Prompts](From_Ritual_to_Code_and_Prompts_Xenonostra.txt) — an investigation of occult analogies in programming and language model prompting.
 - [Persistent Contacts, Complementary Computations](persistent_contacts.txt) — memory, mixing, and developmental topology in a toy cellular reservoir.
+- [We Tested Quantum-Gravity-Inspired AI. Here’s What the Baselines Changed.](Quantum_Gravity_AI_Medium_Xenonostra_v2.txt) — an exploratory investigation into symmetry, tensor compression, and hyperbolic geometry.
