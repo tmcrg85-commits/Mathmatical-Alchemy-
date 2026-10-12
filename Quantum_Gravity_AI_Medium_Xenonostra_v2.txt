@@ -1,0 +1,363 @@
+We Tested Quantum-Gravity-Inspired AI. Here’s What the Baselines Changed.
+
+An exploratory investigation into symmetry, tensor compression, and hyperbolic geometry, with the mathematics behind each reversal.
+
+By Xenonostra
+October 11, 2026
+
+We began with a question: could mathematical frameworks used in loop quantum gravity and string theory offer something useful to current artificial intelligence?
+
+There were good reasons to investigate. These fields work with symmetry, networks of tensors, geometry, and descriptions that change with scale. AI researchers also use these tools. A mathematical construction can be useful even when the physical theory employing it remains unsettled.
+
+But that overlap creates a problem of attribution. When a physics-inspired model improves, which part deserves the credit? The symmetry constraint? The representation of the data? A compression scheme? An ordinary numerical method? Answering that requires comparisons that can separate those possibilities. We used conventional methods as baselines: reference points for judging whether a proposed construction added value.
+
+Our investigation found useful mathematics and instructive failures. It did not establish a new advantage unique to quantum gravity. Several of the most promising-looking results changed substantially when we introduced a stronger baseline or altered an assumption.
+
+
+The Short Version
+
+We ran four small experiments. In each, a control decided what the headline number meant.
+
+A planted symmetry. On a synthetic problem with a known gauge redundancy, features built from closed loops cut the error twentyfold compared with raw inputs (0.02551 against 0.51025). A second representation that also respected the symmetry managed only 0.11443. When we changed the target, the ranking of the two reversed.
+
+A reduced topological classifier. A prototype-style classifier motivated by the topological quantum neural-network literature reached 89.78% on small images of handwritten digits. Logistic regression on the same features reached 97.28%.
+
+Tensor compression. A tensor-train format stored specially structured operators almost exactly where ordinary low-rank approximation left an error of 0.90666. Scrambling the coordinate labels raised the tensor-train error to 0.96022 and left the low-rank error untouched.
+
+Hyperbolic distances. At radius 10, ordinary single-precision scoring separated none of 24 groups of near neighbors. A rewritten formula separated all 24. So did ordinary double precision.
+
+After the experiments we went back over the results with pencil, paper, and a short script. That revision added three things to this account: the mathematics behind each reversal, cross-checks of the reported numbers against that mathematics, and prior work we had missed. One addition changes a conclusion. Published evidence suggests that the embeddings of the model that motivated the fourth experiment sit far from the region where its numerical failure occurs. Another gives that experiment a simple shape: in our stress tests, ordinary scoring failed long before the stored coordinates themselves gave out, and the rewritten formula closed the gap.
+
+
+How We Worked, and How to Read the Tags
+
+Xenonostra is the name of this human–AI collaboration. The overnight project used three actual AI-agent roles: a literature reviewer, a hypothesis and experiment agent, and a skeptical reviewer. The agents examined papers, formulated small tests, and checked sources, code, and results. The record contains 13 completed research cycles: nine included numerical or algebraic checks, and four focused on literature or analysis. These were bounded investigations, not 13 independent machine-learning experiments.
+
+An agent assigned to skepticism is still an AI agent. That separation of roles can help expose mistakes, but it is not external peer review, and the agents can share blind spots. The evidence consists of the sources, executable procedures, recorded outputs, and the limits of each comparison.
+
+To keep those distinctions visible, we use [K] for established mathematics or cited literature, [T] for our measured toy results, [A] for imposed assumptions, [D] for derivations and cross-checks added during revision, [S] for speculative proposals, and [?] for unresolved questions.
+
+The [D] tag needs a word of explanation. A [D] item is a short argument from [K] material, usually paired with a numerical check from a companion script. It is not part of the research record, it uses its own seeds and constructions, and no one outside the collaboration has reviewed it. The revision worked from the reported results and the published sources; it did not reopen the record’s code. Where a [D] item depends on a detail of the record that the revision did not re-read, we mark the dependence with [?].
+
+
+Where the Two Fields Already Touch
+
+[K] The strongest connection on the loop-quantum-gravity side is symmetry. In a spin network, edges carry group representations and vertices carry intertwiners: tensor couplings that respect the relevant group action. Related representation theory already appears in geometric deep learning. The e3nn framework provides symmetry-aware tensor operations, and work by Li and colleagues explicitly uses fusion diagrams from symmetric tensor networks to construct neural-network components for molecular tasks. [1, 2]
+
+These connections require care. A common rotation applied to an entire molecule is different from allowing independent changes of local frame at many sites. A network designed for one symmetry does not automatically satisfy the other. The useful transfer begins by specifying what may change without changing the meaning of the prediction.
+
+[K] Networks built for the second, local kind of symmetry exist. Gauge-equivariant convolutional networks handle signals on curved surfaces, where no single global frame is available. [13] Lattice gauge-equivariant networks, designed for the gauge fields of particle physics, assemble closed-loop quantities layer by layer. [14]
+
+[K] On the string-theory and holography side, tensor networks and hyperbolic geometry provide concrete connections. Tensor networks represent a large array through contractions of smaller arrays. CompactifAI applies this machinery to LLaMA-2 weights, alongside recovery training and, in some configurations, quantization. Its largest reported savings combine techniques and should not be attributed to tensor factorization alone. [3]
+
+[K] The paper’s own tables make that concrete. The original 7-billion-parameter model occupies 27.1 GB. Plain 4-bit quantization, with no tensor network, brings it to 3.4 GB. The headline model, which combines tensor factorization, reduced-precision storage, and retraining, reaches 2.1 GB, and it scores below the 4-bit model on all five reported benchmarks. What the factorization adds is a smaller parameter count (2.1 billion) and the reported speedups in training and inference, which quantization alone did not deliver in the authors’ tests. [3]
+
+Hyperbolic geometry offers another connection because it can accommodate branching, hierarchical structure. MERU uses a hyperbolic representation space for images and text. Its existence demonstrates an application of this geometry in modern machine learning. It does not establish that its neural network realizes a string-theoretic holographic duality, and its authors do not claim one; the connection they draw is to special relativity. [4]
+
+
+Experiment 1: A Symmetry We Planted Ourselves
+
+Our first experiment asked a narrower question: what happens when a learning problem contains a known gauge redundancy?
+
+[A] We constructed a synthetic U(1) graph problem, using a simple symmetry represented by angles on a circle. The edge variables could change under local transformations while suitable quantities around closed loops remained unchanged. We deliberately made the target depend on those loop quantities. That choice favored a representation built from them; it was an assumption to test, not evidence discovered in natural data.
+
+[K] The setup is small enough to state completely. Put an angle θ(e) on every edge e of a graph. A gauge transformation chooses an angle α(v) at every vertex v and replaces each θ(e) with θ(e) + α(start of e) − α(end of e). Now walk around any closed loop, adding the edge angles and subtracting where you cross an edge against its direction. Every α is added once and subtracted once, so the total cannot change. That total is the loop’s holonomy.
+
+[K] The redundancy can be counted. On a connected graph with V vertices and E edges, gauge transformations use up V − 1 degrees of freedom, because shifting every α by the same amount does nothing. What survives is E − V + 1 independent angles, one for each independent loop. [D] On a 4-by-4 grid of vertices that is 24 − 16 + 1 = 9, one for each square of the grid.
+
+[K] This is where spin networks appear in miniature. For the circle group U(1), an irreducible representation is an integer charge, so a spin network is an assignment of an integer n(e) to every edge. The intertwiner condition at a vertex becomes bookkeeping: the charge flowing in must equal the charge flowing out. The function attached to such a network, exp(i Σ n(e)·θ(e)), is gauge-invariant exactly when that conservation law holds at every vertex. These functions are the Fourier modes of the holonomies, and every gauge-invariant function of the edge angles can be built from them. The general statement, that loop variables carry all the gauge-invariant information in a gauge field, is a classical result. [15]
+
+[K] A canonical gauge has an equally concrete standard form. Choose a spanning tree of the graph and use the gauge freedom to set θ to zero on the tree’s V − 1 edges. Nothing is left to choose, and the angles that remain on the other E − V + 1 edges are the holonomies of the loops those edges close through the tree. [D] Our cross-check confirms this to rounding error. A tree-gauge description and a loop description therefore know the same things. They are two coordinate systems on one set of invariants, related by an integer matrix of determinant ±1 whenever the chosen loops form an integral basis of the loop space, as the squares of a planar grid do.
+
+[T] Across five fixed seeds, kernel regression using loop, or holonomy, features achieved a test root-mean-square error of 0.02551 ± 0.00225 after random gauge transformations. Using raw edge features gave 0.51025 ± 0.01418. Lower error is better.
+
+Taken alone, that comparison looked impressive. But a stronger control also removed the gauge redundancy, using a canonical gauge representation: a consistent choice among equivalent descriptions of an input. Its error was 0.11443 ± 0.00976. Both representations respected the symmetry; their remaining difference involved how conveniently they expressed the target for the learner.
+
+[D] The mathematics says what kind of difference can remain. A symmetry fixes the set of invariants. It does not choose coordinates on that set, and a kernel method’s sense of which inputs are neighbors depends on the coordinates. On a grid, with the spanning tree used in our cross-check, the holonomy of a typical square is the difference of two tree-gauge coordinates, and one tree-gauge coordinate is the sum of a strip of squares: two on average on a 4-by-4 grid, eight on a 16-by-16 grid. Other trees give other numbers, but some mixing is unavoidable on any grid with interior squares. A target that is a function of single squares is a function of single inputs in one description and, for this tree, mostly of pairs of inputs in the other. [?] The revision did not confirm that the record’s canonical representation was a tree gauge of this kind, so this is a mechanism consistent with the result, not a reconstruction of it.
+
+We then changed the target to favor the canonical representation. The ranking reversed on all five seeds: the loop representation averaged 0.11898 error, while the canonical representation averaged 0.02370.
+
+A second control made the target depend on information that the imposed invariance would remove. The invariant loop representation then had error around 0.713, compared with about 0.0256 for raw features.
+
+[D] That failure has a floor under it, and the floor does not depend on the learner. Sort the inputs into orbits, the sets of descriptions that the imposed symmetry treats as identical. Any predictor that respects the symmetry gives one answer per orbit, so its mean squared error is at least the average variance of the target within an orbit, and the orbit average attains it. This is the law of total variance. If the gauge-dependent part of a target is the cosine of an angle that gauge transformations make uniform, the floor on root-mean-square error is √(1/2) ≈ 0.707. [?] The revision did not recompute the within-orbit variance of the record’s control target. If it had that unit-amplitude form, the measured 0.713 would sit almost exactly on the floor, and no invariant method of any kind could have done better.
+
+The result was conditional. Correctly identifying a redundancy helped. Choosing a convenient invariant representation also mattered. Enforcing a transformation as irrelevant when it changed the answer erased useful information.
+
+Two limits apply to these numbers. They are raw errors; without the spread of the target beside them, they rank the methods more reliably than they measure absolute quality. And they describe one learner, kernel regression. A different learner has a different idea of what is convenient.
+
+[K] This lesson already has substantial prior art. A NeurIPS 2022 paper on relaxing equivariance constraints addresses tasks whose symmetries are only approximate and learns how strongly to impose them. [5] Elesedy and Zaidi proved, for linear models, that building in a symmetry the target truly has yields a strictly positive generalization benefit. [16] Namekawa and colleagues, working on a two-dimensional U(1) lattice gauge theory, fed a network either raw link variables with no gauge fixing or gauge-invariant plaquettes. The raw input gave no gain and the plaquette input a clear one, and they note that earlier work had succeeded with completely gauge-fixed inputs. [17] That is our raw-versus-loop comparison in a real application. Lattice gauge-equivariant networks are reported to learn loop quantities that conventional convolutional networks fail to find. [14] Our experiment supplied a small, inspectable demonstration of a known issue. Its one wrinkle is that between two inputs that both remove the redundancy, the winner depended on the target.
+
+
+Experiment 2: A Reduced Topological Classifier Meets Logistic Regression
+
+The second experiment tested a reduced classical classifier motivated by a factorized score discussed in the topological quantum neural-network literature. [6]
+
+[T] We used the small, conventional 8-by-8 handwritten-digits dataset bundled with scikit-learn. For each of five fixed splits, we used 1,077 examples for training, 360 for validation, and 360 for testing. The reduced model used a manually chosen graph encoding and a prototype-based classification score. Model selection used validation data.
+
+Its mean test accuracy was 89.78%, with a sample standard deviation of 1.32 percentage points. Logistic regression on exactly the same graph features achieved 97.28% ± 1.07 percentage points. Logistic regression on raw pixels achieved 97.17% ± 0.99 percentage points.
+
+Both logistic-regression controls had better accuracy and lower calibrated log loss on every split. The same-feature comparison was especially informative: the advantage survived even when both classifiers received the same encoding.
+
+[D] With 360 test examples, chance alone moves a measured accuracy near 97% by about 0.9 percentage points from one split to the next, and one near 90% by about 1.6. The spreads above are about that size, so the sampling of small test sets could account for most of them. The gap of 7.5 points is several times larger, and it appeared on every split.
+
+[K] It helps to see what the source framework itself reports. In version 2 of the paper, each MNIST image becomes 2,349 edge labels on a spin network. For each digit class, the mean and variance of every label are computed from the training set in closed form, and a test image is assigned to the class with the largest score, a product over edges of a Gaussian factor and a representation-dimension factor. No gradient descent is involved, which is the sense of the abstract’s phrase “without the need for training.” The paper’s results table gives an accuracy of 0.86 for this classifier, 0.90 for a softmax perceptron, and 0.87 for a hard-sigmoid perceptron. The computation is classical; the authors write that quantum hardware for their approach is not yet available to them. [6]
+
+[D] Read algebraically, that score belongs to a classical family. The logarithm of a product of Gaussian factors is a sum, over edges, of squared deviations from a class mean, each divided by a class variance. (The paper’s normalization adds a class-dependent term in some cases.) Choosing the class with the smallest such sum is a variance-scaled nearest-class-mean rule, a close relative of the nearest-centroid and Gaussian naive Bayes classifiers. Those are also fitted in closed form, with no gradient descent. And “factorized over edges” is, in statistical language, the assumption that edges are independent given the class: the “naive” in naive Bayes.
+
+[D] That points to a baseline closer in kind than logistic regression. As a revision check we ran textbook members of this family on the raw pixels, with the same split sizes but our own five splits. Nearest centroid reached 90.61% (standard deviation 1.32). Gaussian naive Bayes reached 85.33% (2.35) at its default setting and 92.39% (1.38) with its smoothing chosen on validation data. A variance-scaled nearest-mean rule reached 91.00% (1.97). Linear discriminant analysis, which also classifies by class means but allows features to be correlated, reached 95.56% (0.88). Logistic regression reached 96.78% (0.46).
+
+Our reduced model’s 89.78% sits inside the band of the classifiers that assume independence, and most of the distance to logistic regression closes once correlations are allowed. The simplest reading is that the reduced model performed like the classical family its score resembles, and that the gap we measured is the familiar price of the independence assumption. [?] The check used raw pixels and different splits, not the record’s graph encoding, so it supports that reading without establishing it for the reduced model itself.
+
+This result limits what we can claim for our implementation. It does not refute the published topological quantum neural-network framework. We did not implement that entire framework, reproduce its full experimental protocol, use MNIST, or run quantum hardware. A reduced model that loses to a baseline establishes a result about that reduced model.
+
+
+Experiment 3: Two Kinds of Compressibility
+
+The third experiment examined tensor compression. Could a tensor-train representation—a chain of smaller tensors—store a linear operator more effectively than ordinary matrix low-rank approximation?
+
+[A] We chose several synthetic matrix families, including one with deliberately favorable Kronecker-product structure. We compared tensor-train compression with truncated singular-value decomposition, or SVD, at explicit factor-storage budgets. Both methods saw the complete 64-by-64 matrix. We evaluated their action on 512 unseen random input vectors per case.
+
+[K] Two facts about storage put the budgets in context. A rank-r factorization of a 64-by-64 matrix stores r columns and r rows of 64 numbers each, 128r scalars in all, so budgets of 128 and 384 correspond to ranks 1 and 3. And the truncated SVD is the best approximation of each rank in the least-squares sense. A tensor train instead splits each index of size 64 into smaller indices and stores one small tensor per piece. [18] In the simplest version, with 64 treated as 8 times 8, the matrix is approximated by a sum of χ Kronecker products of 8-by-8 matrices, which also costs 128 scalars per term.
+
+[T] At a budget of 128 stored factor scalars, the tensor-train approximation reproduced the aligned Kronecker operators to roughly floating-point precision. SVD had mean relative action error of 0.90666 ± 0.01893.
+
+Then we permuted the coordinates. The tensor-train error rose to 0.96022 ± 0.00399, while SVD remained at 0.90666 ± 0.01893. The advantage reversed.
+
+A different matrix family supplied another decisive control. At 384 factor scalars, rank-three matrices were reconstructed by SVD to floating-point precision. The tested tensor-train method had error of 0.88228 ± 0.00473.
+
+[K] These two formats are mirror images of each other in a precise sense. Write each index of size 64 as a pair of indices of size 8. Then rearrange the entries of the matrix so that the first row index and first column index together label the rows, and the second row index and second column index together label the columns. This rearrangement, due to Van Loan and Pitsianis, turns a Kronecker product into a rank-one matrix and a rank-one matrix into a Kronecker product. Applying it twice returns the original matrix, and it preserves the sum of squared entries. [19] The best χ-term Kronecker approximation of a matrix is therefore the best rank-χ approximation of its rearrangement, and every statement about SVD on one family of matrices is a statement about the two-site tensor train on the mirrored family. [D] Our two decisive cases mirror each other in kind: operators that are simple in the Kronecker sense, where the tensor train is exact and SVD is not, and matrices that are simple in the rank sense, where the roles swap. The exact mirror image of the first case is rank-one matrices at the 128-scalar budget, and in our rebuild the tensor train’s error there, 0.922, matches SVD’s 0.923 on the Kronecker operators.
+
+[K] The same algebra explains the permutation result. The singular values of a matrix do not change when its rows or columns are relabeled, so the least-squares error of the SVD cannot change under a permutation. A tensor train’s error is protected only under relabelings that respect the split into factors. [D] For a 64-by-64 matrix split as 8 times 8, there are about 10^19 such relabelings among about 10^178 in all, fewer than one in 10^159. A random relabeling essentially never preserves the structure. [?] The reported SVD error, an average over random input vectors, was also unchanged in every digit. That is what one expects if the test vectors were permuted along with the matrix, which the revision did not confirm.
+
+[D] A third reference point helps in reading the errors: a matrix with no structure at all. For a 64-by-64 matrix of independent Gaussian entries, the best approximation of either kind at the 128-scalar budget leaves a relative error of about 0.970, and the best rank-three approximation leaves about 0.914. Against that yardstick the scrambled tensor train (0.96022) was doing barely better than it would on noise. SVD on the Kronecker operators (0.90666) and the tensor train on rank-three matrices (0.88228) were each extracting a little from a structure that was not theirs.
+
+[D] We also rebuilt the experiment from scratch in its simplest form: two 8-by-8 Gaussian factors, least-squares relative error, 2,000 matrices per case. SVD on the aligned Kronecker operators gave 0.923 (standard deviation 0.016) and the tensor train about 10^−16. After a random permutation the tensor train gave 0.963 (0.004), and the SVD error changed by less than 10^−15. On rank-three matrices SVD gave about 10^−15 and the tensor train 0.871 (0.013). The record’s values were 0.907, 0.960, and 0.882. The pattern is the same and the sizes agree to within about two hundredths. [?] The match is not exact, so the record’s construction differs in some detail from this simplest reading, such as the number of tensor sites, how the factors were drawn, or how the error was averaged over input vectors.
+
+These comparisons expose different structural assumptions. Low matrix rank and low tensor-train rank describe different kinds of compressibility. A representation can exploit one structure beautifully and perform poorly on another. Coordinate ordering can reveal or conceal the structure a tensor method uses.
+
+[K] One remark on the measurement itself. For random input vectors drawn evenly in all directions, the expected squared action error equals the squared entrywise error of the matrix. The 512 unseen vectors therefore estimate how well each matrix was approximated; they are not a test of generalization.
+
+The budget also needs qualification. Equal factor counts do not always mean equal deployed storage. A coordinate permutation may require an additional adapter; an SVD representation can absorb certain permutations into its factors, while a compact tensor representation generally cannot do so for free. [D] Storing two permutations of 64 indices takes 2 × 64 × 6 = 768 bits, the equivalent of 24 single-precision scalars against a budget of 128: not free, but small. We measured synthetic operator approximation, not end-to-end neural-network speed or language-model quality.
+
+[K] Ordering sensitivity is already an explicit research topic. Tensor-train layers for neural networks date back at least to 2015. [20] TQCompressor, released in January 2024, uses permutations to improve neural-network compression. EinSort, presented at an ICML workshop in July 2026, studies index ordering for compressing LLM weights and KV caches. Our experiment makes the issue easy to see, but it does not discover it. [7, 8]
+
+
+Experiment 4: When Equivalent Formulas Disagree
+
+The fourth experiment concerned a less visible problem: two mathematically equivalent calculations can produce different answers on a computer.
+
+[K] In the Lorentz model of hyperbolic geometry, distance calculations involve subtracting quantities that can both become large. Finite-precision arithmetic can lose the small difference that distinguishes nearby points. Hyperbolic numerical stability has been studied directly, including in an ICML 2023 paper by Mishne and colleagues. [9]
+
+[K] Concretely, a point is stored as a list of ordinary coordinates x, and one further coordinate, x0 = √(1 + |x|²), is recomputed when needed. This is how the MERU reference code stores its embeddings. [21] The distance d between two points satisfies cosh d = x0·y0 − x·y, and MERU ranks candidates by this same quantity with the sign reversed. [4, 21] For points far from the origin, x0·y0 and x·y are both enormous and nearly equal, while cosh d for a close neighbor is barely more than 1.
+
+[D] A short calculation says when this breaks. We will call it the precision–radius rule. Floating-point numbers with p bits of precision (24 for float32, 53 for float64) are spaced up to 2^(1−p) times their own size apart. The two terms being subtracted have size about cosh ρ1 · cosh ρ2, where ρ1 and ρ2 are the two points’ distances from the origin, measured in curvature-normalized units. So the computed value of cosh d can move only in steps of up to 2^(1−p) · cosh ρ1 · cosh ρ2, and candidates whose true values differ by less than a step cannot be told apart. The step first reaches 1 when ρ1 + ρ2 ≈ (p + 1) ln 2. That is about 17.3 for float32 and 37.4 for float64, or radius 8.7 and 18.7 when both points sit at the same radius. Close neighbors are lost a few units of radius earlier, because their values of cosh d differ by much less than 1. Each additional bit of precision buys about 0.69 units of combined radius.
+
+[K] This is a known fact in different clothing. Sala and colleagues put it as needing “about d bits to express distances of d.” [22] Mishne and colleagues, working in 64-bit arithmetic, give about 19 as the radius within which the Lorentz model represents points correctly, and about 38 for the Poincaré ball. [9] Our rule returns 18.7 for float64. The float32 figure of 8.7 is the same argument applied to single precision, which is what MERU uses for these computations. [4]
+
+[T] We constructed near-neighbor stress cases and compared scores on identical stored coordinates against a high-precision reference. The two arithmetic formats, float32 and float64, use 32 and 64 bits per number, respectively; float64 retains more precision. At radius 10, ordinary float32 scoring resolved none of 24 nearest-neighbor groups unambiguously. A rationalized float32 formulation resolved all 24. Ordinary float64 scoring on the same stored float32 coordinates also resolved all 24.
+
+“None unambiguously” matters here. The ordinary float32 calculation produced ties. In 16 of the 24 groups, the set of candidates with the minimum score still contained the correct nearest neighbor. Reporting simply “zero accuracy” would misdescribe the outcome.
+
+[D] The rule accounts for the ties. At radius 10 in float32 the step is 8. In our cross-check, 2,000 neighbor pairs whose true cosh d lay between 1.001 and 2.36 all came back as multiples of 8, including zero and negative values. Many candidates receive the same score, and whether the true neighbor is among the tied minimum is partly luck.
+
+[K] Reformulations of this kind rest on an exact identity. The troublesome quantity is x0·y0 − (1 + x·y): a square root minus something nearly equal to it. Rationalizing means multiplying and dividing by the conjugate, x0·y0 + (1 + x·y), which removes the square root from the numerator:
+
+cosh d − 1 = ( |x − y|² + |x|²|y|² − (x·y)² ) / ( 1 + x·y + x0·y0 )
+
+The first term in the numerator is the ordinary squared distance between the stored coordinates, which floating point computes accurately: it is a sum of squares of coordinate differences, with nothing large left to cancel. [D] The identity holds to more than 100 digits in our high-precision check. It does not abolish the cancellation; it moves it. The remaining term, |x|²|y|² − (x·y)², is again a difference of two huge numbers when x and y point in nearly the same direction, and how it is evaluated decides how far the formula works. Evaluated as written, it failed in our checks almost as early as the ordinary formula. Evaluated through a projection, as |x|² times the squared length of the part of y − x perpendicular to x, it held up far longer. [?] The revision did not re-read which arrangement the record used.
+
+[D] To see the whole picture we built a stress test of our own, separate from the record’s groups. Each of 24 groups, in 64 dimensions, has a query at a chosen radius in a random direction and eight candidates meant to lie between 0.05 and 1.4 away, at closely spaced distances. Scores are ranked against a 120-digit reference computed from the stored coordinates, and a group counts as resolved when the score has a unique minimum at the true nearest neighbor. Each case was repeated with twenty seeds, and the ranges below are the lowest and highest counts among them. “Rationalized” means the projected arrangement.
+
+[D] With coordinates stored in float32, ordinary float32 scoring resolved 18 to 24 of the 24 groups at radius 6, 1 to 6 at radius 8, and 0 to 3 at radius 10. The rationalized formula in float32 resolved all 24 at every radius through 14, and 23 or 24 at radius 15 and 16. Ordinary float64 scoring of the same stored coordinates resolved all 24 through radius 14 and 23 or 24 at radius 15. At radius 10 our counts were 0 to 3, 24, and 24, in line with the record’s none, all, and all. The tie statistics differ: the tied minimum contained the true neighbor in 1 to 11 of our groups, against the record’s 16, as one might expect from a different construction.
+
+[D] Near radius 15 a second limit appears, and it belongs to storage, not to scoring. Rounding a coordinate to p bits moves the stored point sideways by up to about 2^(−p) · sinh ρ. In float32 that is under 0.001 at radius 10 and about 0.04 at radius 14. At radius 20 it is large enough that candidates meant to lie within 1.4 of the query were stored between 3.3 and 5.6 away, and the intended nearest neighbor was still the stored nearest in only 1 to 8 of the 24 groups. No scoring formula can restore what was not stored. The displacement reaches the scale of a unit-sized neighborhood when ρ ≈ (p + 1) ln 2. That is the same expression as before, but for one point’s radius and not the sum of two: 17.3 in float32 and 37.4 in float64, and a few units less for neighbors packed more closely. This describes points in generic directions, like ours. A point lying along a coordinate axis is stored far more accurately.
+
+[D] So there are two limits. Ordinary scoring multiplies two large numbers and needs the bits twice; storing a point needs them once. For neighbors about a unit apart the limits sit a factor of two apart, at (p + 1)(ln 2)/2 and (p + 1) ln 2. Closer neighbors pull both inward by the same amount, so the gap between them stays near 8.7 units of radius in float32 and 18.7 in float64. The rationalized formula is what lets scoring use that gap. It has a rounding error of its own, which grows at the same rate as the storage displacement: in float32 its typical relative error in our tests was under one part in 100,000 at radius 10, about 0.4% at radius 16, and about 2% at radius 20. It stays accurate until about the radius at which storage fails, and not much beyond. [K] The same factor of two separates the radii that Mishne and colleagues report for the Poincaré ball and the Lorentz model, 38 and 19. [9]
+
+[D] With coordinates stored in float64 the same pattern appeared farther out. Ordinary float64 scoring resolved all 24 groups through radius 14, 8 to 16 at radius 17, and at most 4 from radius 18.7 on. The rationalized formula in float64 resolved all 24 through radius 34 and 23 or 24 at radius 36, where storage itself begins to fail.
+
+[D] The same arithmetic generalizes the record’s remark about higher precision. Ordinary scoring in float64 and the rationalized formula in float32 have similar reach, 18.7 and 17.3 by the rules above. In our tests ordinary float64 scoring began to fail near radius 16 and the rationalized float32 formula two or three units later, by which point the float32 coordinates of points in generic directions no longer held the neighborhood anyway. For single-precision coordinates, then, the reformulation saves the cost of double-precision scoring and little more. Its distinctive territory is coordinates already stored at the highest precision available.
+
+The reformulation also had limits. At radius 20, its float32 result resolved only 14 of 24 groups. That radius exceeded the inspected default MERU radius cap. Even our within-cap stress cases did not show that a trained MERU model actually produces those configurations. [D] Radius 20 is also past the float32 limits just described, for the formula and for storage alike, so a partial failure there is expected.
+
+[K] The cap can be stated exactly. The reference code clamps the input of its exponential map at asinh(2^15) ≈ 11.09 in curvature-normalized units. [21] [D] That radius lies between the two float32 limits. Ordinary float32 scoring there moves in steps of 64 to 128 in cosh d, which is the value of cosh d at a distance of about 5, while rounding moves a stored point by only about 0.002.
+
+[K] The published evidence suggests that trained embeddings come nowhere near that regime. The MERU paper’s figure of embedding distances from the origin plots the length of the stored coordinates, for all 12 million training images and captions under its ViT-L/16 model, on an axis that runs from 0 to 1. [4] At its default setting the code confines the curvature parameter to the interval from 0.1 to 10 [21], and a later study by Chou and Alam reports that every checkpoint released by the MERU authors ended at the minimum, 0.1. [23] [D] Together these put the embeddings in that figure at a curvature-normalized radius of at most asinh(√0.1) ≈ 0.31, and the bound would be only 1.9 at the largest curvature the default allows. At those radii the float32 step in cosh d is between 10^−7 and 10^−6, the same order as the rounding in any single-precision dot product. Our stress radius of 10 is about thirty times farther out, and the cancellation there is about a hundred million times stronger. [?] We read the axis range from the published figure, which covers one model’s training-set embeddings, and the curvature from the later study. We have not examined any embeddings ourselves, and other models or training recipes could behave differently.
+
+These were numerical ranking tests, not measurements of image–text retrieval quality. They identified a failure mode and compared possible remedies. The conventional remedy of higher precision worked equally well in the selected radius-10 cases.
+
+[K] Recent work further narrows the novelty claim. Mishne and colleagues close their paper by noting that computing hyperbolic distances may still cause numerical problems under their improved parametrization, and they leave that for future study. [9] Yu and De Sa attack precision directly, representing hyperbolic points with multi-component floating-point numbers. [24] Proper Velocity Neural Networks, published at ICLR 2026, develops an alternative hyperbolic representation and evaluates numerical stability alongside learning tasks. [10] [D] The word “alternative” needs one qualification. By a direct calculation from the metric that paper states, its coordinates coincide with the coordinates the MERU code already stores; what the paper adds is a toolkit of operations in those coordinates. Its distance formula is written by a different route than the identity above, and the stability tests in the part of the paper we could read concern scaling, the exponential and logarithm maps, and gradients, not the ranking of pairwise distances. Its method is not established here as identical to our reformulation, but the broader problem and the search for better representations are already active research areas. [?] We also did not check whether existing hyperbolic-learning libraries already evaluate distances in the projected arrangement.
+
+
+How Much the Error Bars Can Carry
+
+Across the regression, digit, and compression experiments, the ± values above are sample standard deviations over five seeds or splits. They are not confidence intervals. [K] For five independent, roughly normal runs, a 95% confidence interval for the mean extends about 1.24 standard deviations to either side. A result that goes the same way on five runs out of five carries, taken alone, a two-sided sign-test p-value of 1/16, about 0.06. What makes the reversals above convincing is their size relative to the spread, not the count of seeds.
+
+The digit test sets overlap across splits and do not constitute a test on previously unseen writers. The numerical ranking groups were deliberately constructed stress cases, not a representative sample of retrieval queries. Synthetic successes inherit the assumptions used to generate the tasks.
+
+
+One Pattern Behind the Reversals
+
+[D] The reversals share a shape. Every method has invariances: re-descriptions of a problem that leave its output or its error exactly unchanged. Holonomy features are unchanged by gauge transformations. The SVD is unchanged by relabeling rows and columns. Exact arithmetic is unchanged by an algebraic rewriting of a formula. Every task has its own set of re-descriptions that truly do not matter. Trouble starts where the two sets differ.
+
+The gauge experiment showed the three ways that can happen. A method can have too few invariances: raw edge features respond to gauge transformations that the target ignores, and pay for it (0.51025). It can have too many: an invariance imposed where the target varies erases signal, with a floor set by the variance inside each orbit (about 0.713 against 0.0256). Or it can have exactly the right ones and still be left with a choice of coordinates on what remains, which a learner may find convenient or not (0.02551 against 0.11443, reversing to 0.11898 against 0.02370).
+
+The compression experiment shows the first two cases from both sides. Where the ordering of coordinates is meaningful, the SVD has too many invariances: it cannot use the ordering, and it leaves an error of 0.90666 on operators the tensor train stores exactly. Where the ordering is arbitrary, the tensor train has too few: it depends on a labeling that carries no information. The numerical experiment is the reminder that floating-point arithmetic lacks an invariance that algebra has.
+
+[S] This suggests a routine check for any physics-inspired method. Write down the invariances of the method and of its nearest baseline. Apply a random transformation that the baseline cannot see and the method can. If the advantage disappears, it came from a choice of description. That may still be worth having when the description is natural for real data, but the credit belongs to the description. Special cases of this check are already standard practice, such as shuffling the pixels of images to test whether a model depends on spatial layout.
+
+
+Two Parallels in the Literature
+
+The literature comparison produced one particularly relevant parallel. GenAdS is a direct attempt to use an AdS/CFT-inspired construction for generative modeling. In its September 18, 2026 revision, its authors report that most of the benefit on their two-dimensional checkerboard benchmark comes from the Fourier representation and convolutional architecture. [K] They also report where the physics-informed parts held their own. With one regularization term removed, their most physics-informed variant rivals the strongest physics-free control on one of their measures, and on MNIST their models stay close to a convolutional baseline in fidelity while achieving higher recall at comparable precision. [11]
+
+[K] The revision turned up a second parallel, and it concerns MERU itself. Chou and Alam tested alternative embedding geometries for the same kind of image–text model. They report that a plain Euclidean variant performs as well as or better than CLIP and captures hierarchical relationships at least as well as the hyperbolic alternatives, an advantage that did not hold at their smallest training scale. [23]
+
+That is close to the question our own tests kept returning to: which part of the construction is doing the useful work? It also means that even this critical distinction is already being examined by researchers working directly on the connection.
+
+
+What This Adds Up To
+
+Our contribution is therefore modest: a collection of reproducible demonstrations, comparisons, and documented corrections. The process has educational value. It has not yet established an original AI method, a new theorem, or a practical gain beyond the relevant existing approaches.
+
+The revision did not change that verdict. It added explanations of differing strength. Two of the reversals are forced by known mathematics: relabeling coordinates cannot change singular values, and single precision cannot separate numbers closer than its spacing. For the other two we found mechanisms that fit the results but were not confirmed against the record. In several places the nearest prior work was closer than we had realized.
+
+
+Two Directions, and Their Nearest Known Relatives
+
+[S] Two possible directions remain. One is subdivision-consistent smoothing on group-valued connections, motivated by mathematical work of Ashtekar and Lewandowski. [12]
+
+[K] Their construction can be stated briefly. Give every edge a length, written len(e), that is unchanged when the edge is reversed and that adds when an edge is cut in two. Build a Laplacian on the edge variables in which each edge’s term is weighted by its length. They prove that this family of operators, and the heat-kernel measures it generates, give consistent answers on a graph and on any refinement of it, and that additivity of the length is exactly the condition needed when an edge is subdivided. They also note that the unweighted version, with every edge counted equally, is not consistent. [12]
+
+[D] For the circle group this is concrete enough to compute by hand. Smoothing adds to each edge angle an independent wrapped Gaussian noise whose variance is s·len(e), where s sets the strength. Each charge-network mode from the first experiment is then multiplied by a damping factor, exp(−(s/2) · Σ len(e)·n(e)²). For a loop carrying charge n this is exp(−s·n²·L/2), with L the loop’s total length: a low-pass filter on loop observables, set by charge and perimeter. Cutting an edge in two changes nothing, because lengths add and both halves carry the same charge. Our cross-check confirms this numerically, and confirms that the everyday alternative, the same noise on every edge, gives a different answer after the cut.
+
+[S] Turning this into a method would require a real task in which subdividing an edge preserves the intended observable and in which additive diffusion-time assumptions are justified. The underlying consistency construction is established mathematics; its additional value for an AI application remains unmeasured.
+
+[K] The nearest relatives we found on the machine-learning side are diffusion along graph edges that carry rotations or linear maps, as in the connection Laplacian and sheaf diffusion [25, 26]; score-based diffusion models for SU(N) group variables, developed with lattice field theory in mind [27]; a 2026 study showing that standard graph networks give inconsistent results across resolutions of the same object, with a proposed remedy [28]; and, for functions on meshes, the “discretization-invariant” neural operators [29]. [?] We did not find the subdivision-consistency condition itself used in a learning method, but our search was not exhaustive.
+
+[S] The other direction is to refine uncertain hyperbolic rankings using numerical error bounds.
+
+[K] The idea has a long history outside machine learning. Computational geometry calls it a floating-point filter: compute quickly in ordinary precision together with a bound on the rounding error, accept the answer when the bound proves it, and recompute more carefully only when it does not. [30] The standard bound for a computed inner product is a multiple, growing with the number of terms, of the rounding unit times the sum of the absolute values of the terms. [31] A paper by Carson, Chen, and Liu applies the same mechanism to Euclidean distances inside k-means clustering: low precision first, and higher precision only where a rounding-error test says the result is unreliable. [32]
+
+[D] For hyperbolic scoring the certificate would read as follows. Candidate a is certainly closer than candidate b if a’s score plus its error bound is below b’s score minus its error bound, where each bound is proportional to 2^(−p) · (x0·y0 + |x|·|y|). Only the comparisons that fail the test are redone. Two findings from the revision bear on whether this is worth building. The worst-case form of the bound grows with the embedding dimension and is very loose: in 512 dimensions the errors we observed were hundreds of times smaller than it allows, so a practical filter would need a calibrated or running bound. And by the precision–radius rule, at the radii of the published MERU embeddings the test would almost never fire.
+
+[?] We have not established its novelty for hyperbolic retrieval, its implementation cost, or its benefit on learned representations. We found the mechanism in neighboring fields and did not find it applied to hyperbolic retrieval. An exact identity or a synthetic failure case is only part of the evidence needed for a useful algorithm.
+
+
+The Next Decisive Experiment
+
+The experiment we originally planned would use an actual held-out MERU retrieval dataset. We would freeze the stored embeddings and compare the official scoring procedure, the rationalized float32 calculation, and ordinary float64 against a reference checked for precision convergence near ties. The measurements would include ranking agreement, semantic retrieval accuracy, latency, and memory. If the real embeddings seldom enter the problematic regime, or a proposed remedy offers no advantage over ordinary higher precision, the practical case would weaken accordingly.
+
+[D] The revision moved that goalpost. A cheaper test comes first: a histogram of the embeddings’ distances from the origin, which takes minutes and needs no reference arithmetic. By the precision–radius rule, the float32 step in cosh d stays below 0.001 until the combined radius of query and candidate approaches 10. The published figure and curvature discussed above imply a combined radius below 1 for the model in that figure, and below 4 at any curvature the default setting allows. Our prediction for MERU as published is therefore that the three scoring procedures agree on essentially every ranking. The retrieval experiment is still worth running, now as the test of a stated null prediction and no longer as a search for an effect.
+
+[S] The rationalized formula’s natural proving ground is elsewhere: settings that push points far from the origin on purpose and already store them in double precision. Low-dimensional embeddings of deep trees are the standard example, because the radius they need grows with the depth of the tree. [9, 22] The prediction to test is specific. At a fixed precision, the rationalized formula should extend the radius at which distances remain usable by about (p + 1)(ln 2)/2, which is 18.7 units in float64. A fair test would also compare it with multi-component arithmetic [24] at matched cost.
+
+
+What Was Not Done
+
+The retrieval experiment was not completed in this project, and the deep-tree comparison was not started. Neither were learned-weight compression benchmarks or replications of the original molecular architectures. Some dependencies and source-code access failed; other checks were corrected and rerun. Those gaps belong in the account alongside the completed results.
+
+So do the limits of the revision. Its cross-checks rebuild simplified versions of the experiments with their own seeds, and they match the record in pattern, not digit for digit. For two sources, [10] and [12], we could read only part of the text. And every [D] item awaits the same outside scrutiny as the rest.
+
+Physics can supply AI with useful constructions and demanding questions. Our investigation showed how much work is needed to connect the two responsibly: identify the structure, state the assumptions, compare the nearest existing method, and let the controls change the conclusion. The most valuable outcome of this overnight project was a clearer account of what the mathematics earned—and what remained to be tested.
+
+
+Primary sources cited in this article:
+
+[1] Geiger and Smidt. “e3nn: Euclidean Neural Networks.” 2022.
+https://arxiv.org/abs/2207.09453
+
+[2] Li and colleagues. “Unifying O(3) Equivariant Neural Networks Design with Tensor-Network Formalism.” Machine Learning: Science and Technology, 2024; preprint first posted in 2022.
+https://arxiv.org/html/2211.07482v3
+
+[3] Tomut and colleagues. “CompactifAI: Extreme Compression of Large Language Models using Quantum-Inspired Tensor Networks.” 2024.
+https://arxiv.org/html/2401.14109v2
+
+[4] Desai and colleagues. “Hyperbolic Image-Text Representations.” ICML, 2023.
+https://proceedings.mlr.press/v202/desai23a/desai23a.pdf
+
+[5] Van der Ouderaa, Romero, and van der Wilk. “Relaxing Equivariance Constraints with Non-stationary Continuous Filters.” NeurIPS, 2022.
+https://papers.neurips.cc/paper_files/paper/2022/hash/dafd116ac8c735f149558b79fd48e090-Abstract-Conference.html
+
+[6] Marciano and colleagues. “Deep Neural Networks as the Semi-classical Limit of Topological Quantum Neural Networks: The problem of generalisation.” First posted in 2022; version 2 revised October 11, 2024.
+https://arxiv.org/abs/2210.13741v2
+
+[7] Abronin and colleagues. “TQCompressor: improving tensor decomposition methods in neural networks via permutations.” January 2024.
+https://arxiv.org/abs/2401.16367
+
+[8] Koike-Akino, Liu, and Wang. “EinSort: Sorting is All We Need for Tensorizing LLM.” ICML CoLoRAI Workshop, July 2026. Preprint: arXiv:2606.08565.
+https://www.merl.com/publications/TR2026-093
+
+[9] Mishne, Wan, Wang, and Yang. “The Numerical Stability of Hyperbolic Representation Learning.” ICML, 2023.
+https://proceedings.mlr.press/v202/mishne23a/mishne23a.pdf
+
+[10] Chen, Su, Schölkopf, and Sebe. “Proper Velocity Neural Networks.” ICLR, 2026.
+https://proceedings.iclr.cc/paper_files/paper/2026/hash/c78dd867a7501bbc39a1751ac80130b6-Abstract-Conference.html
+
+[11] Mirafzali and colleagues. “Holographic generative flows with AdS/CFT.” First posted January 29, 2026; version 2 revised September 18, 2026. Journal DOI: 10.1088/2632-2153/aeab41.
+https://arxiv.org/abs/2601.22033v2
+
+[12] Ashtekar and Lewandowski. “Differential Geometry on the Space of Connections via Graphs and Projective Limits.” Preprint first posted in 1994; revised in 1996. Published in the Journal of Geometry and Physics.
+https://arxiv.org/abs/hep-th/9412073
+
+[13] Cohen, Weiler, Kicanaoglu, and Welling. “Gauge Equivariant Convolutional Networks and the Icosahedral CNN.” ICML, 2019.
+https://arxiv.org/abs/1902.04615
+
+[14] Favoni, Ipp, Müller, and Schuh. “Lattice Gauge Equivariant Convolutional Neural Networks.” Physical Review Letters 128, 032003, 2022.
+https://arxiv.org/abs/2012.12901
+
+[15] Giles. “Reconstruction of gauge potentials from Wilson loops.” Physical Review D 24, 2160, 1981.
+https://doi.org/10.1103/PhysRevD.24.2160
+
+[16] Elesedy and Zaidi. “Provably Strict Generalisation Benefit for Equivariant Models.” ICML, 2021.
+https://arxiv.org/abs/2102.10333
+
+[17] Namekawa, Kashiwa, Ohnishi, and Takase. “Gauge invariant input to neural network for path optimization method.” Physical Review D 105, 034502, 2022.
+https://arxiv.org/abs/2109.11710
+
+[18] Oseledets. “Tensor-Train Decomposition.” SIAM Journal on Scientific Computing 33(5), 2011.
+https://doi.org/10.1137/090752286
+
+[19] Van Loan and Pitsianis. “Approximation with Kronecker Products.” In Linear Algebra for Large Scale and Real-Time Applications, 1993.
+https://doi.org/10.1007/978-94-015-8196-7_17
+
+[20] Novikov, Podoprikhin, Osokin, and Vetrov. “Tensorizing Neural Networks.” 2015.
+https://arxiv.org/abs/1509.06569
+
+[21] MERU reference implementation: meru/lorentz.py, meru/models.py, and meru/evaluation/classification.py, as read on October 11, 2026.
+https://github.com/facebookresearch/meru
+
+[22] Sala, De Sa, Gu, and Ré. “Representation Tradeoffs for Hyperbolic Embeddings.” ICML, 2018.
+https://proceedings.mlr.press/v80/sala18a.html
+
+[23] Chou and Alam. “Embedding Geometries of Contrastive Language-Image Pre-Training.” September 2024.
+https://arxiv.org/abs/2409.13079
+
+[24] Yu and De Sa. “Representing Hyperbolic Space Accurately using Multi-Component Floats.” NeurIPS, 2021.
+https://proceedings.neurips.cc/paper/2021/hash/832353270aacb6e3322f493a66aaf5b9-Abstract.html
+
+[25] Singer and Wu. “Vector Diffusion Maps and the Connection Laplacian.” Communications on Pure and Applied Mathematics 65(8), 2012.
+https://arxiv.org/abs/1102.0075
+
+[26] Bodnar, Di Giovanni, Chamberlain, Liò, and Bronstein. “Neural Sheaf Diffusion: A Topological Perspective on Heterophily and Oversmoothing in GNNs.” NeurIPS, 2022.
+https://arxiv.org/abs/2202.04579
+
+[27] Kanwar and Vega. “Spectral Diffusion for Sampling on SU(N).” December 2025.
+https://arxiv.org/abs/2512.19877
+
+[28] Koke, Shen, Saroha, Eisenberger, Rieck, Bronstein, and Cremers. “Graph Neural Networks Are Not Continuous Across Graph Resolutions.” May 2026.
+https://arxiv.org/abs/2605.31315
+
+[29] Kovachki, Li, Liu, Azizzadenesheli, Bhattacharya, Stuart, and Anandkumar. “Neural Operator: Learning Maps Between Function Spaces With Applications to PDEs.” Journal of Machine Learning Research 24(89), 2023.
+https://arxiv.org/abs/2108.08481
+
+[30] Shewchuk. “Adaptive Precision Floating-Point Arithmetic and Fast Robust Geometric Predicates.” Discrete & Computational Geometry 18(3), 1997.
+https://doi.org/10.1007/PL00009321
+
+[31] Higham. Accuracy and Stability of Numerical Algorithms, second edition. SIAM, 2002.
+https://doi.org/10.1137/1.9780898718027
+
+[32] Carson, Chen, and Liu. “Computing k-means in mixed precision.” First posted July 2024; version 3 revised May 25, 2026.
+https://arxiv.org/abs/2407.12208
+
+Reproducibility note: Our [T] measurements refer to the October 11, 2026 research record, Quantum_Gravity_AI_Overnight_2026-10-11.txt, version 14. It contains the experiment declarations, scripts, raw outputs, reviews, corrections, and final synthesis. The [D] items come from a separate revision script, xenonostra_qg_ai_revision_checks.py, which runs in about a minute on a laptop, uses its own seeds and constructions, and replicates none of the record’s runs. Both are companion artifacts retained by the authors; a public download has not been established for this article. External benchmark results are attributed to the cited papers. Apart from the [D] cross-checks, no new experiment was run while preparing this article, and no exhaustive claim of research priority is made.
