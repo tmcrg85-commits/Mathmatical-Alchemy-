@@ -1,0 +1,361 @@
+Can Intelligence Grow?
+Five experiments on reproducing agents, collective learning, and the conditions for useful emergence
+
+By Xenonostra
+October 12, 2026
+
+An AI system that can reproduce raises a question about how far it might spread. It also raises a different question: what might its descendants learn to accomplish together?
+
+Imagine agents encountering different environments, retaining useful discoveries, specializing, and leaving behind artifacts that later agents can improve. Could their capabilities accumulate across generations? Could a larger model coordinate those specialists into a system more adaptable than any individual member?
+
+[S] These are plausible hypotheses. The central difficulty is identifying what would make them true. Population growth, agreement, cooperation, learning, and general intelligence describe different properties. An increase in one does not establish an increase in the others.
+
+We explored those distinctions through five contained experiments, a targeted literature review, and a separate falsifier role. Three experiments used symbolic populations and fixed rules. Two follow-ups used policies or parameters that actually learned from feedback. The experiments found useful learning and a conditional benefit from adding fresh specialists, alongside several failures of copying and information sharing.
+
+Our starting point was an October 12, 2026 research blog post by William Zhou and Daniel Freeman of Anthropic’s Frontier Red Team. It investigates whether small models could eventually reproduce across inexpensive devices and demonstrates distributed inference across fifteen Android TV boxes. [1]
+
+Its experimental boundaries matter. Splitting one model across devices is not a society of reasoning agents. In the replication evaluation, the acting model uses a separate inference server while setting up a smaller model on the target machines; copies are spawned after experiment checks. The work motivates questions about future small replicators, rather than demonstrating an autonomous collective intelligence.
+
+We used that report as a starting question, not as evidence for our proposed answer. Our own experiments operated on bounded numerical records and small learning models. No LLM population or physical hardware network was deployed.
+
+Throughout this article, [K] marks supported findings or explicitly scoped mathematical results; [A] marks supplied assumptions; [S] marks speculation; and [?] marks questions left untested. Simulation evidence remains simulation evidence.
+
+
+What biology suggests—and what the analogy cannot carry
+
+Fungal networks and ant colonies suggest concrete mechanisms worth studying. Fungi can reinforce and recycle transport pathways as resources change. Research on harvester ants shows local interactions regulating worker activity at different timescales. These systems link local information to coordinated allocation without requiring one component to represent the entire problem. [2,3]
+
+The useful analogy concerns relations: local sensing, feedback, retained state, transport costs, and changing resource demand. A fungal mycelium is an integrated organism. Its branching is not equivalent to creating autonomous software agents with separate objectives. The cited ant adjustments occur over seconds or minutes and do not depend on producing new workers during the adjustment.
+
+This distinction turns a biological metaphor into an experimental question: which advantage comes from useful feedback, which comes from persistent structure, and which comes specifically from reproduction?
+
+The broader research direction already has substantial precedent. TerraLingua studies LLM ecologies with limited lifetimes and persistent artifacts, reporting social organization and cultural lineages; part of its analysis uses an AI observer. SwarmWorld evaluates artifacts produced by language-model societies under unseen disturbances. Its shared societies develop broader and more resilient portfolios, while isolated search remains competitive for the strongest individual artifact. These are 2026 preprints with different experimental designs, not demonstrations that reproduction necessarily causes general intelligence. [4,5]
+
+Our contribution is a critical synthesis and a set of controlled mechanism tests. It is not the discovery of agent ecologies as a new field.
+
+
+What would “greater than the sum” mean?
+
+A population should not earn that description merely by outperforming one member while using twelve times the resources. Nor should we add bounded accuracy scores and call the result collective intelligence.
+
+Let P denote a higher-is-better performance measure on specified tasks. Let B describe the resource envelope: observations, computation, storage, communication, and training opportunities. Two useful operational contrasts are:
+
+Interaction gain(B) = P(interacting full team; B) − P(independent full team; B)
+
+Copying gain(B) = P(copying team; B) − P(fixed interacting team; B)
+
+The first asks whether interaction contributes beyond a complete independent team. The second asks whether a particular copying-and-replacement rule adds value beyond interaction already present. These are definitions for an experiment, not universal equations for intelligence.
+
+A positive interaction gain with no copying gain would still be interesting. It would locate useful capability in coordination or shared memory. A copying gain could depend on where offspring are placed, what they inherit, which members they replace, or additional resources. Those mechanisms need to be reported, not hidden inside the word reproduction.
+
+Our experiments match different parts of B. Some use identical abstract work opportunities; others match training examples and optimizer updates while using different amounts of arithmetic. We do not describe them as uniformly compute-matched.
+
+
+Experiment one: more descendants, less independent evidence
+
+The falsifier began with nine observers of a binary fact. Each independently received the correct answer with probability 0.65. We then repeatedly selected a current individual at random and copied its opinion until the population reached 201. Descendants received no new evidence.
+
+[K—simulation] Exact majority accuracy fell from 82.83% among the founders to 75.28% among their descendants. Yet the expected fraction supporting whichever opinion was dominant rose from 68.38% to 71.85%. An exact finite-state calculation and 50,000 simulated worlds agreed.
+
+The population became more concentrated in its agreement while becoming less reliable.
+
+Here is the underlying mathematics. Let X_i equal 1 if founder i is correct and 0 otherwise. Let w_i be the number of votes descended from that founder, and W the total votes. The fraction voting correctly is:
+
+S = (sum_i w_i X_i) / W
+
+Conditional on lineage sizes generated independently of the founders’ correctness, and independent founder observations with the same accuracy p:
+
+Var(S | w) = p(1 − p) × (sum_i w_i^2) / W^2
+
+An equivalent variance-based sample size is:
+
+N_eff = W^2 / (sum_i w_i^2)
+
+Equal lineage weights give N_eff = 9. Concentration in a few lineages reduces it. Even with 201 descendants, this expression cannot exceed the nine independent founders. The calculation is exact for the variance under those assumptions; it is not an exact formula for majority-vote accuracy. Our accuracy numbers come from the separate finite-state calculation.
+
+Copying did not make the copied observations independent. That does not mean copies can never improve capability: additional execution could enable more searches, observations, redundancy, or parallel work. This experiment deliberately excluded those mechanisms.
+
+The transferable lesson is narrower: apparent consensus should be evaluated by the independence and quality of its evidence, not just the number of agents repeating it.
+
+
+Experiment two: memory is useful, but old information can remain wrong
+
+Next, twelve agents collected thirty-two binary facts spread across four niches. Each niche contained eight facts. A withheld query required one fact from every niche. We compared independent memories, several transfer rules, inherited copies, and a persistent shared board. Births replaced existing members, keeping the population at twelve.
+
+This task has a simple exact score. If agent i can access c_in correct facts in niche n, its fully informed query coverage is the product of the four niche coverage fractions. Averaging over the population gives:
+
+Coverage = (1/N) × sum_i product_n(c_in / 8)
+
+This follows from choosing one fact independently from each niche. A missing niche makes the product zero. Large amounts of information from one niche cannot compensate for no usable information from another.
+
+[K—simulation] Across 19,200 runs, the stationary, uniform, high-budget comparison reached a ceiling: fixed agents with a shared board scored 100.00%, and copying agents with the same board scored 99.96%. That ceiling offers little discrimination.
+
+The preselected changing environment was more informative. Facts changed halfway through the run, while the birth rule favored one niche. At a budget of 1,800 declared work units, fixed agents with shared memory reached 99.62% coverage; the reproducing population reached 90.11%. The paired difference was −9.52 percentage points, with a 95% interval of [−11.13, −7.90].
+
+Births consumed opportunities that could have gathered observations and concentrated agents in the favored niche. The copying condition made about 766 observations against 862 for the fixed population. Those effects were bundled; this experiment does not identify how much of the loss each caused.
+
+[A] The shared board was idealized. Evaluation reads were free, collection costs were abstract, and the score measured access to supplied facts rather than learned reasoning. In this board condition, persistent agents copying a donor’s niche at each replacement event would produce the same relevant dynamics. Calling the event a birth supplied no additional mechanism.
+
+An archive can preserve discoveries across generations. It cannot guarantee that preserved claims remain correct after the world changes.
+
+
+Experiment three: what selection rewards can differ from what we value
+
+Our evolutionary toy contained 240 individuals in twenty-four groups. Two types, A and B, made complementary contributions; a third contributed nothing. Contributions cost their bearers. We changed which group output increased reproductive success and whether offspring groups remained together or mixed.
+
+[A] The specialist types and their usefulness were supplied. If a and b are the fractions of A and B in a group, complementary output was defined as:
+
+q_comp = 4ab = (a + b)^2 − (a − b)^2
+
+This score rewards both participation and balance. Its maximum is 1 when half the group is A and half B. A group containing only one specialty scores zero, even if every member contributes.
+
+Location matters as well as population totals. Across groups:
+
+mean(q_comp) = 4 × mean(a) × mean(b) + 4 × Cov(a, b)
+
+The covariance here is over group compositions, using population normalization. Two populations can contain identical total numbers of A and B yet differ in output because the complementary types occupy different groups. Global diversity alone does not establish local cooperation.
+
+The reproduction weight of an individual was:
+
+w = 1 + 0.8 q_reward − 0.15z
+
+Here z = 1 for a contributor and 0 otherwise. Rewarded output q_reward was either zero, a alone, or q_comp, depending on the condition. A noncontributor has an advantage over contributors in the same group, while a productive group can have an advantage over less productive groups. Groups were selected by mean weight, then offspring were sampled within each selected group according to individual weights.
+
+For readers wanting the selection decomposition, before mutation the conditional expected change in contributor frequency satisfies:
+
+z_selected − mean(z) = [Cov_groups(mean(w), mean(z)) + mean_groups Cov_within(w, z)] / mean(w)
+
+With equal group sizes, this is the decomposition of the total fitness–trait covariance into between-group and within-group terms. All covariances use population rather than sample normalization. Inside a group, q_reward is shared, so Cov_within(w, z) = −0.15 Var_within(z). The within-group pressure therefore opposes contribution. The between-group term can pull the other way. This is a statement about conditional expectations, not an exact description of every random generation.
+
+Our 1% mutation rule also matters. Because a noncontributor can mutate into either contributor type, while a contributor mutates into the noncontributor only half the time:
+
+E[z_next | current population] = 0.01 + 0.985 z_selected
+
+Mixing preserves the immediate global counts but changes the arrangement on which selection acts next.
+
+[K—simulation] When only A was rewarded and groups stayed together, A’s share rose from one-third to about 91.7%. The unselected complementary score fell from 0.401 to 0.081. When complementary output was rewarded and groups persisted, it reached about 0.600. Under full mixing, the same complementary reward produced about 0.0047.
+
+Improvement on the selected objective coincided with deterioration on another function. The model did not invent a capability or discover group reproduction; both were built into its rules. All conditions reproduced, so this experiment isolates selection and grouping within a reproducing population, not reproduction versus its absence.
+
+More expansive digital-evolution research has demonstrated evolved division of labor under task-switching costs. That is relevant positive evidence for conditional collective organization, distinct from our supplied-type toy. [6]
+
+
+Why we added actual learning
+
+The first three experiments could reveal failures of inference, memory allocation, and selection. Their fixed repertoires could not test the acquisition of new policies from experience.
+
+That limitation motivated two additional experiments. We wanted to credit genuine learning if it occurred while continuing to ask whether copying added anything beyond it.
+
+
+Experiment four: an environment can coordinate a population badly
+
+Twelve controllers routed three job types onto six simulated devices. Some devices were better at particular jobs. Queues, transmission delays, temporary failures, and changing demand made yesterday’s successful route potentially poor today. We also tested uniform devices as a control.
+
+Each learner updated an estimate Q of the completion cost for a job type and device:
+
+Q_new = (1 − alpha) Q_old + alpha L
+
+L was observed completion latency, or a failure penalty. Alpha was 0.15. Decisions were usually based on the lowest estimated cost, with a 10% chance of random exploration. The correct routes were not supplied.
+
+Shared environmental traces added a second estimate. Old trace values moved back toward an uninformed prior q0 as time passed:
+
+T_aged = q0 + (T_old − q0) × exp(−delta_t / tau)
+
+T_new = (1 − beta) T_aged + beta L
+
+We used q0 = 20, tau = 60 ticks, and beta = 0.20. Trace users averaged their private estimate with the accessible trace estimate. The analogy to environmental memory was functional; these were not simulations of fungal physiology or ant behavior.
+
+[K—simulation] Across the 1,280-run suite, timely completion on diverse devices averaged:
+
+Random routing: 51.16%.
+Independent learners: 53.56%.
+Independent learners with copying: 53.08%.
+Fixed learners with shared traces: 46.28%.
+Shared traces with copying: 46.68%.
+Scrambled shared traces: 54.09%.
+One pooled learner: 42.72%.
+Privileged queue-aware reference: 95.16%.
+
+Independent learning improved on random routing by 2.41 percentage points, with a paired 95% interval of [1.44, 3.37]. The improvement reached 4.17 points in the later evaluation period. Useful adaptation occurred.
+
+Shared traces nevertheless reduced performance. Copying added an inconclusive 0.40 points over fixed trace users, interval [−0.66, 1.46], while remaining 6.88 points below the independent team. Nearly all eighteen scheduled replacement opportunities occurred, so missing reproduction did not explain the result.
+
+The resource accounting also matters. Independent learners used about 8,563 controller-work units, fixed trace users 17,126, and copying trace users 17,827, from the same 24,320 opportunities. Trace-only routing rarely deferred decisions and never deferred feedback updates. Its lower performance cannot simply be attributed to an exhausted controller budget.
+
+[S] Shared estimates may have synchronized decisions, discarded important local distinctions, or prompted reactions to delayed information. Scrambling the traces improved performance while preserving communication costs. That is evidence against assuming that more correctly indexed sharing must help; it does not identify the particular cause of harm.
+
+The uniform-device control also resisted a simple story. Independent learning scored 60.49% against 61.28% for random routing; fixed traces scored 49.24% and copying traces 49.02%. The queue-aware greedy reference scored only 47.98% there. Despite its privileged information, it was not an optimal scheduler or a performance upper bound.
+
+Hardware differences supplied opportunities and difficulties, not automatic cognitive diversity. Two agents on different processors can still carry the same information and make correlated mistakes.
+
+
+Experiment five: a controller, growing specialists, and an unexpected rule
+
+The final experiment addressed the proposed datacenter hierarchy at a smaller mathematical scale. A learned controller coordinated trainable specialists. We compared adding inherited specialists, adding fresh specialists, keeping a fixed specialist bank, and using a larger single learner.
+
+[A] This was a centrally trained mixture-of-experts regression model. The specialists were linear predictors, not independently deliberating language models. The controller was a learned routing function, not a frontier model.
+
+For input x and context c, prediction took the form:
+
+y_hat(x, c) = sum_j pi_j(c) × (theta_j dot x)
+
+pi_j(c) = exp(v_j dot [1, c1, c2]) / sum_k exp(v_k dot [1, c1, c2])
+
+Each theta_j contained a specialist’s learned coefficients. Each v_j helped determine the routing weights pi_j, which sum to one. Training adjusted both experts and routing from prediction errors. No specialist received the correct answer coefficients in advance.
+
+The first three tasks shared a structure:
+
+y = x dot [w0 + 0.4 c1 w1 + 0.4 c2 w2]
+
+The model saw three of the four combinations of two context bits. We then tested the missing combination without training on it. Separately, we introduced a deliberately contradictory rule at that context:
+
+y_changed = x dot [−w0 + 0.4 w1 + 0.4 w2 + 0.5 u]
+
+The vectors w0, w1, w2, and u were independently generated for each seed. New labeled examples allowed adaptation to the changed rule. This separated transfer before new feedback from learning after feedback arrived.
+
+Growing models began with one expert and ended with four. A copied newborn inherited the currently preferred expert’s weights plus a small perturbation. A fresh newborn started from random weights. Phase boundaries determined when to add experts; discovering when to grow was not tested.
+
+[K—learning experiment] After thirty-two updates on the unexpected rule, mean normalized prediction errors across twenty-four seeds were:
+
+Growing copied specialists: 1.8288.
+Fixed four-specialist bank: 1.5323.
+Growing fresh specialists: 0.7796.
+Larger dense learner: 0.0153.
+Structured additive learner: 0.6053.
+
+Lower is better. These are regression errors divided by a common target-variance scale within each seed, not intelligence scores.
+
+Copied growth performed worse than the fixed bank by 0.2965, with a paired bootstrap 95% interval of [0.1997, 0.3989]. Fresh growth performed better in the reported means. The final four-task errors were 0.1365 for copied growth, 0.0813 for the fixed bank, and 0.0462 for fresh growth.
+
+That positive fresh-growth result deserves attention. It suggests a useful allocation and initialization schedule under this particular shift. It does not show that physical reproduction was necessary: preallocated slots activated and initialized at the same times would implement equivalent computation.
+
+The reversal was deliberately unfavorable to inherited assumptions. Fresh experts also changed predictions before receiving any new training, so their advantage cannot be attributed exclusively to a faster learning rate. We tested a defined stress case, not a representative distribution of all possible changes.
+
+Learned coordination mattered. Replacing the trained clone model’s router with uniform weights increased its final error from 0.1365 to 0.8515. This is an inference-time ablation of a jointly trained system. It does not tell us how well a separately trained uniform-routing architecture would perform.
+
+All methods received the same examples, replay opportunities, and optimizer updates. They did not use the same computation. The larger dense learner had 304 parameters against 44 in each final expert bank and used about 6.2 times the fixed bank’s estimated forward arithmetic. The fixed bank used 1.6 times the growing banks’ arithmetic because all its experts were active from the start. These estimates omit gradients and other overheads.
+
+The ranking also changed on zero-shot composition. The correctly structured additive learner scored 0.0232, the fixed expert bank 0.2026, copied growth 0.2543, and the larger dense model 1.0649. Three contexts do not identify an arbitrary fourth-context rule. A matching structural assumption helped transfer; a broader representation helped fit the subsequent contradiction. The additive learner then suffered greater forgetting because it could not preserve four arbitrary rules simultaneously.
+
+The evidence supports real learned competence and task-dependent tradeoffs. It does not support a single ladder on which more reproduction means more intelligence.
+
+
+Could a larger model grow a more general system?
+
+[S] A larger model could potentially coordinate specialists that acquire different experience, preserve useful discoveries, and adapt to changing tasks. The resulting system might gain capabilities even while the controller’s own weights remain unchanged.
+
+Several related mechanisms already have direct prior art. MoEC combines planning, expert memory, failure-triggered growth, and consolidation for Minecraft control. CaRE studies routing across long sequences of classification tasks. Population Based Training copies successful model states while exploring training settings. These establish relevant methods, not a general theorem that reproducing agents become AGI. [7–9]
+
+Three evaluation targets should remain separate: the complete system with specialists available; a controller using a persistent archive; and a controller that retains competence after those external resources are removed. Work on growing mixtures with a compact student illustrates why consolidation into one learner is a separate training problem. [10]
+
+Our learned gate had no standalone prediction head. We therefore did not test whether it absorbed its specialists’ abilities. Nor did any toy acquire new objectives, invent an unrestricted communication protocol, or demonstrate broad reasoning across unrelated domains.
+
+A collective could be the unit evaluated for general intelligence. No principle here requires every member to be individually general. But task breadth, proficiency, transfer, and autonomy must be measured explicitly. The Levels of AGI framework provides one useful way to separate those dimensions. [11]
+
+“Beyond the original task” also needs precision. Solving a larger instance, recombining old skills, discovering a new method, building reusable infrastructure, and adopting a new goal are different outcomes. A higher score on an existing objective establishes none of the others automatically.
+
+[S] The hypothesis worth carrying forward is that collective capability can accumulate when varied experience produces useful discoveries, evaluation distinguishes useful from misleading work, memory preserves what remains valid, and coordination makes complementary contributions available. Reproduction may support that process. It may also amplify stale assumptions or replace rare useful specialists.
+
+Our strongest positive result was a growing bank of fresh learners under a particular change. Our strongest caution was that the benefits of learning, memory, and coordination cannot be assigned to reproduction merely because reproduction occurs alongside them.
+
+
+How to reproduce the experiments without embedding code
+
+The following protocol describes independent replications of the designs. It is not a claim that prose specifies every random-number draw or implementation convention. Exact row-for-row reproduction requires the preserved implementation, generator order, and software versions. No source code or executable commands are included in this article.
+
+Use an offline numerical environment. We used Python 3.12, the standard library, and NumPy 2.3.5; plotting was optional. Represent agents as bounded records or parameter vectors. Record designs and primary contrasts before seeing results. Use the same generated environment within each paired seed. Retain every condition, including weak baselines, nulls, ceilings, and counterexamples.
+
+1. Neutral-copying consensus
+
+Generate nine independent Bernoulli correctness indicators with probability 0.65. Repeatedly choose one existing individual uniformly and append a copy of its indicator until the population reaches 201. Score strict majority correctness and the larger opinion’s population fraction before and after growth. Preserve founder identities so descendants can also be collapsed into one vote per founder. Repeat for 50,000 worlds; our Monte Carlo seed was 2026101203.
+
+For an exact check, initialize probabilities for k correct founders using the binomial distribution with n = 9. At population size n, a state with k correct individuals sends probability k/n to state (n + 1, k + 1), and probability 1 − k/n to (n + 1, k). Iterate to 201 and sum states with at least 101 correct individuals. Calculate dominant share as max(k, n − k)/n. This recurrence reproduces the mathematical result without relying on Monte Carlo noise.
+
+2. Memory, coverage, and replacement
+
+Use twelve agents initially split evenly among four niches, with eight independently generated noiseless binary facts per niche. At each action opportunity, move with probability 0.08, attempt transfer or birth with probability 0.18 where supported, and otherwise observe a uniformly selected fact in the current niche. Unsupported transfer opportunities become observations. Select the acting observer or mover uniformly; a destination niche is uniform.
+
+Choose a donor with weight fertility(niche) × [1 + available local record count], without consulting hidden correctness. Choose a different recipient uniformly. Compare eight rules: independent memory; gossip merging records; memory overwrite without moving the recipient; inherited birth copying memory and niche; birth copying only niche; inherited birth with shuffled copied values; fixed agents using a shared board; and niche-copying births using the same board. Newer timestamps resolve duplicate records. Gossip retains recipient records; birth overwrites them.
+
+Charge one unit for observing/storing locally or moving; charge one plus the number of copied records for transfer; charge two for observation with a board write; charge one for niche-only birth. If a transfer is unaffordable, observe instead. Count a final unusable unit as idle. Cross budgets 600 and 1,800 with uniform fertility or a 12:1 preference for one niche, and stationary truth or a midpoint flip of all facts in niches 2 and 3. Do not allow a transfer to cross the shift boundary; substitute an observation. Evaluate all 8^4 queries and uniformly assigned recipients, without feeding query outcomes into collection. Seeds 0–299 across all conditions produce 19,200 runs.
+
+3. Selection and group persistence
+
+Initialize exactly eighty A, eighty B, and eighty noncontributors, randomly arranged in twenty-four groups of ten. Use the reproduction weights above, with q_reward equal to zero, a, or 4ab. For each newborn group, select a parental group proportional to mean weight, then sample ten offspring according to fitness-weighted type frequencies within it. Mutate each offspring with probability 0.01 into either other type uniformly. Select each offspring for dispersal with probability 0, 0.1, or 1; randomly permute selected individuals among their positions. This preserves global counts during dispersal.
+
+Run all nine conditions for seeds 0–63 over 200 generations, always producing 240 offspring per generation. Record selected output, population frequencies, and the average group-level 4ab score, using the final forty generations for the reported long-run summaries. Keep initial output as the no-change comparison. There are 576 runs. For mean intervals use 5,000 seed-level percentile bootstrap resamples; our bootstrap seed was 90417.
+
+4. Adaptive device routing
+
+Use twelve controllers, three source sites, six FIFO service devices, and three job types. Supply one job per tick plus a second with probability 0.40. Assign jobs to controllers uniformly. Run 360 initial ticks, 360 shifted evaluation ticks, and forty drain ticks. Initial type probabilities are [0.50, 0.30, 0.20], changing to [0.20, 0.30, 0.50]. Jobs must complete within forty ticks of creation. Transmission takes one tick within a site and three otherwise; completion or expiry supplies delayed feedback. Failure cost is 80.
+
+Uniform devices have capacity 1 and work requirement 5 per job. Diverse capacities are [0.75, 1, 1.25, 0.75, 1, 1.25]. Preferred job types have base work 3, others 6; multiply all base works for each type by a common factor so sum_device(capacity/work) = 1.2 jobs per tick. Number controllers and devices from zero, assigning each to the site given by its index modulo three. Device s initially prefers type s modulo three, changing to (s + 1) modulo three at the shift; recompute work normalization after the rotation. Remove each source site’s access to its formerly local second device, disable device index 1 for the first eighty evaluation ticks, and halve device index 4’s capacity for the last 180 evaluation ticks and the forty drain ticks. Both affected devices have baseline capacity 1 in both regimes.
+
+Initialize private cost tables at 20 and use the learning and trace equations above. Evaluate random routing, private learning, private learning with copying, fixed trace users, copying trace users, traces with device values scrambled at decision time, a pooled learner, and a privileged greedy queue-aware reference. The reference sees queue/service state and remains a heuristic.
+
+Every forty ticks after tick zero, a copying condition attempts to replace a uniform recipient. Choose between its two ring neighbors with probability proportional to their positive local fitness. Fitness starts at 0.10 and updates with rate 0.15 from actual timely return max(0, 1 − latency/41), with failure return zero; donor weights add 0.005. Copy eighteen table values, perturb each with independent Gaussian standard deviation 0.75, clip to [1,80], and reset recipient fitness. Its physical site remains fixed, and delayed feedback follows the physical slot.
+
+Provide 32 controller-work units per tick, with carry capped at 64. Charge private decisions one unit per available-device read plus one selection; trace decisions add one trace read per device and one request message. Charge two units per private feedback update, four for trace feedback, and three for pooled feedback. Copying costs 39 units; queue-aware decisions cost two reads per device plus one selection. Process feedback, then scheduled copying, then routing. Defer unaffordable feedback and decisions, but skip unaffordable scheduled births. Birth attempts occur at ticks 40 through 720 inclusive, including one during draining. Keep simulator bookkeeping separate. Use seeds 0–79 across eight policies and two hardware regimes, producing 1,280 runs. Record offered jobs, timely completions, early/late evaluation scores, actual work, messages, copying events, deferrals, and service utilization.
+
+5. Learned controller and specialists
+
+For seeds 0–23, draw each component of x from a zero-mean Gaussian with variance 1/8. Draw w0, w1, w2, and u independently from N(0,I8). Train the first three contexts in this order: (−1,−1), (−1,+1), (+1,−1). Provide 128 distinct training examples per phase with independent Gaussian label noise of standard deviation 0.05. Use 1,024 independently generated, noiseless test inputs per evaluated task.
+
+After phase three, evaluate context (+1,+1) under both the additive rule and the unexpected rule, before either provides training feedback. Phase four supplies 128 new noisy examples of the unexpected rule. Compare copied growth, fresh growth, a fixed four-expert bank, the larger dense learner, and the additive control. Grow from one expert by one at each phase boundary. Copy the current highest-gate-probability expert for that context and add Gaussian noise of standard deviation 0.01. Fresh experts and initial expert weights use Gaussian standard deviation 0.10; gate rows use standard deviation 0.20. New gate rows are fresh in both growth conditions.
+
+The larger learner uses features x multiplied by each element of [1,c1,c2,c1×c2], a direct linear output path, and an eight-unit tanh residual. The additive control uses x multiplied by [1,c1,c2]. These yield 304 and 24 parameters respectively, versus 44 in the final expert banks.
+
+Use squared-error training with Adam: learning rate 0.02, beta values 0.9 and 0.999, epsilon 10^−8, batch size 32, and 160 updates per phase. After the first phase, each batch contains sixteen current examples and sixteen replay examples drawn from twenty-four retained examples per earlier task. Share training sets, replay choices, and minibatch indices across methods. Reset all Adam moments and step counts at every phase boundary. This gives each method 512 labels, 640 updates, and 20,480 training-row visits.
+
+Score adaptation after 0, 8, 32, and 160 updates, old-task error change, zero-shot composition, final four-task error, and uniform-routing ablations. Normalize MSE by the mean true target variance across the four final tasks within each seed; also retain raw MSE. Use 5,000 paired seed-level bootstrap resamples, with bootstrap seed 91270. Count allocated and active parameters and actual or estimated computation separately from the matched label budget.
+
+For the memory and routing experiments, our intervals use paired seed differences and mean ± 1.96 standard errors. Confidence intervals concern variation at the chosen settings. They do not quantify validity for real AI populations. Secondary comparisons were not adjusted for multiplicity.
+
+
+What the audit changed
+
+The falsifier checked probability calculations, budgets, transitions, gradients, evaluation separation, and selected source replays. It identified one material routing defect: an update could revive an old trace by resetting its timestamp without first aging its value. We corrected that update and reran the same suite without changing other settings. All 800 non-trace rows remained unchanged. Only corrected results appear above; original outputs were preserved.
+
+The hierarchy audit checked all 372 gradient entries against finite differences, verified the larger model’s representational adequacy, and found no test-label feedback into training. The earlier memory design also received an arithmetic correction to its stated run count, from 9,600 to 19,200, without changing conditions.
+
+Designs were frozen locally before outcomes, not registered with an external service. Separate AI agents handled literature, implementations, and adversarial review. That separation helped identify defects; it is not independent laboratory replication or peer review.
+
+The next stronger test would use actual LLM systems on withheld task families, comparing a strong single model, a fixed team, fresh specialist growth, and inherited specialist growth. It would charge all controller and specialist work, let agents learn whether and when to share, and test what remains when outside assistance is removed.
+
+The question is still open: under what conditions does inheritance and turnover improve a collective’s ability to handle unfamiliar problems beyond what a persistent, equally resourced system can achieve? These experiments give us sharper conditions to investigate and several attractive shortcuts we should no longer mistake for evidence.
+
+
+Sources
+
+[1] William Zhou and Daniel Freeman. AI models may be capable of self-replicating without access to a datacenter. Anthropic Frontier Red Team research blog post, October 12, 2026.
+https://www.anthropic.com/research/self-replicating-ai
+
+[2] Daniel P. Bebber et al. Biological solutions to transport network design. Proceedings B, 2007. Transport properties include calculations from measured network geometry.
+https://pmc.ncbi.nlm.nih.gov/articles/PMC2288531/
+
+[3] Noa Pinter-Wollman et al. Harvester ants use interactions to regulate forager activation and availability. Animal Behaviour 86, 197–207, 2013.
+https://pubmed.ncbi.nlm.nih.gov/24031094/
+
+[4] Giuseppe Paolo et al. TerraLingua: Emergence and Analysis of Open-endedness in LLM Ecologies. 2026 preprint.
+https://arxiv.org/abs/2603.16910
+
+[5] Subhadeep Pal, Fiona Y. Wang, and Markus J. Buehler. SwarmWorld: Stigmergic technological evolution in societies of language-model agents. 2026 preprint.
+https://arxiv.org/abs/2608.26081
+
+[6] Heather J. Goldsby, Anna Dornhaus, Benjamin Kerr, and Charles Ofria. Task-switching costs promote the evolution of division of labor and shifts in individuality. PNAS 109, 13686–13691, 2012.
+https://pubmed.ncbi.nlm.nih.gov/22872867/
+
+[7] Hui Wu et al. MoEC: A Memory-Routed Mixture-of-Experts Controller for Adaptive Minecraft Control. ACL, 2026.
+https://aclanthology.org/2026.acl-long.1027/
+
+[8] Meng Lou, Yunxiang Fu, and Yizhou Yu. Scaling Continual Learning to 300+ Tasks with Bi-Level Routing Mixture-of-Experts. ICML, 2026.
+https://proceedings.mlr.press/v306/lou26c.html
+
+[9] Max Jaderberg et al. Population Based Training of Neural Networks. 2017 preprint.
+https://arxiv.org/abs/1711.09846
+
+[10] Fei Ye and Adrian G. Bors. Training a Dynamic Growing Mixture Model for Lifelong Learning. IEEE Transactions on Neural Networks and Learning Systems, 2025.
+https://eprints.whiterose.ac.uk/id/eprint/227585/
+
+[11] Meredith Ringel Morris et al. Position: Levels of AGI for Operationalizing Progress on the Path to AGI. ICML, 2024.
+https://proceedings.mlr.press/v235/morris24b.html
