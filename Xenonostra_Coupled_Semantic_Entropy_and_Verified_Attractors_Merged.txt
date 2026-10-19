@@ -1,0 +1,655 @@
+COUPLED SEMANTIC ENTROPY AND VERIFIED ATTRACTORS
+A Geometric and Quantum-Inspired Framework for Uncertainty Dynamics in Generative AI
+
+By Xenonostra'
+October 18, 2026
+
+An exploratory mathematical synthesis, analytical toy models, a review of prior work, and a falsifiable experimental program. This article integrates the questions and calculations developed in our coupled-semantic-entropy discussion with the mathematical and numerical results reported in two earlier manuscripts: "Information Taking Shape" and "From Semantic Entropy to Verified Attractors."
+
+ABSTRACT
+
+Can a generative language model exhibit several distinct kinds of semantic uncertainty, and can those uncertainties change together as a model interprets a prompt, forms a conclusion, and selects a line of reasoning? We propose a measurable framework in which interpretation, factual conclusion, and expressed reasoning strategy are distinct semantic variables, each associated with an entropy, but all embedded in a common joint probability distribution. A conditional-entropy toy model demonstrates that resolving one ambiguity can expose another without a conservation law. A quantum-inspired two-basis calculation illustrates how different measurements can display opposite uncertainty trends while the underlying mathematical state retains zero von Neumann entropy. We then combine these observations with information geometry, Gibbs objectives, semantic coarse-graining, topological attractors, and evidence provenance. Prior toy experiments show that entropy can increase while an objective improves, stable incorrect conclusions can be indistinguishable from stable correct ones, and duplicated evidence can create extreme false confidence. Our distinctive proposal is not that language models contain literal thermodynamic entropy reservoirs or quantum states. It is that a carefully defined multicomponent uncertainty model, paired with independently verified constraints, may predict transitions and error modes better than simpler uncertainty estimators. We specify the controls needed to test that proposal. No experiment reported here demonstrates semantic entropy conversion or a new physical law in a deployed language model.
+
+HOW TO READ THE CLAIMS
+
+[K] Established mathematics, independently identifiable prior literature, or an explicit analytical calculation. When a number comes from a prior toy experiment, it is described as a source-reported toy result, not as a measurement independently rerun for this merged article.
+[A] Assumptions, supplied state spaces, classifications, distributions, or experimental conditions.
+[S] Hypotheses and proposed interpretations awaiting empirical tests.
+[?] Gaps, unresolved questions, or unverified novelty claims.
+
+These tags matter. A correct identity in probability theory is not an observed property of a language model. A reproducible synthetic calculation is not an improvement on real-world question answering. An appealing analogy is not a mechanism.
+
+1. THE ORIGINAL QUESTION: ARE THERE MULTIPLE SEMANTIC ENTROPIES?
+
+Physical entropy, statistical entropy, quantum von Neumann entropy, and semantic uncertainty arise in different formal descriptions. Their similarities can motivate mathematics, but the word "entropy" does not make them interchangeable. A language model's computer expends physical energy; a distribution over possible meanings is a mathematical object; neither fact implies the other follows a universal semantic decay law.
+
+Our starting thought was simple: if one generated answer can be uncertain in several ways, a single entropy score may hide the structure of that uncertainty.
+
+Consider three distinguishable questions:
+
+- Which interpretation of the prompt is the model pursuing?
+- Which factual or mathematical conclusion will the model assert?
+- Which reasoning strategy, explanation, or procedure will appear in the answer?
+
+These need not have identical uncertainty or respond identically to added context. A clarification may collapse interpretive ambiguity while leaving the difficult factual question unresolved. A retrieved document may change factual confidence without determining which explanation the model uses. An instruction to show a proof may constrain the form of a reasoning trace without resolving whether the conclusion is correct.
+
+[K] Semantic entropy already measures uncertainty over meanings rather than mere wording. Farquhar and colleagues (2024) demonstrated why clustering paraphrases matters for hallucination detection [1]. Nikitin and colleagues (2024) developed kernel language entropy using von Neumann entropy of semantic similarity kernels [2]. Walha and colleagues (AAAI 2026) explicitly decompose uncertainty into aleatoric and epistemic aspects using spectral methods [3]. Li and Du (2026) develop soft-community graphs and Rényi spectral uncertainty [4]. Quantum tensor-network methods have also been applied to semantic uncertainty estimation [5]. Thus "multiple entropies" or "quantum mathematics for language" cannot, by themselves, be claimed as new.
+
+[S] The narrower, testable hypothesis is that *different semantic aspects of the same generation process have coupled, potentially direction-dependent uncertainty dynamics*. The important contribution would be a reliable prediction of how one measured uncertainty changes after a controlled intervention on another aspect, beyond ordinary conditioning and matched classical baselines.
+
+A terminology distinction is essential: "types of semantic uncertainty" can mean different *random variables* (interpretation versus conclusion) or different *entropy functionals* (Shannon versus Rényi versus von Neumann). These are not the same distinction. We will keep them separate.
+
+2. FROM NEXT-TOKEN PREDICTION TO MEANING
+
+[K] An autoregressive language model assigns a probability to a completed token sequence y given a prompt x:
+
+    P_theta(y | x) = product_(t=1 to T) P_theta(y_t | x, y_<t).
+
+This exact probabilistic factorization does not say that the model is carrying out an explicit search over meanings. It supplies a way to define probabilities of complete strings under specified sampling conditions.
+
+[A] Let phi be a declared mapping from completed responses to task-relevant semantic classes. Then the probability of a meaning c is
+
+    P_theta(c | x) = sum_(y : phi(y)=c) P_theta(y | x).
+
+Different strings may therefore support the same meaning. An elementary control illustrates the difference. Suppose a finite response distribution assigns 0.30 to "4," 0.30 to "The answer is 4," and 0.40 to "5" for the question "2+2?" The single most probable string is wrong; the most probable semantic class is the correct answer, with mass 0.60. The source manuscript calculates wording entropy as approximately 1.570951 bits and meaning entropy as approximately 0.970951 bits. That is a consequence of this stipulated three-string distribution, not evidence about a particular model.
+
+A semantic classification system must be specified before entropy can be measured. For factual problems, verified equivalence may be clear. For natural-language interpretation, classes may overlap, depend on context, or require adjudication. A similarity score is not automatically a logically valid equivalence relation.
+
+A token prefix is not the same thing as a reasoning revision. Appending a token changes the conditioning context; replacing an earlier answer after receiving external evidence is a different transition mechanism. We should measure those situations separately rather than describing both as movement down one universal landscape.
+
+3. THE MULTICOMPONENT SEMANTIC MODEL
+
+[A] For a prompt and a declared generation setting, define three random variables over completed, classified responses:
+
+    I = interpretation represented by the answer;
+    F = factual or task-level conclusion represented by the answer;
+    R = expressed reasoning strategy or explanation category.
+
+These are labels of observed output properties. They are not asserted to be three physical reservoirs or three independently accessible neural subsystems. In particular, an expressed reasoning trace need not reveal the internal computation that produced it.
+
+Let p_t(i,f,r) represent the joint distribution inferred from repeated completions under a specified context or prefix at stage t. Then define Shannon entropies in bits:
+
+    H_I(t) = -sum_i p_t(i) log2 p_t(i),
+    H_F(t) = -sum_f p_t(f) log2 p_t(f),
+    H_R(t) = -sum_r p_t(r) log2 p_t(r).
+
+The joint entropy obeys the ordinary Shannon chain rule:
+
+    H(I,F,R | x)
+       = H(I | x) + H(F | I,x) + H(R | I,F,x).
+
+[K] This identity is exact when the variables and their joint distribution are well defined. It does not require, and ordinarily does not permit, treating H_I + H_F + H_R as a conserved total. Marginal entropies count shared dependencies more than once. The total correlation
+
+    TC(I,F,R) = H(I)+H(F)+H(R)-H(I,F,R)
+
+is nonnegative in the finite classical setting, and becomes zero if the variables are mutually independent. It is one way to quantify the dependence that a list of three entropies alone would miss.
+
+[S] We call the time-indexed collection
+
+    h(t) = [H_I(t), H_F(t), H_R(t)]^T
+
+an "entropy profile." Changes in this vector may be informative, but the vector is not an autonomous dynamical state unless its changes can actually be predicted from that vector and declared interventions. A complete joint distribution, and sometimes additional history, may be needed.
+
+A proposed coarse phenomenological equation is
+
+    Delta h_t approximately A_t h_t + b_t,
+
+where A_t would be estimated on training examples and tested on held-out transitions. This is only a model class, not a derived physical law. We must compare it with ordinary conditional-probability predictions and models allowing explicit dependencies between semantic classes. If a fitted coupling term merely reproduces ordinary conditional probabilities, it does not establish an extra form of entropy conversion.
+
+4. TOY TEST ONE: CLARIFICATION CAN EXPOSE ANOTHER UNCERTAINTY
+
+[A] Consider two interpretations of an ambiguous question, A and B, each initially given probability 1/2. Under A the question has one definite factual answer. Under B there are two equally probable factual answers. We stipulate that all three factual answers are distinct.
+
+Before clarification,
+
+    H(I) = 1 bit.
+
+The factual entropy *conditional on the interpretation*, averaged over A and B, is
+
+    H(F | I) = (1/2)(0) + (1/2)(1) = 0.5 bit.
+
+The joint entropy is therefore
+
+    H(I,F) = H(I) + H(F | I) = 1.5 bits.
+
+Now suppose a clarification establishes B. Then
+
+    H(I | I=B) = 0,
+    H(F | I=B) = 1 bit,
+    H(I,F | I=B) = 1 bit.
+
+The interpretive uncertainty disappears, while the branch-specific factual uncertainty is greater than the earlier *average conditional* factual uncertainty. In conversational terms, deciding what the question means reveals a harder unresolved subproblem.
+
+[K] This is exact arithmetic for the stipulated model. Crucially, 0.5-to-1 bit compares different conditionings: an average over interpretations before clarification versus the B branch after clarification. It is not a demonstration that half a bit flowed from one physical container to another. The overall joint entropy falls from 1.5 to 1 bit in the B branch. Had A been clarified instead, the final factual entropy would be zero.
+
+There is also a strong constraint on any claimed decay rule. For a fixed random variable F and genuinely observed evidence E,
+
+    H(F | x) - H(F | E,x) = I(F;E | x) >= 0,
+
+where the right side is conditional mutual information and the left side is interpreted as the *expected* reduction over possible evidence outcomes. Equivalently,
+
+    E_E[ H(F | E=e,x) ] <= H(F | x).
+
+An individual surprising observation can increase posterior uncertainty on its realized branch. Such an increase does not contradict the average inequality. The older manuscript supplies a calibrated example in which a 0.9-versus-0.1 belief becomes 0.5-versus-0.5 after an unexpected observation: entropy rises from approximately 0.468996 to 1 bit on that branch, while expected posterior entropy is approximately 0.257914 bits.
+
+This toy supplies a useful question for real models: Can a controlled clarification reliably reduce interpretive uncertainty while moving factual uncertainty differently across identifiable branches, and can a joint model predict those changes better than simple conditionalization?
+
+5. QUANTUM MATHEMATICS AS A RESTRICTED MODELING TOOL
+
+We next asked whether the *mathematics* of quantum theory could reveal something useful, with no claim that LLM semantics is literal quantum mechanics.
+
+[K] Consider a normalized two-dimensional complex vector, written in quantum notation:
+
+    |psi(theta)> = cos(theta)|0> + sin(theta)|1>,
+
+with 0 <= theta <= pi/4. Define two measurement bases:
+
+    Z basis: |0>, |1>;
+    X basis: |+> = (|0>+|1>)/sqrt(2),
+             |-> = (|0>-|1>)/sqrt(2).
+
+The corresponding outcome probabilities are
+
+    p_Z = [cos^2(theta), sin^2(theta)],
+    p_X = [(1+sin(2theta))/2, (1-sin(2theta))/2].
+
+Let h2(p) = -p log2(p) - (1-p) log2(1-p), with the usual zero convention. Measurement entropies are
+
+    H_Z(theta) = h2(cos^2(theta)),
+    H_X(theta) = h2((1+sin(2theta))/2).
+
+The analytical values are:
+
+    theta = 0:       H_Z = 0;         H_X = 1.
+    theta = pi/8:    H_Z = 0.600876;  H_X = 0.600876.
+    theta = pi/4:    H_Z = 1;         H_X = 0.
+
+At these values, one measurement becomes less uncertain as the other becomes more uncertain. The density operator rho = |psi><psi| remains rank one, and its von Neumann entropy
+
+    S(rho) = -Tr(rho log2 rho)
+
+is zero at every theta. For these two mutually unbiased bases, the entropic uncertainty relation H_Z + H_X >= 1 bit provides a further constraint. At theta=pi/8 the sum is about 1.201752 bits.
+
+[K] These are familiar consequences of two-dimensional quantum mathematics; they are not novel experiments and not observations of an LLM. If we assign semantic meanings to Z and X measurements without an operational measurement protocol, the exercise is only a change of mathematical representation.
+
+One more general data-analytic construction is
+
+    rho = sum_k w_k |v_k><v_k|,
+
+where the normalized vectors v_k represent features of sampled responses and the weights w_k sum to one. This creates a positive-semidefinite, unit-trace matrix with a calculable von Neumann entropy. Such objects can be useful representations of semantic similarity, but their use does not prove the underlying language model implements a quantum physical state. Kernel language entropy and later spectral approaches already occupy much of this territory [2-5].
+
+[S] A genuinely useful quantum-inspired semantic proposal would have to define incompatible operational queries, possible order effects, and predictions that outperform well-specified classical conditional models. Showing two curves moving in opposite directions is not enough. Classical context-dependent sampling can produce that pattern too. Even apparent interference must be compared with sufficiently flexible classical baselines before receiving a non-classical interpretation.
+
+Thus the quantum toy provides a *warning and a design tool*, not a discovery of literal entropy conversion.
+
+6. EFFECTIVE SEMANTIC ENERGY AND STABILIZATION SHELLS
+
+The phrase "semantic energy" can be made precise in a limited sense. For a declared semantic class c given a context and generation prefix, define
+
+    E_t(c) = -ln P_theta(c | x,y_<=t).
+
+Classes with similar values of E_t can be grouped into bands, or "effective semantic energy shells":
+
+    S_epsilon(e,t) = { c : e <= E_t(c) < e + epsilon }.
+
+The terms "energy" and "shell" are analogies for probability scores and score bands. They do not describe joules, atomic orbitals, thermodynamic metastability, or a demonstrated architecture-level structure. Ma and colleagues (2025) already introduced a different, logits-based semantic-energy method [6]. Our definition is simply the negative logarithm of a semantic probability; the name does not establish priority.
+
+[A] Build a graph whose nodes are sampled semantic classes, whose edges reflect permitted revisions or prefix-conditioned transitions, and whose weights are measured transition frequencies. Then define an operational stabilization statistic. For instance, for a candidate meaning c and a declared perturbation family Delta,
+
+    Stability(c;Delta) = P( revised meaning = c | starting at c,
+                           perturbation sampled from Delta ).
+
+A high value means that the specified revision procedure tends to preserve c under the tested perturbations. It does not imply c is correct. A useful verifier must respond differently to harmless paraphrasing and genuinely corrective evidence.
+
+[S] The testable idea is that some semantic classes persist within stable bands or basins while others switch when new constraints arrive. We should estimate the transition kernel and perturbation response directly rather than infer motion from a snapshot of P(c).
+
+7. THE GEOMETRIC FOUNDATION: A GIBBS OBJECTIVE AND FISHER FLOW
+
+The third source paper, "Information Taking Shape," contributes a particularly important mathematical restriction. It gives us a valid dynamical construction in which an objective decreases, but Shannon entropy need not decrease.
+
+[A] Let Omega be a finite set of candidate states, p0(x) a strictly positive reference distribution, L(x) a fixed finite task penalty, and tau > 0 a regularization parameter. Let q(x) be the candidate distribution. Define
+
+    F_tau(q) = E_q[L] + tau D_KL(q || p0),
+
+where
+
+    D_KL(q || p0) = sum_x q(x) ln(q(x)/p0(x)).
+
+The minimizing distribution is the Gibbs-form expression
+
+    q*(x) = p0(x) exp(-L(x)/tau) / Z,
+    Z = sum_x p0(x) exp(-L(x)/tau).
+
+Indeed,
+
+    F_tau(q) = tau D_KL(q || q*) - tau ln Z.
+
+[K] The minimizing form and identity are standard results in probabilistic inference. The prior and the loss require justification. No useful evidence enters merely because a Boltzmann-looking formula has been written down. The parameter tau is in compatible score units; it is not the processor's physical temperature.
+
+For a geometry on positive probability vectors, use the Fisher metric
+
+    g_q(u,v) = sum_i (u_i v_i)/q_i,
+
+with sum_i u_i = sum_i v_i = 0. Define
+
+    a_i = L_i + tau ln(q_i/p0_i).
+
+One associated natural-gradient flow is
+
+    dq_i/dt = -q_i [a_i - E_q[a]].
+
+[K] Under the stated fixed-objective assumptions,
+
+    dF_tau/dt = -Var_q(a) <= 0.
+
+So the objective F_tau monotonically decreases. But Shannon entropy H(q) does not have to decrease. The flow has a unique interior equilibrium for this finite, convex, positive-prior setup; multiple modes of q* alone do not establish multiple competing attractor basins of F_tau. Producing metastability or multiple basins requires additional structure such as nonconvex parametrization or altered dynamics.
+
+The source paper gives a clean counterexample:
+
+    p0 = (0.99, 0.01),
+    L = (ln 99, 0),
+    tau = 1,
+    q(0) = p0,
+    q* = (0.5, 0.5).
+
+Then
+
+    F_tau(q(0)) approximately 4.549169,
+    F_tau(q*)   approximately 3.912023,
+
+while
+
+    H_bits(q(0)) approximately 0.080793,
+    H_bits(q*)   = 1 bit.
+
+[K] The defined objective improves as Shannon entropy rises. This is an exact finite-model counterexample to the claim that any favorable inference dynamics must monotonically reduce Shannon entropy. It does *not* show that increasing entropy always improves truthfulness; correctness still depends on L being appropriate to the task.
+
+For this flow, the log-odds discrepancy with equilibrium contracts exponentially:
+
+    d/dt ln[(q_i/q_j)/(q*_i/q*_j)]
+      = -tau ln[(q_i/q_j)/(q*_i/q*_j)].
+
+That offers a possible quantitative stabilization prediction. But this equation describes the constructed flow, not measured next-token inference. A fit to an LLM would need to specify L, p0, tau, and the time interpretation before testing held-out trajectories.
+
+8. A PROBABILITY LANDSCAPE DOES NOT IDENTIFY ITS MOTION
+
+A second result from "Information Taking Shape" tells us why semantic transformation laws cannot be guessed from probabilities alone.
+
+[A] Consider two three-state Markov chains. In the first, each state remains in place with probability 0.5 and moves to either other state with probability 0.25. In the second, each state remains in place with probability 0.5, moves clockwise with probability 0.4, and moves counterclockwise with probability 0.1.
+
+[K] Both chains have the same uniform stationary distribution and therefore the same stationary negative-log-probability scores. Yet the first satisfies detailed balance and the second has a nonzero directional probability current. In the earlier calculation the stationary current along each directed cycle edge is 0.1; a forward-versus-reversed path diagnostic is 0.3 ln 4, approximately 0.415888 nats per step.
+
+The two systems have equal stationary uncertainty and different transition rules. This mathematical counterexample blocks the inference "same entropy landscape implies same stabilization mechanism." It also makes "directional semantic entropy dynamics" a measurement problem: observe transitions, not only marginals.
+
+To pass from detailed states to semantic classes, let phi map states to meanings. An exact autonomous meaning-level Markov chain requires that whenever phi(x)=phi(x'),
+
+    sum_(z:phi(z)=b) K(x,z)
+      = sum_(z:phi(z)=b) K(x',z)
+
+for every target meaning b. This is the standard strong-lumpability condition. The second manuscript tested an artificial four-state case in which two detailed states sharing the same meaning had 0.8 versus 0.2 probability of remaining in that meaning. Their transition discrepancy was 0.6, so the coarse meaning alone could not determine the next step. A deliberately repaired matrix reduced the discrepancy to zero.
+
+[K] Lumpability is established Markov-chain mathematics, and related language-model semantic abstraction has direct prior art. The toy shows why an apparently sensible meaning partition may not support its own independent law. Memory, surface wording, prompt history, or other variables may remain dynamically relevant.
+
+9. ATTRACTORS, TOPOLOGY, AND THE DIFFERENCE BETWEEN STABILITY AND TRUTH
+
+The earlier paper "From Semantic Entropy to Verified Attractors" contributes a distinct question: when reasoning reaches a stable answer, what makes that answer trustworthy?
+
+[A] Let X be a set of possible reasoning states and V(x) a chosen potential or transition landscape. Local minima may define attractors under a specified update rule. Constraints C restrict the allowed region:
+
+    X_C = { x in X : C_j(x) holds for every required j }.
+
+The number of connected components (beta_0) and the number of one-dimensional holes (beta_1) are topological descriptors. Neither is a truth label.
+
+If T is a designated correct terminal set and F a designated incorrect terminal set in a finite Markov system, define the committor
+
+    q_C(x) = P_x( reach T before F under constraints C ).
+
+On nonterminal states it satisfies
+
+    q_C(x) = sum_y P_C(x,y) q_C(y),
+
+with q_C=1 on T and q_C=0 on F. Unlike mere connectivity, this quantity depends on dynamics, accessible destinations, and starting states. It is also dependent on externally supplied correct and incorrect terminal labels in the toy construction.
+
+The first manuscript reported a designed five-well landscape on an 81-by-81 grid. From a fixed pool of 332 starts, removing successively more incorrect terminal regions raised the computed truth-reaching probability:
+
+    No terminal exclusions:          92.464%.
+    One incorrect terminal removed:  94.115%.
+    Two incorrect terminals removed: 95.982%.
+    Three removed:                   97.868%.
+    Four removed:                    100.000%.
+
+These percentages were reported by the source toy study, not rerun here. The terminal designated "correct" and the invalid regions were supplied by the experimenter. The final 100% is guaranteed by construction once the only remaining reachable terminal is correct. None is a deployed-LLM accuracy rate.
+
+An especially useful control applied exclusions that produced the same coarse topological signature, one connected component and one hole:
+
+    Remove an incorrect region: 94.115% truth-reaching probability.
+    Remove a neutral region:    92.499% truth-reaching probability.
+    Remove the correct region:   0.000% truth-reaching probability.
+
+Equal beta_0 and beta_1 did not imply equal correctness. A second control found that an annular barrier yielded 100% truth-reaching probability from chosen interior starts but only 10.708% under a uniform distribution over all allowed starts. The geometry must be evaluated together with the actual initial-state distribution.
+
+[S] The useful proposal is not "topology creates truth." It is that empirically identified transition structures and independently justified constraints might help explain which semantic errors remain reachable. Learning valid constraints *without already knowing the answer* is the unsolved and decisive step.
+
+A simpler attractor control reinforces the point. Set the true numerical target to 2, and compare two revision functions:
+
+    T_good(x) = 2 + (x-2)/2,
+    T_bad(x)  = 5 + (x-5)/2.
+
+[K] Both halve the distance to their respective fixed points with identical contraction factors. Their limiting task errors are 0 and 3. They are equally stable and unequally correct. Stability, certainty, correctness, and robustness to new evidence must be measured separately.
+
+10. WHY LOW ENTROPY, AGREEMENT, AND CONFIDENCE CAN ALL BE WRONG
+
+[K] For a binary correctness probability p,
+
+    h2(p) = h2(1-p).
+
+A model assigning 92.4142% probability to a correct claim and another assigning 7.5858% can have the same binary entropy, approximately 0.387414 bits. The earlier "Verified Attractors" paper constructed mirrored log-odds trajectories to demonstrate this symmetry. Under unequal priors or a richer answer space, that simple reflection need not preserve the full semantic entropy.
+
+The source manuscript "Information Taking Shape" reported a more severe artificial check: two solvers received a series of informative constraints on a ten-bit hidden state. One was supplied correct observations and the other a deliberately corrupted observation treated as true. After ten queries, *both* had zero posterior entropy. The clean system was 100% accurate; the corrupted system was 0% accurate. This is a controlled demonstration that certainty does not equal truth, not a result about ordinary Bayesian inference with correctly specified observations.
+
+The combined lesson is that any semantic stabilization framework needs a separate verification layer. One proposed score is
+
+    E_ver(a) = -ln pi(a)
+               - sum_o ln P(e_o | a)
+               + lambda sum_j g_j(a),
+
+where pi is an answer prior, e_o are evidence observations from genuinely distinct origins, and g_j are penalties for violations of defensible constraints. Lower scores indicate greater support under the specified model.
+
+[A] Summing log-likelihood terms is justified only when their likelihoods and independence assumptions are appropriate. Multiple agents repeating the same source do not provide multiple independent confirmations. Incorrect constraints can stabilize an incorrect answer. A small E_ver is therefore not a certificate of universal truth.
+
+The source paper's 50,000-case synthetic comparison demonstrates why an equal-information baseline matters. With nominally different independent checking channels, it reported:
+
+    Initial proposer alone:             58.284% accuracy.
+    Unweighted three-way vote:          81.344% accuracy.
+    Reliability-weighted fusion:        86.736% accuracy.
+    Single reasoner given identical
+      reports and fusion rule:          86.736% accuracy.
+
+The group gained from additional useful evidence, not from the mere existence of multiple agents. Under deliberately injected copying and shared false cues, fusion became less reliable: with both sources of correlation active, accuracy fell to 50.178% even while mean model confidence was approximately 94.004%.
+
+When reports carried origin identifiers and duplicated origins were counted only once, the source toy reported that, with 60% copying,
+
+    Naive fusion:                  62.836% accuracy.
+    Provenance-aware fusion:       71.368% accuracy.
+    Difference:                     8.532 percentage points.
+
+The fraction of *all* tasks that were both wrong and given at least 90% confidence fell from 16.308% to 1.420% under that copying intervention. The denominator is all synthetic tasks, not only high-confidence tasks. With shared false cues and copying together, the corresponding accuracy gain was only 50.178% to 57.120%. Deduplicating repeated sources does not repair a common false source.
+
+These are synthetic results reported in the source text; the underlying simulation scripts were not part of the two uploads provided for this merger, so independent reproduction is still required. The defensible design insight is narrower than "many agents are smarter": genuinely complementary, independently grounded evidence is useful; copying creates correlated error and counterfeit confidence.
+
+11. INFORMATION MUST BE RELEVANT TO THE TASK
+
+A further control from "Information Taking Shape" shows that minimizing global entropy can work against the practical question.
+
+[A] Consider nine binary variables. One target bit Y has probability P(Y=1)=0.2; eight unrelated nuisance bits are fair. The solver can query one bit directly. Measuring a fair nuisance bit reveals one full bit of global information. Measuring Y reveals only
+
+    H(Y) = h2(0.2) approximately 0.721928 bit.
+
+A greedy policy maximizing *global* information may therefore prefer eight irrelevant nuisance bits, while a target-aware policy can solve the intended question with a single relevant query.
+
+The source-reported eight-query comparison was:
+
+    Global-entropy-focused policy:
+      Remaining total H(X) = 0.721928 bits;
+      Remaining target H(Y) = 0.721928 bits;
+      Target accuracy = 80%.
+
+    Target-focused policy:
+      Remaining total H(X) = 1 bit;
+      Remaining target H(Y) = 0 bits;
+      Target accuracy = 100%.
+
+Thus the policy with *more total uncertainty* gave the better task answer. The relevant objective is not the smallest entropy everywhere; it is uncertainty and utility for a defined target.
+
+Greedy relevance is not always sufficient either. If Y=X0 XOR X1 with independent fair bits, either single measurement gives zero immediate information about the parity, whereas observing both determines Y. The prior paper's controlled two-query lookahead reached 100% accuracy in that synthetic case under its stipulated schedule; a greedy policy with an unfavorable tie rule reached 50%. This is a counterexample about complementarity and myopia, not a general theorem that all greedy inference fails.
+
+For our proposed multiple-entropies framework, "which entropy changed?" must always be joined by "about which decision?" and "with what cost?" Factual accuracy, calibration, recovery after evidence changes, and computational resource use are not interchangeable objectives.
+
+12. COARSE-GRAINING AND THE LIMITS OF AN INFORMATION HOLOGRAM
+
+The "information hologram" idea from the older manuscript can be retained as a *carefully limited* analogy for a structured, potentially compact representation of what matters to a declared task. It does not imply gravitational holography, optical reconstruction, or universal lossless compression.
+
+[A] Partition a probabilistic system into interior variables X, boundary/interface variables B, and exterior query variables Y. Suppose the joint distribution factorizes as
+
+    p(x,b,y) = f(x,b) g(b,y) / Z.
+
+All influence of the interior on the exterior passes through the interface B. Define a message
+
+    m(b) = sum_x f(x,b).
+
+Then the exterior distribution is preserved exactly by
+
+    p(y) = [sum_b m(b)g(b,y)] / [sum_(b,y) m(b)g(b,y)].
+
+[K] This is ordinary variable elimination, not a new holographic theorem. The message preserves the declared class of exterior probabilities while the factorization is correct. If an omitted direct interior-to-exterior dependency exists, the old interface may fail.
+
+The source paper reported forty finite boundary tests in which valid or repaired representations agreed with full enumeration at floating-point precision, while an omitted crossing dependency produced a representative total-variation error of 0.268363. Expanding the separator restored near-exact agreement. A stronger counterexample gave two different interiors with the same old boundary message but post-crossing exterior distributions separated by total variation 0.524840. Thus no decoder receiving only that old message could always reconstruct the missing effect.
+
+These calculations motivate verified compact memory and dependency tracking. They do not show that all semantically useful state can be compressed into a short object. A stable belief distribution and a sufficient interface message are different mathematical constructions: one describes dynamics, the other specifies which consequences survive elimination of hidden variables. The combined proposal may use both, but it must not pretend one theorem automatically implies the other.
+
+13. THE UNIFIED HYPOTHESIS
+
+[S] We propose the following operational research statement:
+
+    In a declared task distribution, semantic interpretation, factual
+    conclusion, and expressed reasoning strategy can be measured as
+    related but distinguishable uncertainties. Their transitions may
+    exhibit predictable coupling under controlled prompt, evidence,
+    and revision interventions. Modeling that coupling, together with
+    independently justified constraints and evidence provenance, may
+    improve prediction of error or support better verified decisions
+    over equally informed classical baselines at matched cost.
+
+There are four separate levels of assertion:
+
+    Level A — Measurement:
+      Can we reliably classify interpretations, conclusions, and
+      explanation strategies across generated responses?
+
+    Level B — Dynamics:
+      Can a joint transition model predict changes in those labels
+      and entropies over prefixes or revisions better than baselines?
+
+    Level C — Geometry:
+      Do proposed potentials, energy bands, or attractor structures
+      make additional held-out transition or perturbation predictions?
+
+    Level D — Verification:
+      Does independent evidence and valid constraint selection improve
+      independently checked correctness and calibration at equal cost?
+
+A model might pass A and fail B, or pass B and fail C. A controller can perform better on D without showing that an ordinary LLM naturally follows its specified dynamics. A positive result at one level must not be silently promoted to evidence for the next.
+
+The proposed "semantic entropy transformation" is therefore a name for empirically resolved changes in the *profile of uncertainty*, not literal exchange of a conserved substance. For a controlled intervention delta applied to a prompt, define a measurable contrast:
+
+    Gamma_(I->F)(delta)
+       = E[Delta H_F | clarification delta]
+         - E[Delta H_F | matched control].
+
+This contrast may be nonzero because clarifying interpretation changes the available factual branches. Its sign and magnitude depend on the intervention, task set, class definitions, and sampling process. A significant contrast alone does not establish a new law; the key question is whether a coupled model predicts new cases better than ordinary conditioning and intervention-aware classical models.
+
+14. WHAT A DECISIVE REAL-LLM EXPERIMENT WOULD REQUIRE
+
+The two source manuscripts contain meaningful artificial controls; neither supplies a completed real-LLM validation of this combined hypothesis. The next test should not recycle the toy numbers as empirical performance claims.
+
+[A] First specify an evaluation task set with independently checkable conclusions. Construct a factorial design that varies prompt ambiguity and factual difficulty separately. Include prompts where clarification changes only interpretation, prompts where added evidence changes factual knowledge, and prompts where a prescribed explanation format changes only the expressed strategy. Fix model versions, sampling parameters, token and tool budgets, and the mapping from responses to semantic classes before inspecting test outcomes.
+
+Measure a distribution of completions at fixed prompts and, separately, at selected generation prefixes. Estimate H_I, H_F, H_R, their joint entropy, conditional entropies, and dependence. Attach uncertainty intervals. Human-adjudicated labels, automated classifiers, and soft-classification alternatives should be compared; semantic-classification errors must not be mistaken for novel entropy dynamics.
+
+Test at least four model families:
+
+    Model 1: Independent semantic components with matched marginals.
+    Model 2: Classical coupled joint transitions/conditional probabilities.
+    Model 3: Geometric or energy-shell transition model.
+    Model 4: Quantum-inspired representation, evaluated only against
+             comparably expressive classical alternatives.
+
+The key outcome for predictive dynamics is held-out forecast quality under new prompt interventions, not how visually convincing fitted curves appear. Evaluate both log loss and calibration for future semantic classes, not only retrospective entropy correlation. Require predeclared predictions about direction, magnitude, and robustness of component changes.
+
+To test stabilization, separate paraphrase robustness, recovery from a known wrong answer, and appropriate movement after correct new evidence. Include cycles, refusal/abstention, delayed corrections, and adversarially misleading but apparently authoritative inputs. A frozen answer that never updates is stable yet unhelpful.
+
+For correctness, compare an equally informed single reasoner, simple voting, reliability-weighted fusion, provenance-aware fusion, and provenance-aware fusion plus learned constraints. Do not use oracle knowledge of the answer to choose the constraints except in a clearly labeled upper-bound condition. Deduplicate actual shared sources; also test subtler correlation from common training data and shared premises.
+
+For cost, count sampling, classification, prompt tokens, model calls, search/retrieval, verification, graph construction, fitting, maintenance, and repair. Comparing a richer model using more information with a weaker baseline using less information would not establish the claimed mechanism.
+
+A practical preregistered result might ask whether Model 2 improves held-out next-step semantic-class prediction versus Model 1, and whether Models 3 or 4 add reliable improvement beyond Model 2 without exceeding the matched computational budget. A separate result should ask whether provenance-aware verified decisions improve independently scored accuracy and calibration.
+
+15. REPRODUCIBILITY: WHAT CAN BE CHECKED NOW
+
+Several calculations in this article can be reproduced with a scientific calculator or a short local script. The equations needed for the main analytical checks are given above, without inserting pages of code into the Medium article.
+
+Independent analytical checks:
+
+    A. Two-interpretation conditional entropy:
+       H(I)=1; H(F|I)=0.5; H(I,F)=1.5;
+       after selecting B, H(F|B)=1 and H(I,F|B)=1.
+
+    B. Quantum-inspired two-basis calculation:
+       theta = 0, pi/8, pi/4 gives (H_Z,H_X) of
+       (0,1), (0.600876,0.600876), and (1,0).
+       The pure-state von Neumann entropy remains zero.
+
+    C. Gibbs counterexample:
+       p0=(0.99,0.01), L=(ln 99,0), tau=1;
+       F falls from approximately 4.549169 to 3.912023;
+       H increases from approximately 0.080793 to 1 bit.
+
+    D. Binary reflection:
+       h2(p)=h2(1-p), irrespective of which outcome is true.
+
+    E. Markov directionality:
+       compare a symmetric 0.5/0.25/0.25 three-state chain
+       to a 0.5/0.4/0.1 directed-cycle chain.
+       Both have uniform stationary distribution, with different currents.
+
+The earlier manuscript "Information Taking Shape" names companion scripts for the ten-bit constraint tests, nine-bit target-information tests, semantic-stability controls, Fisher/Gibbs checks, and valid/broken boundary-message experiments. The other manuscript names scripts for reflected evidence, topological attractors, multi-agent fusion, and evidence provenance. Their exact protocols, synthetic assumptions, and original reported numeric outputs are described in those source manuscripts.
+
+Important availability disclosure: only the two textual manuscripts were provided in this merger. Their companion code archives, input files, and CSV/JSON outputs were not supplied here, so the source-reported simulation percentages are *not* independently rerun or certified in this article. Anyone reproducing them must obtain or reimplement the stated procedures, fix random seeds and numerical dependencies, and compare the actual outputs against the reported values. This is separate from the new analytical calculations, which were independently evaluated arithmetically while preparing the merged draft.
+
+The earlier "Information Taking Shape" manuscript cites, for its own companion ZIP, Python scripts called cycle1.py, cycle2.py, boundary_test.py, toy_tests.py, sphere_flow.py, and basic_checks.py, with seeds and environment details stated there. "From Semantic Entropy to Verified Attractors" cites entropy_mirror_test.py, topological_attractor_test.py, multicellular_agents_toy.py, and dna_rna_provenance_toy.py. Those filenames are reproduction leads, not attachments to this Medium article. This article deliberately omits lengthy code blocks.
+
+16. WHAT IS ESTABLISHED, WHAT REMAINS ORIGINAL TO THE PROPOSAL, AND WHAT COULD FAIL
+
+[K] Established mathematical tools in the synthesis include Shannon entropy and chain rules, mutual information, von Neumann entropy, Gibbs distributions, KL divergence, Fisher-natural-gradient flow, Markov transition currents, lumpability, committors, variable elimination, and Bayesian evidence aggregation under valid assumptions. These are not newly discovered laws.
+
+[K] Already investigated in LLM literature are meaning-level semantic entropy, semantic similarity kernels, spectral uncertainty decomposition, energy-style language-model descriptions, quantum-inspired uncertainty estimators, entropy-guided branching, verification, and several forms of attractor or revision dynamics. The literature is more developed than the first intuitive statement of our idea might suggest [1-12].
+
+[K] Analytical findings of the combined inquiry are limited but useful: disambiguation can select a branch with more residual uncertainty than the prior average; quantum basis uncertainty can change in opposite directions while the pure-state von Neumann entropy does not; a valid optimization objective may fall while Shannon entropy rises; identical stationary distributions may support different currents; and equivalent semantic classes may fail to have equivalent futures.
+
+[K] Source-reported synthetic findings demonstrate failure modes: certainty can attach to false beliefs, constraints can help or hurt depending on which regions they remove, globally high information gain may ignore the task target, and correlated agent agreement can create striking overconfidence. These demonstrations are not real-model confirmations of our central hypothesis.
+
+[S] The contribution we propose to test is an *integrated, operational coupling-and-verification framework*: jointly characterize different semantic uncertainties, measure directional transition responses, analyze stabilization when its assumptions fit, and keep correctness grounded in independent evidence. Its novelty, if any, must come from precise new predictions, a better method under matched conditions, or a useful theorem with assumptions not already subsumed by known models.
+
+[?] We have not established a conserved semantic entropy, literal conversion between entropy substances, quantum coherence inside a transformer, universal semantic energy shells, a single scalar potential descended during ordinary next-token generation, or an architecture-independent new law of intelligence. Nor have we shown that the combined controller improves real models, or that the overall synthesis has priority over all existing research.
+
+Three results would seriously weaken the proposal:
+
+    1. Apparent semantic coupling disappears when semantic labels,
+       changed conditioning, or class-imbalance artifacts are controlled.
+
+    2. A straightforward classical conditional model predicts all the
+       observed transitions as well as the proposed geometric or
+       quantum-inspired machinery, at equal information and cost.
+
+    3. Verified attractor and provenance methods produce no reproducible
+       gain over ordinary verification, structured memory, or an equally
+       informed single-agent baseline, once discovery cost is counted.
+
+Those are legitimate outcomes. A falsifiable synthesis becomes useful precisely when it names the conditions under which it would fail.
+
+CONCLUSION
+
+The original intuition survives, but in a more disciplined form. A generated response need not have one undifferentiated kind of semantic uncertainty. Interpretation, factual conclusion, and expressed reasoning strategy can be represented as different random variables with a joint distribution. Their measured uncertainties can change in different directions when context or evidence changes, without violating classical information theory and without implying literal conversion of conserved entropy.
+
+Quantum-inspired mathematics offers one structured comparison of incompatible measurements, not proof of quantum computation. Information geometry supplies exact conditional flows, not a universal theory of token generation. Topology can describe reachability, not decide which answer is true. A stable answer is not automatically a verified answer; agreement among agents is not automatically independent evidence.
+
+Our proposed research sequence is therefore:
+
+    Specify semantic variables
+      -> estimate their joint uncertainty
+      -> test transition predictions
+      -> identify stabilization only where measurable
+      -> impose justified constraints
+      -> verify conclusions with independent evidence
+      -> compare accuracy, calibration, and cost against baselines.
+
+The central unresolved question is concrete: *Can a coupled description of semantic uncertainty, paired with independently checked attractor constraints and provenance, predict and reduce language-model errors more effectively than existing methods under equally demanding tests?*
+
+That is a defensible exploratory Xenomostra' research program. It is not yet a demonstrated law of semantic entropy decay, a new physical theory, or a proven improvement to generative AI.
+
+REFERENCES AND PRIOR ART
+
+[1] Farquhar, S., Kossen, J., Kuhn, L., and Gal, Y. (2024). Detecting hallucinations in large language models using semantic entropy. Nature 630, 625-630.
+https://doi.org/10.1038/s41586-024-07421-0
+
+[2] Nikitin, A., Kossen, J., Gal, Y., and Marttinen, P. (2024). Kernel Language Entropy: Fine-grained Uncertainty Quantification for LLMs from Semantic Similarities. arXiv preprint.
+https://arxiv.org/abs/2405.20003
+
+[3] Walha, N., Gruber, S. G., Decker, T., Yang, Y., Javanmardi, A., Huellermeier, E., and Buettner, F. (2026). Fine-grained Uncertainty Decomposition in Large Language Models: A Spectral Approach. Proceedings of AAAI 2026, 40(31), 26090-26098.
+https://doi.org/10.1609/aaai.v40i31.39811
+
+[4] Li, Z., and Du, J. (2026). Soft-Community Kernel Renyi Spectrum for Semantic Uncertainty Estimation in Large Language Models. Entropy 28(4), 442.
+https://doi.org/10.3390/e28040442
+
+[5] Vipulanandan, P., Premaratne, K., and Sarkar, D. (2026). Semantic Uncertainty Quantification of Hallucinations in LLMs: A Quantum Tensor Network Based Method. ICLR 2026.
+https://proceedings.iclr.cc/paper_files/paper/2026/hash/4c79c359b3c5f077c0b955f93cb0f53e-Abstract-Conference.html
+
+[6] Ma, H., Pan, J., Liu, J., Chen, Y., Zhou, J. T., et al. (2025). Semantic Energy: Detecting LLM Hallucination Beyond Entropy. arXiv preprint.
+https://arxiv.org/abs/2508.14496
+
+[7] Shannon, C. E. (1948). A Mathematical Theory of Communication. Bell System Technical Journal 27, 379-423 and 623-656.
+https://people.math.harvard.edu/~ctm/home/text/others/shannon/entropy/entropy.pdf
+
+[8] Jaynes, E. T. (1957). Information Theory and Statistical Mechanics. Physical Review 106, 620-630.
+https://doi.org/10.1103/PhysRev.106.620
+
+[9] Amari, S. (1998). Natural Gradient Works Efficiently in Learning. Neural Computation 10(2), 251-276.
+https://doi.org/10.1162/089976698300017746
+
+[10] Blondel, M., Sander, M. E., Vivier-Ardisson, G., Liu, T., and Roulet, V. (2026). Autoregressive Language Models are Secretly Energy-Based Models: Insights into the Lookahead Capabilities of Next-Token Prediction. ICML 2026, PMLR 306, 8644-8675.
+https://proceedings.mlr.press/v306/blondel26a.html
+
+[11] Kuhn, L., Gal, Y., and Farquhar, S. (2023). Semantic Uncertainty: Linguistic Invariances for Uncertainty Estimation in Natural Language Generation. ICLR 2023.
+https://arxiv.org/abs/2302.09664
+
+[12] Dechter, R. (1999). Bucket Elimination: A Unifying Framework for Reasoning. Artificial Intelligence 113, 41-85.
+https://ics.uci.edu/~dechter/publications/r76A.pdf
+
+[13] Tishby, N., Pereira, F., and Bialek, W. (2000 arXiv version). The Information Bottleneck Method.
+https://arxiv.org/abs/physics/0004057
+
+[14] Du, Y., Li, S., Torralba, A., Tenenbaum, J., and Mordatch, I. (2024). Improving Factuality and Reasoning in Language Models through Multiagent Debate. ICML 2024.
+https://proceedings.mlr.press/v235/du24e.html
+
+[15] Smit, A. P., et al. (2024). Should we be going MAD? A Look at Multi-Agent Debate Strategies for LLMs. ICML 2024.
+https://proceedings.mlr.press/v235/smit24a.html
+
+[16] Hennig, P., and Schuler, C. J. (2012). Entropy Search for Information-Efficient Global Optimization. JMLR 13, 1809-1837.
+https://www.jmlr.org/papers/v13/hennig12a.html
+
+[17] Evans, B. P., Ganesh, S., and Ardon, L. (2026). Entropy-informed Decoding: Adaptive Information-Driven Branching. ICML 2026.
+https://proceedings.mlr.press/v306/evans26a.html
+
+[18] Zhu, Q., Chen, S., Yu, R., Wu, Z., and Wang, B. (2026). From Lossy to Verified: A Provenance-Aware Tiered Memory for Agents. Preprint.
+https://arxiv.org/abs/2602.17913
+
+[19] Wang, Z., Li, Y., Yan, J., Cheng, Y., and Zhang, Y. (2025). Unveiling Attractor Cycles in Large Language Models: A Dynamical Systems View of Successive Paraphrasing. arXiv preprint.
+https://arxiv.org/abs/2502.15208
+
+[20] Emadi, S. M. (2026). The Critical Horizon: Inspection Design Principles for Multi-Stage Operations and Deep Reasoning. arXiv preprint. Semantic-state abstraction and lumpability are discussed in the preprint; the full claims have not been independently audited for this article.
+https://arxiv.org/abs/2602.09394
+
+[21] Maassen, H., and Uffink, J. B. M. (1988). Generalized Entropic Uncertainty Relations. Physical Review Letters 60, 1103-1106.
+https://doi.org/10.1103/PhysRevLett.60.1103
+
+SOURCE MANUSCRIPTS INTEGRATED
+
+Xenonostra'. (2026). Information Taking Shape: Entropy, Semantic Attractors, and the Information Hologram Hypothesis. Unpublished exploratory manuscript supplied for this synthesis.
+
+Xenonostra. (2026). From Semantic Entropy to Verified Attractors: A Topological and Provenance-Aware Framework for Multi-Agent Reasoning. Unpublished exploratory manuscript supplied for this synthesis.
+
+These two manuscripts are primary records of the earlier toy-model constructions and their reported outputs. They are not independent peer-reviewed evidence for a new theory.
+
+AUTHOR'S NOTE
+
+This exploratory article was developed through human-AI collaboration under the pen name Xenonostra'. The human research direction combined semantic entropy, possible transformations between uncertainty components, geometric stabilization, and quantum mathematics as a deliberately nonliteral modeling tool. AI assistance contributed literature review, formal mathematical checks, criticism, manuscript comparison, and drafting. The analytical checks and synthetic-source reports are marked separately. Neither AI-assisted internal review nor mathematical elegance substitutes for independent replication, peer review, or real-model validation.
