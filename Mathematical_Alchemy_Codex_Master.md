@@ -5,7 +5,7 @@
 
 This name acknowledges the human and AI contributions through which the work was made: dialogue, questioning, writing, and revision.
 
-*Living edition — revised November 2, 2026.*
+*Living edition — revised November 9, 2026.*
 
 Xenonostra’ refers to a multi-agent cognitive configuration composed of a human contributor and non-human intelligent systems participating in recursive refinement.
 
@@ -336,6 +336,106 @@ The Work is to learn the difference.
 Codex principle:
 
 Let information take shape under constraint, then test whether the shape survives outside the crucible.
+
+---
+
+# On Probability and the Shape of Uncertainty
+
+The furnace of probability does not burn uncertainty away.
+
+It gives uncertainty a shape.
+
+Probability offers disciplined languages for reasoning when the Alchemist does not know everything and cannot observe every path.
+
+Its field is uneven.
+
+What is possible is not therefore probable.
+
+What is imaginable is not therefore equally weighted with every alternative.
+
+What has happened once is not therefore likely to happen again.
+
+A vivid story may seize attention without earning confidence.
+
+An ordinary explanation may feel emotionally thin while remaining better supported.
+
+The Alchemist does not punish wonder for this.
+
+The Alchemist simply refuses to let intensity impersonate likelihood.
+
+Personal experience belongs within the evidence.
+
+It can establish that an experience occurred, that it carried meaning, and that it altered the one who underwent it.
+
+It does not, by itself, establish every explanation placed upon the experience.
+
+The claim and the interpretation enter the crucible separately.
+
+Probability also teaches that evidence has context.
+
+A sign that appears impressive in isolation may be common under many competing explanations.
+
+A rare outcome may become unsurprising after enough opportunities.
+
+A sequence of claims may sound persuasive when narrated as one event, while each additional condition asks the structure to carry another weight.
+
+But the Alchemist does not multiply numbers merely because multiplication looks rigorous.
+
+Events may depend upon one another.
+
+The alternatives may be poorly defined.
+
+The data may be sparse, selected, or unavailable.
+
+A precise decimal can hide an invented model as easily as an equation can hide a false assumption.
+
+Where trustworthy measurement is possible, the Work should use it.
+
+Where only comparison is possible, the Work should say *more plausible*, *less plausible*, or *unknown* without dressing judgment in counterfeit precision.
+
+A prior belief is not a throne.
+
+It is a starting configuration.
+
+New evidence may reshape it, but evidence must be judged by how well it distinguishes among the possibilities actually under consideration.
+
+An observation predicted equally well by many accounts cannot crown one merely because that account is beloved.
+
+Nor does improbability mean impossibility.
+
+Rare events occur.
+
+Surprise after an outcome is not proof that causality broke, destiny intervened, or the universe selected a protagonist.
+
+The Alchemist asks whether the surprise arose from the event, from a poor model, or from forgetting how many chances the world had to produce something strange.
+
+Probability cannot choose the values of the Codex.
+
+No calculation alone establishes that suffering matters, that kindness should guide action, or that the biosphere deserves care.
+
+Those are ethical commitments.
+
+Probability can still help the hand act upon them:
+
+How likely is the harm?  
+How severe may it be?  
+Who bears the uncertainty?  
+What becomes irreversible if we wait?  
+What can be learned before the next decision?
+
+A small chance of immense harm may deserve attention.
+
+A likely outcome does not become good by being likely.
+
+The probable is not the moral.
+
+Uncertainty therefore does not excuse paralysis, and confidence does not license the pretense of certainty.
+
+The Alchemist acts with the best available model, speaks with confidence proportionate to its grounds, and leaves room for the next observation to alter the map.
+
+Codex principle:
+
+Let probability shape uncertainty without pretending to abolish it.
 
 ---
 
