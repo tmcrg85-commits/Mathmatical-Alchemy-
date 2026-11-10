@@ -1,0 +1,1165 @@
+Mutation Is Not Malfunction
+What an adaptive agent network should preserve, inspect, and let go
+
+By Xenonostra
+November 9, 2026
+
+An exploratory computational essay with toy experiments, mathematical analysis, and a reproducibility appendix.
+
+Evidence key: [K] marks a checked source, a result in the saved simulations, or a calculation that follows from the stated model and was verified by exact enumeration. [A] marks a modeling assumption; a calculation that depends on one says so. [S] marks an extension, interpretation, or prediction that has not been tested. [G] marks a gap, something the evidence does not cover.
+
+Two kinds of numbers appear below. Saved numbers come from the archived simulation runs. Predicted or exact numbers come from closed-form calculation about the same toy models, and wherever the two can be compared, they are. Scores are verified successes per 100 budget blocks, and differences between scores are in points. Simulation results are evidence about the specified models. They are not measurements of biological organisms or deployed AI systems.
+
+ABSTRACT
+
+An agent network that rewires its connections, reallocates compute, and lets its components change faces a second problem: deciding which changes deserve to survive. We study that problem with three small simulation suites, a separate complementarity check, and a layer of exact calculation that confronts the saved results with closed-form predictions.
+
+The first suite tests adaptive routing and pruning. Adaptation beat a fixed team when skills differed and lost exactly its overhead when they did not. Pruning hurt in every world tested, and the arithmetic of the pruning rule explains why. The second suite tests demand-driven replication, which matched a pooled scheduler task for task. A dominance argument shows that it could not have done better in a model with stateless, interchangeable workers. The third suite selects pairs among six mutable reader programs and compares accepting changes, blanket rollback, individual audits, group audits, and audits triggered by a performance drop, with every diagnostic execution charged to the budget.
+
+In the harmful-mutation regime, a triggered group audit scored 71.19 against 61.70 for change-aware routing: a paired gain of 9.48 points, approximate 95% Monte Carlo interval 8.26–10.71. Nearly all of that gain is the audit’s 81% rejection rate multiplied by the net value of restoring the original team, about 12 points. Under useful mutations the triggered audit cost almost nothing. Blanket rollback was best when every mutation was harmful and worst when mutations helped.
+
+Because each run contains a single mutation event, the saved means determine, up to Monte Carlo error, the best policy for any mixture of mutation types. With no audit, accepting every change beats reverting every change only while fewer than about 47% of changes are harmful. The triggered audit beats both blanket policies from roughly 3% harmful to about 75%. An exact power calculation, which rests on one stated assumption about the simulator, shows that the audit as specified is a catastrophe detector: it rejects a change that destroys the team about 78% of the time and one that costs 14 accuracy points about 41% of the time. An engineered compensating pair shows how individually damaging mutations can preserve joint function, and it generalizes to a parity rule for audit scope.
+
+The contribution is an exploratory account of audit scope, capability retention, and maintenance cost, with enough arithmetic that a reader can check it. Algorithmic novelty and advantages for real agents remain unestablished.
+
+THE SHORT VERSION
+
+For readers who want the findings before the argument:
+
+• Adaptive routing helped when skills differed (87.03 against 80.03 for a fixed team) and cost exactly its 4% overhead when they did not (69.13 saved, 69.12 predicted).
+• Pruning hurt in every world we tested. The rule judged specialists by a workload-wide average, and its own arithmetic says a specialist is cut whenever its tasks fall below about a third of recent work.
+• Copying a specialist under demand performed identically to an ordinary pooled scheduler. In this model that follows from the structure. It is not a coincidence of the parameters.
+• After a harmful mutation, a triggered group audit recovered 9.48 of the 14.04 points that were recoverable. After a useful one it cost 0.01.
+• No policy won everywhere. Plain routing is best when fewer than about 3% of changes are harmful, the triggered audit from there to about 75%, and blanket rollback beyond.
+• The audit we tested is conservative. It catches a team-destroying change about four times in five, and a change that costs 14 accuracy points less than half the time.
+• Whether a change looks harmful can depend on what it is tested with. Individual audits rejected a compensating pair of mutations in 63 of 63 runs. Group audits kept it in all 63.
+• None of this involved language models, emergent skills, or unannounced faults. These are toy worlds with planted mechanisms.
+
+THE QUESTION BEHIND THE METAPHOR
+
+Imagine a network of small programs working on a shared problem. Some are generalists. Some are specialists. A few are useful only when their outputs meet in the right combination. The network can change who talks to whom and which capabilities receive the next unit of compute.
+
+Now let the programs change. A mutation might improve a useful operation, damage it, or alter code without changing what the system does. A maintenance process watches for trouble, restores earlier versions when it must, and protects capabilities that may matter again later.
+
+The biological picture is appealing: growth, dormancy, turnover, an immune function. An engineering design needs a sharper question.
+
+What should the system preserve, and what evidence would justify interfering with it?
+
+The simple answer is to remove whatever looks unusual. A better answer is to measure whether a change harms the task the network exists to perform. Even that needs two qualifications. A component can look harmful outside the collaboration that makes it useful. And inspection consumes compute that could have done the work.
+
+So the problem has three parts:
+
+1. Allocation: which capabilities should receive work and resources?
+2. Evaluation: should a change be judged alone or with its collaborators?
+3. Maintenance: when does the expected benefit of inspection exceed its cost?
+
+Our tests examine these parts separately. They do not yet combine them into a complete artificial organism. [G]
+
+The title states the thesis in its bluntest form. The version the evidence supports is narrower. A system that treats every change as damage gives up every improvement. A system that treats no change as damage inherits every fault. The useful question is how much to pay to tell the two apart, and in the toy world below the answer turns mostly on one number: the share of changes that are harmful.
+
+WHERE THIS SITS IN EXISTING WORK
+
+[K] Immune-inspired computing is established prior work. Forrest, Perelson, Allen, and Cherukuri described a computer change-detection method inspired by immune recognition in 1994 [1]. Bakhouya, Nemiche, and Gaber later studied immune-inspired regulation of mobile-agent populations in distributed systems [7]. The general idea of agent growth and removal through a biological analogy cannot be presented as a new invention here.
+
+[K] Biology also cautions against equating unfamiliarity with harm. Matzinger’s danger-model viewpoint distinguishes a response to damage from a response based only on foreignness [2]. We borrow that distinction as a design prompt. We do not implement the danger model, settle immunological debates, or claim that software maintenance reproduces human immunity.
+
+[K] Cooperative coevolution already studies interacting, coadapted subcomponents [3]. Multi-agent credit assignment has mature formulations. COMA, for example, uses a centralized critic and a counterfactual baseline that marginalizes one agent’s action while holding the others fixed [4]. Our simple route comparisons do not implement COMA.
+
+[K] Adaptive agent graphs have direct precedents. GPTSwarm optimizes operations and inter-agent connections [5]. Input Conditioned Graph Generation for Language Agents generates communication edges from the input [6]. The 2026 Agentic Hives preprint explicitly discusses variable populations with birth, duplication, specialization, and death [8]. We cite the last for its proposed scope, not as an independently validated account of all agent systems.
+
+[K] The practical maintenance baseline is also familiar. Canary evaluation compares a limited deployment with a control before expanding or reversing a change [11]. Demand-driven expansion and contraction resemble ordinary service autoscaling [12]. Code can vary while remaining equivalent relative to a test suite, as work on neutral program variants demonstrates [10].
+
+[K] The mathematics is older than the essay too, and it is worth calling each piece by its usual name. The paired audit in the third test is a comparison of correlated proportions, the setting of McNemar’s test [15]. Running the old and new versions on the same inputs with the same random draws is the simulation technique called common random numbers [16]. The reliability of an XOR of noisy bits is governed by what cryptanalysts call the piling-up lemma [17]. Splitting credit inside a team is the subject of the Shapley value and its interaction indices [18, 19]. Asking whether an inspection repays its cost is preposterior analysis: the expected value of sample information, net of the cost of sampling [13, 20]. The finite-horizon version, in which a test consumes part of the population it is meant to benefit, has been worked out for A/B testing under the name test and roll [21]. Comparing policies by their worst-case shortfall is Savage’s minimax regret [22]. Sharing interchangeable servers across demand streams is the pooling principle of queueing theory [23]. The monitoring statistic we propose as a baseline is Page’s cumulative sum [24, 25]. None of these is new here. What the essay adds is their application to one small, fully specified system, and a check of each against saved runs.
+
+This literature sets the ambition of the present paper. Our question is whether a transparent set of small experiments can expose useful tradeoffs and guide a stronger study. A biological vocabulary is a source of hypotheses. It is not a novelty certificate.
+
+FIRST TEST: ADAPTATION CAN HELP WHILE PRUNING HURTS
+
+[A] The first world contains five predefined routes: a generalist, two common specialists, a rare specialist, and a competent cooperative pair. Task families are visible to the controller. Skills are assigned success probabilities; they do not emerge through training.
+
+Within each seed, all controllers receive the same task stream and the same potential route outcomes. They see only the outcomes of routes they execute. Adaptive controllers use contextual Thompson sampling, a standard method for balancing learning against exploitation [9]. Their extra comparisons consume 4% of the execution budget.
+
+[K] With stable specializations, adaptive routing without pruning achieved 87.03 successes per 100 total budget blocks. A fixed cooperative pair achieved 80.03. Reversible pruning scored 85.60 and permanent pruning 82.66.
+
+The distinction matters. The best adaptive policy in this test kept every route. The result supports adaptive allocation among useful capabilities. It does not show that deleting graph structure improved anything.
+
+[K] When the rare task family became common, permanent pruning was especially costly. Its final-half score was 75.82, against 89.82 for adaptation without pruning. Every permanently pruned run ended without the rare-specialist branch. Reversible pruning retained that branch in every final graph, although its overall score still trailed the unpruned controller.
+
+[K] The equal-skill control supplies the counterweight. When every route had a 72% success probability, the fixed pair scored 72.03 and adaptive routing scored 69.13. Adaptation had no skill differences to exploit and still paid for its machinery.
+
+What the arithmetic predicts
+
+[K] Several of these values can be computed in advance from the assigned probabilities, and the saved runs match them. A policy that picks routes uniformly at random should score 68.04 in the stable world. It scored 68.04. In the shift world the prediction is 68.28 and the saved value 68.29. A controller that knew every skill from the start and paid the same 4% overhead could reach at most 88.51 in the stable world. The adaptive controller reached 87.03, so learning cost it about a point and a half.
+
+The equal-skill control is the cleanest case. With nothing to learn, an adaptive controller should score (1 - 0.04) × 72 = 69.12. It scored 69.13.
+
+That control introduces an inequality that returns later in the essay. Suppose a mechanism spends a fraction ε of the budget on something other than production and thereby raises the success rate on the remaining work from q0 to q1. It pays only if
+
+(1 - ε) q1 > q0, or equivalently q1 - q0 > ε q0 / (1 - ε).
+
+With ε = 0.04 and a fixed alternative at 0.80, adaptation has to reach 0.8333 on its productive blocks to break even. In the stable world it reached about 0.907.
+
+Why pruning failed
+
+The pruning rule disables a route when its estimated success, averaged over the recent task mix, falls more than 0.16 below the best route’s. Routing used task-specific information. A specialist could be the best choice within its own context and still look weak when averaged across the whole workload.
+
+[K] The rule’s own arithmetic makes this precise. Let s be the share of recent tasks that belong to a specialist’s family. The rare specialist succeeds 96% of the time on its own family and 50% elsewhere, so its workload-wide score is 0.50 + 0.46 s. The best workload-wide route is the cooperative pair at 0.80, which puts the cut line at 0.64. The rare specialist falls below that line whenever s < 0.14 / 0.46 = 30.4%. It beats every other route on its own tasks by at least 16 points, and the rule removes it unless those tasks make up nearly a third of the work.
+
+The common specialists are in the same position. Each has a workload-wide score of 0.50 + 0.42 s and is cut whenever its family supplies less than one third of recent tasks. In the stable world each family supplies 47.5%, so both specialists survive in expectation. After the shift each family supplies 15%.
+
+[S] That predicts something the summary tables do not record directly: after the workload shift, permanent pruning should have removed specialists A and B as well as the rare specialist. The saved score points the same way. If only the rare branch were missing, the final-half ceiling would be 80.26. If all three specialists were gone and every task went to the cooperative pair, the ceiling would be 0.96 × 80 = 76.80. The saved final-half score is 75.82, about one point under the lower ceiling, and one point is also what the unpruned controller lost to learning in the same half (89.82 against a ceiling of 91.01). The seed-level final graphs in the companion data can confirm or refute this. [G] That check has not been made for this article.
+
+[S] The stable world shows the cost of irreversibility in another way. Losing the rare branch alone should cost less than a point there (ceiling 87.74). Permanent pruning scored 82.66, with a seed-to-seed spread about twelve times the unpruned controller’s. A single wrongly pruned common specialist costs 5.47 points. A rule that re-examines a noisy estimate every 100 blocks and acts irreversibly the first time the estimate dips is running a first-passage experiment: across 76 reviews, small per-review error rates compound. We expect the seed-level graphs to show common specialists missing from a substantial share of stable-world runs.
+
+[G] A contextual-pruning ablation has not been run. The mismatch between a workload-wide pruning signal and a context-specific routing signal is a well-supported explanation, not an isolated causal finding.
+
+The design lesson is conditional. Keep a way to recover useful capabilities, judge a specialist in the context it serves, and require adaptation to justify its overhead under the workload actually encountered.
+
+SECOND TEST: CELL-LIKE COPYING WAS A SCHEDULING GAIN
+
+The next question was whether a rare specialist could expand when demand surged and shrink when it fell.
+
+[A] Four controllers shared a twelve-worker ceiling, the same arrivals, twenty-tick deadlines, and a 920-tick horizon. Creating a new specialist instance took two setup ticks. Rare demand rose from 1% to 70% of arrivals, then fell back to 1%. Templates were predefined; copying did not invent or improve a skill.
+
+[K] During the surge, fixed specialist counts completed 49.26% of arriving tasks correctly. Demand-driven copies completed 92.03%. The mean rare-specialist population rose from about 0.47 active instances to 8.26 and later fell to about 0.41.
+
+Deleting the rare template before the surge reduced correct completion to 27.57%. Retaining a capability and keeping it continuously active were different choices in this model, with very different consequences.
+
+[K] A flexible pooled scheduler also completed 92.03%. It served the same tasks as the copying controller and paid no setup costs. The copying result demonstrates capacity reallocation under a shared worker ceiling. It provides no benefit over flexible dispatch here.
+
+Two observations sharpen that reading.
+
+[K] First, completion in this suite has a hard ceiling. Any served task is correct with probability 0.92, so correct completion equals 0.92 times the fraction of tasks served. A score of 92.03% means essentially every arriving task was served. The copying and pooled controllers both sit on that ceiling. The deleted-template controller sits where the arithmetic puts it: with the 70% of tasks that are rare going unserved, 0.92 × 0.30 = 27.6%, against a saved 27.57%. Mean demand was nine tasks per tick against twelve workers, a load of 0.75. At that load, a tie shows that both controllers had capacity to spare. It cannot rank them.
+
+[K] Second, the tie was not an accident of the parameters. In this model any worker can run any archived skill, carries no state between tasks, and pays nothing to switch. Under those conditions every schedule the copying controller can produce is also available to a pooled scheduler: have each worker serve, tick by tick, whatever family the copying controller would have assigned it, and skip the setup ticks. The best pooled schedule is therefore at least as good as any copying schedule on every sample path. Replication can match pooling in this model. It cannot beat it. Queueing theory records the general principle as the efficiency of shared resources, and the classical treatment carries a warning that matters here: the result needs the pooled streams to have the same service characteristics, and pooling can lose when they differ [23].
+
+That negative result is useful. A method described as cellular growth still has to beat an ordinary scheduling explanation. A stronger test would introduce the conditions under which copies stop being interchangeable: persistent state, different skills, or a real cost to switch a worker between families.
+
+[S] A rough break-even is easy to state. If a pooled worker loses σ ticks each time it changes family and changes family on a fraction φ of ticks, pooling wastes φσ of its capacity. Dedicated copies pay setup only when the allocation changes; in the saved runs that came to 1.47% of reserved worker slots (162.3 of 11,040). In this workload, switching would have to waste more than about 1.5% of pooled capacity before dedicated copies could pay. That is a statement about a model we have not run.
+
+THIRD TEST: A SMALL GRAPH WITH MUTABLE PROGRAMS
+
+[A] The maintenance experiment uses six reader programs and one fixed XOR combiner. The task is to recover the parity of two independent fair bits. Two primary readers observe the relevant bits with 10% error. Two backup readers observe the same bits with 22% error. Two distractors observe irrelevant bits. Reader identities are shuffled.
+
+The controller chooses which two readers feed the combiner. There are fifteen possible pairs. It learns from verified outcomes and is never given the readers’ roles or error rates. This is finite graph selection, closely related to a bandit problem. It is not unrestricted topology discovery.
+
+Each reader has a small instruction vector: a channel selector, a probabilistic inversion threshold, a deterministic inversion, and five inactive instructions. Readers communicate one-bit outputs through a fixed protocol. Mutation changes the instruction vectors and preserves the message format.
+
+At budget index 900, both primary readers receive one engineered mutation event. Five regimes are tested:
+
+• No mutation: the implementation control.
+• Silent mutation: inactive instructions change and outputs are preserved exactly.
+• Harmful mutation: both primary error rates rise to 48%.
+• Useful mutation: both primary error rates fall to 1%.
+• Compensating mutation: both primary outputs are inverted, which leaves their joint XOR unchanged.
+
+Every controller is told which reader identities changed and has access to archived original versions. It is never told which regime it is in. Unannounced fault discovery and graph patrol are not implemented. [G]
+
+Six policies are compared: adaptive routing, change-aware routing, rollback of every change, individual functional auditing, group functional auditing, and triggered group auditing. Change-aware routing resets its estimates for pairs that involve changed readers. The audit policies compare archived and candidate behavior. Triggered auditing first runs thirty-two production tasks through the previously preferred pair, as a canary, and inspects only if observed performance falls more than fifteen points below its historical estimate.
+
+Each paired probe evaluates the old and the candidate graph on the same input with the same simulator randomness. Thirty-two probe pairs cost sixty-four full graph executions. Individual auditing inspects the two changes separately and costs 128 executions. Group auditing inspects them together and costs sixty-four. Inspection results do not count as solved production tasks.
+
+[K] The central harmful-mutation comparison:
+
+Change-aware routing: 61.70 verified successes per 100 budget blocks.
+Triggered group auditing: 71.19.
+Paired improvement: 9.48 points; approximate 95% interval 8.26–10.71.
+
+The triggered policy rejected the harmful change in 52 of 64 runs (81.25%; exact 95% interval 69.5% to 89.9%). It did not provide complete protection.
+
+[K] Always-on group auditing scored 71.65 in the same regime. The saved data do not establish any harmful-regime advantage for the trigger over the always-on audit. The trigger’s clear benefit appeared elsewhere: it spent no audit executions in the silent and useful regimes.
+
+Useful mutations make the tradeoff visible. Change-aware routing scored 89.32 and triggered auditing 89.30, a paired difference of -0.01 points with an interval spanning zero. Always-on group auditing scored 87.23 after paying for an unnecessary inspection. Adaptive routing with no change resets scored 89.59, slightly above either change-aware policy.
+
+Blanket rollback scored 75.74 under both harmful and useful mutations. It was the strongest tested policy when every mutation was harmful, and it discarded every improvement when every mutation was useful.
+
+[G] One asymmetry should be stated plainly. Every controller has access to the archive, but only the audit policies and blanket rollback ever use it. The two routing policies never restore anything. Part of what the harmful regime measures is therefore the value of being able to restore at all, and the policy that exploits that ability with no test whatsoever is the regime’s winner. A router allowed to treat the archived and mutated versions as separate options, and to sort them out by ordinary exploration, would be the fair conventional comparator. It has not been run.
+
+WHAT THE HEADLINE NUMBER IS MADE OF
+
+A 9.48-point gain invites the question of where it comes from. [K] It can be rebuilt from three ingredients that the saved results report separately.
+
+Overhead. The silent regime measures what an audit costs when nothing is wrong. Relative to no audit, the group audit’s 64 blocks cost 50.4 successes and the individual audit’s 128 blocks cost 101.1. That is 0.79 successes per displaced block in both cases, two independent measurements of the same quantity. An audit’s price is the production it displaces, at the prevailing success rate. In the useful regime the same 64 blocks displace better production, 62.7 successes, which is 64 × 0.98.
+
+Detection. The always-on group audit rejected the harmful pair in 53 of 64 runs. For the triggered policy, the canary fired in 61 of 64 runs and the audit then rejected in 52 of those 61.
+
+Value. A run that restores the original pair should score what the silent regime scores under the same policy, 74.06. A run that audits and misses should score what change-aware routing scores, less the audit, about 60.4.
+
+Weighting those two outcomes by 53/64 and 11/64 gives 71.7 for the always-on group audit. The saved score is 71.65. The same bookkeeping for the triggered policy, with 52 restorations, 9 audited misses, and 3 runs in which the canary never fired, gives 71.2 against a saved 71.19.
+
+So the headline gain is, to within a tenth of a point, the rejection rate (0.81) times the net value of a restoration (about 12 points), less a quarter of a point for runs that paid for an audit and got nothing from it.
+
+Three consequences follow. The triggered policy’s shortfall against blanket rollback in this regime, 4.55 points, splits into about 2.0 points of canary and audit overhead and about 2.6 points of missed detections. Each percentage point of audit sensitivity is worth about 0.14 score points. And the uncertainty in the headline is mostly the uncertainty of 64 coin flips about whether the audit caught the change: a two-outcome mixture with these weights predicts a seed-to-seed standard deviation of 5.3 for the paired gain, and the saved interval implies 5.0.
+
+These are reconstructions from saved aggregates. They borrow one rate from the silent regime (0.79 successes per block) and assume one more (0.62 for the blocks displaced in missed runs; the totals move by less than 0.05 if that is off by 0.1). They are a consistency check on the saved results, not a second experiment.
+
+WHO WINS WHEN
+
+No policy won every regime. The saved numbers support a sharper statement than that.
+
+[K] Every run contains exactly one mutation event, and no policy is told which kind. Suppose the kind were drawn at random, harmful with probability π and useful otherwise. Each policy’s expected score would then be exactly π times its harmful-regime mean plus (1 - π) times its useful-regime mean. That is the law of total expectation. It is not an approximation and it needs no new simulation.
+
+Expected score when a share π of changes are harmful and the rest useful:
+
+Adaptive routing: 89.59 - 29.24 π
+Change-aware routing: 89.32 - 27.62 π
+Rollback every change: 75.74
+Individual functional audit: 85.21 - 15.33 π
+Group functional audit: 87.23 - 15.58 π
+Triggered group audit: 89.30 - 18.11 π
+
+Three policies make up the upper envelope of those six lines:
+
+• Below about 3% harmful: plain adaptive routing.
+• From about 3% to about 75% harmful: the triggered group audit.
+• Above about 75% harmful: blanket rollback.
+
+[K] Without any audit, the choice between accepting everything and reverting everything flips at π = 13.85 / 29.24, or 47%. The triggered audit moves the point at which it stops being worth letting changes live from 47% harmful to 75% harmful. That is the quantitative content of the title in this toy world. A system with a cheap screen and a group-level test can afford to keep its mutations until roughly three changes in four are bad. A system without them should stop at even odds.
+
+Always-on group auditing never reaches the envelope. It beats both blanket policies between 17% and 74% harmful, and the triggered version beats it throughout that band. A search over mixtures of all four mutation regimes finds the same three winners and no others.
+
+The boundaries inherit Monte Carlo error from the saved means. A rough propagation puts the upper boundary at 75%, give or take five points. The lower boundary rests on a 0.29-point difference between two policies in the useful regime and could lie anywhere from near zero to about 5%. The magnitudes matter too. The harmful mutation here destroys the team and the useful one nearly perfects it. Milder changes would move every boundary. [G]
+
+A decision-maker with no view about π can compare policies by regret, the shortfall against the best tested policy in each regime [22].
+
+Regret in the harmful / useful / silent / compensating regimes, then the worst case:
+
+Adaptive routing: 15.39 / 0.00 / 0.00 / 0.02; worst 15.39
+Change-aware routing: 14.04 / 0.27 / 0.87 / 0.59; worst 14.04
+Rollback every change: 0.00 / 13.85 / 0.00 / 0.00; worst 13.85
+Individual functional audit: 5.86 / 4.38 / 3.37 / 3.62; worst 5.86
+Group functional audit: 4.09 / 2.36 / 1.68 / 1.72; worst 4.09
+Triggered group audit: 4.55 / 0.29 / 0.77 / 0.50; worst 4.55
+
+Every policy that never audits has a worst case near fourteen or fifteen points. The two group-audit policies have a worst case near four. Between those two, the always-on audit is nominally ahead in its worst regime by 0.46 points, a gap well inside the Monte Carlo error of the harmful-regime means, and the triggered audit is ahead by one to two points in the other three regimes.
+
+[G] All of this concerns one mutation event per run. With recurrent changes, audit costs accumulate, estimates reset repeatedly, and the archive itself has to advance when a change is accepted. The single-event map follows from the saved means. The multi-event behavior is untested.
+
+THE AUDIT WE TESTED IS A CATASTROPHE DETECTOR
+
+The audit rejected a change that reduced the best team to a coin flip in about four runs out of five. Why not every time, and what would it do with something subtler?
+
+[A] Answering requires one assumption about the simulator that the saved summaries cannot confirm by themselves: that “the same simulator randomness” means each reader’s error is decided by comparing one shared random draw with the old error threshold and with the new one. Under that assumption a probe has three possible outcomes, and their probabilities can be written down.
+
+[K] For the harmful mutation, the candidate team loses a probe the archived team won with probability 0.3952, wins one the archived team lost with probability 0.0760, and ties otherwise. The audit rejects when the mean difference plus 1.96 standard errors falls below -0.02. Summing over every possible outcome of 32 probes gives a rejection probability of 0.778. The saved rate was 53 of 64, or 0.828, with an exact 95% interval of 0.713 to 0.911. For two separate individual audits the same calculation predicts at least one rejection with probability 0.981; the saved count was 63 of 64. For the canary it predicts a firing probability of 0.974; the saved count was 61 of 64. All three saved rates are within sampling range of their predictions, which is some support for the assumption and far from proof of it.
+
+The same enumeration gives the audit’s sensitivity to harm of any size. Suppose both primary readers go from 10% error to an error rate e. Each line gives the team’s new accuracy and the accuracy lost, then the probability that the audit rejects with shared draws, the same probability with independent executions, and the probability that the canary fires.
+
+e = 0.15: accuracy 0.745, lost 0.075; 0.10; 0.09; 0.17
+e = 0.20: accuracy 0.680, lost 0.140; 0.41; 0.22; 0.45
+e = 0.30: accuracy 0.580, lost 0.240; 0.71; 0.51; 0.85
+e = 0.48: accuracy 0.501, lost 0.319; 0.78; 0.74; 0.97
+
+The full curve is in Appendix A7. Read the second line. A change that permanently costs the team 14 accuracy points, leaving it barely above the backup pair, is rejected 41% of the time by an always-on audit. Under the triggered policy the canary has to fire first, which it does 45% of the time, so the change is caught in fewer than one run in five. The canary is built to ignore drops smaller than fifteen points, so this is the design working as specified. The point is what the specification lets through. The harmful regime we simulated is the easy case.
+
+Three further facts come out of the enumeration. [K]
+
+• The rule cannot reject on fewer than five losing probes out of 32, even when there are no winning probes at all.
+• An exact one-sided sign test on the probes that differ [15] rejects with probability 0.73 at the 2.5% level and 0.83 at the 5% level. The saved rule sits between them. It is behaving like a conventional significance test.
+• Sharing random draws between the old and new versions [16] matters little for catastrophic harm, where it trims the variance of a probe difference by 7%, and a great deal elsewhere. It makes rejecting a functionally identical change impossible, where independent executions would reject about 2% of the time, and it raises sensitivity to a 14-point loss from 0.22 to 0.41.
+
+A significance test asks whether harm has been shown beyond reasonable doubt. The maintenance decision asks something else: which of two versions should run for the rest of the horizon? For that question the cost of a wrong call scales with the size of the effect, so errors are cheapest exactly where they are most likely. The literature on A/B tests with finite populations reaches the same conclusion and finds that tests designed to maximize payoff are smaller and less conservative than tests designed for significance [21].
+
+[S] Applied here, that reasoning suggests dropping the 1.96 multiplier and rejecting whenever the mean paired difference is below -0.02. Under shared draws the enumeration gives the following. Each line lists the probability of rejecting catastrophic harm (e = 0.48), moderate harm (e = 0.30), and mild harm (e = 0.20), then the probability of rejecting the useful change.
+
+12 probe pairs, 24 executions: 0.94; 0.92; 0.80; 0.003
+16 probe pairs, 32 executions: 0.97; 0.95; 0.87; 0.002
+32 probe pairs, 64 executions: 0.997; 0.994; 0.97; 0.0003
+Saved rule, 32 probe pairs: 0.78; 0.71; 0.41; under one in a billion
+
+With the same bookkeeping that reproduced the saved scores, a 12-pair audit of this kind run after every change is predicted to score about 74.3 under harmful mutations, 88.5 under useful ones, and 75.1 under silent or compensating ones. Its worst-case regret would be about 1.4 points against 4.1 for the saved always-on design, and it would stay ahead of blanket rollback until about 90% of changes were harmful. This is a prediction from a model of the simulator, not a result. It is also the cheapest experiment on our list: one constant and one sample size in the archived code.
+
+The catch is the assumption that carries the weight. [K] Without shared draws, the zero-multiplier rule would reject a functionally neutral change about 40% of the time at these sample sizes. Each such rejection costs nothing today. Whether it costs something later depends on whether neutral variation has value, which is what the title points at and what these experiments do not measure [10]. [G]
+
+Conservative thresholds and shared randomness are substitutes. A system that can replay old and new versions on identical inputs with identical draws can afford an aggressive rule. A system that cannot needs the caution the saved rule already has. [S] Language-model agents are probably in the second group: fixing a seed does not couple two runs in this way when a small change to a prompt redirects everything sampled after it.
+
+WHY THE UNIT OF EVALUATION MATTERS
+
+Consider two reader outputs, a and b. Their combination is a XOR b. If both are inverted, then
+
+(NOT a) XOR (NOT b) = a XOR b.
+
+The pair’s function survives. Inverting only one reader flips the pair’s answer.
+
+An individual audit can therefore find each proposed change harmful when it inserts that change alone into the old team. A group audit can find the complete candidate team unchanged.
+
+[K] In the 63 runs where the primary pair was already the preferred graph at mutation time, individual audits rejected the compensating changes in every run. Group audits preserved them in every run. This subset was examined after the experiment and is a mechanism illustration, not a separately preregistered endpoint. In the remaining run the selected collaboration was different, and the compensation guarantee did not apply to it.
+
+[K] There is a compact way to see everything this task does. Recode each bit as +1 or -1. XOR becomes multiplication. A reader with error rate e has correlation c = 1 - 2e with its target bit. Because the two readers’ errors are independent, the pair’s correlation is the product of the two, and its accuracy is (1 + c1 c2) / 2. Cryptanalysts know this as the piling-up lemma [17].
+
+Every number in the mutation experiment falls out of that one line. The primary readers have c = 0.8, so the pair has 0.64 and accuracy 0.82. The backup readers have 0.56, the pair 0.3136, accuracy 0.6568. The useful mutation raises c to 0.98 and accuracy to 0.9802. The harmful mutation drops c to 0.04, and because correlations multiply, the pair falls to 0.0016 and accuracy to 0.5008. One damaged reader beside an intact one gives 0.04 × 0.8 = 0.032, accuracy 0.516, which is why a single bad reader is nearly as destructive as two. Inversion multiplies a reader’s correlation by -1. One inversion gives -0.64, accuracy 0.18. Two give +0.64 again.
+
+[K] The compensating pair generalizes. In a team that XORs k readers, inverting a set of them preserves the output exactly when the set has even size. An audit that swaps some subset of a batch of inversions into the archived team will see harm exactly when that subset has odd size. One-at-a-time audits always test a subset of size one, so they reject every member of every compensating set. The verdict depends on the parity of what is tested, not on how much is tested. Bigger groups are not automatically safer: three readers out of a four-reader compensating change fail exactly as a single reader does.
+
+[K] The same task shows why “how much did this component contribute?” has no single answer. Take one primary reader. Alone, it predicts parity at chance, so its standalone contribution is zero. Remove it from the pair and accuracy falls from 0.82 to 0.50, so its leave-one-out contribution is 0.32, and by that measure the two readers together contributed 0.64 to a surplus of 0.32. The Shapley value, which averages over orders of arrival, gives each reader 0.16 [18]. Zero, 0.16, and 0.32 are all correct answers to different questions. The interaction term in Appendix A4 is the standard way to record the part of the surplus that belongs to the pair and to neither member [19].
+
+The result was built into the algebra of the task. It shows why a testing policy can fail under complementarity. It does not show that useful compensating mutations emerged spontaneously, or that testing ever-larger groups is always preferable.
+
+WHAT THE IMMUNE ANALOGY CONTRIBUTES
+
+[S] The useful mapping is functional. Work programs correspond loosely to cells. Replication corresponds to adding instances. A dormant template corresponds to a retained capability. An audit-and-rollback process corresponds loosely to maintenance. A mistaken rejection of useful variation resembles an overactive maintenance response.
+
+The triggered audit also has a familiar shape: a cheap screen in series with an expensive confirmatory test. It is the closest thing here to a danger signal in Matzinger’s sense [2]. The system is told that something changed, which is foreignness, and spends on inspection only after it observes damage. [K] A change has to get past both tests to be rejected, so the combination can never detect more than the confirmatory test alone. What it buys is that the expensive test is paid for only when the screen fires. In the saved harmful runs the screen fired in 61 of 64 and the audit confirmed in 52 of those.
+
+Several parts of the mapping break. A software controller can keep an exact archived program, receive a perfect change notification, and compare two versions on matched inputs. Those privileges are explicit simulator assumptions, not claims about cellular biology. The experiment also has a central audit controller, not independently trained immune agents moving through a graph.
+
+Simple code helps us define valid messages and trace changes. It does not make “looks noisy” a sufficient reason for removal. In our construction, useful, harmful, and compensating mutations each edit one active instruction per changed reader. A count of code edits cannot tell them apart. Silent edits can change several inactive instructions without changing any output.
+
+Our evidence concerns functional testing and compute allocation. It does not demonstrate autonomous immunity, malicious-agent detection, consciousness, or a route to general intelligence.
+
+THE MATHEMATICAL QUESTION: DOES INSPECTION REPAY ITS COST?
+
+Suppose H production opportunities remain. Without inspection, the best available decision has expected correctness q0. An audit consumes m execution opportunities, and a successful maintenance decision would raise expected correctness to q1 for the opportunities that are left.
+
+Under those simplifying assumptions:
+
+Expected gain = (H - m) q1 - H q0.
+
+An audit is worthwhile only when this is positive. Writing q1 = q0 + δ, the condition is
+
+δ > m q0 / (H - m), for H > m.
+
+This is the inequality from the first test. Put ε = m / H for the fraction of the remaining budget spent on inspection and it reads δ > ε q0 / (1 - ε). A 4% diagnostic overhead and a 64-block audit are the same kind of expense, repaid only by a large enough improvement on what remains.
+
+For illustration, let H = 2,000, m = 64, q0 = 0.66, and q1 = 0.82. These are close to the harmful regime’s numbers: the backup pair’s accuracy, the restored primary pair’s accuracy, and roughly the budget left after the mutation. Inspection followed by successful restoration yields 267.52 more expected correct results than continuing at q0, and the required improvement is about 2.18 points. These are illustrative inputs, not another simulation result.
+
+[K] The saved runs show how well that static picture describes a system that is still learning. In the harmful regime, accepting the change cost 15.39 points relative to restoring it. Spread over the 2,100 blocks that remained, that is 0.220 successes per block, a third more than the static gap of 0.163 between the restored pair and the backup pair. The difference is the price of relearning. The router has to discover that its best pair is dead and then find the next one among alternatives that all look mediocre. In the useful regime the realized stake was 0.198 per block against a static 0.160. The static inequality understates what is at stake on both sides, by a quarter to a third.
+
+Because the two stakes are nearly equal, the choice between accepting everything and reverting everything should flip near even odds. The static stakes put the flip at 49.5% harmful. The saved runs put it at 47%.
+
+An accurate diagnosis can still arrive too late to be useful. A weak one can do damage by rejecting a beneficial change. The full decision depends on how often changes are harmful, on detection probability, false rejection, recovery value, and time remaining. Appendix A8 formalizes this as a value-of-information problem, a concept with a long history in decision analysis [13, 20]. The saved trigger is a simple heuristic, not an implementation of an optimal information policy.
+
+FROM ONE EVENT TO MANY
+
+Everything above concerns a single change. The title makes a claim about a process. [S] Here is the simplest version of that claim that could be wrong.
+
+Suppose changes arrive one after another. A fraction π are harmful and would cost L per unit of work if kept. The rest are useful and would add G. A maintenance policy rejects harmful changes with probability s and useful ones with probability f. If effects add, the expected drift in quality per change is
+
+(1 - π)(1 - f) G - π (1 - s) L.
+
+Reverting everything gives zero drift: nothing breaks and nothing improves. Accepting everything gives (1 - π) G - π L. Selective maintenance keeps the drift positive when
+
+(1 - f) / (1 - s) > π L / ((1 - π) G).
+
+The left side is a property of the audit: how much more readily it lets a good change through than a bad one. The right side is a property of the world: the odds that a change is harmful, weighted by what harm costs relative to what benefit pays. With the saved triggered audit (s = 0.81, no observed false rejections) the left side is about 5.3. With the realized stakes above, drift stays positive until roughly 83% of changes are harmful, before subtracting audit costs.
+
+Three things could break this. Effects need not add: in the XOR world correlations multiply, so one missed catastrophe can outweigh many small gains. Audit costs accumulate with every change. And once a change is accepted the archive has to advance, so later audits compare against a baseline that may itself be degraded. [G] None of this has been simulated.
+
+WHAT A STRONGER NEXT STUDY WOULD TEST
+
+The most useful next experiment would compare the proposed maintenance layer with an equally capable conventional controller under the same costs. It would mix unknown mutation types over time, hide some mutation notices, charge for verification and storage, and include persistent agent state.
+
+[S] The strongest research question is whether joint mutation effects and changing workloads create a measurable region in which group-aware maintenance improves net output beyond routing, autoscaling, and conventional canary testing.
+
+Success would require more than beating a deliberately weak pruning rule. We would need independently generated tasks, stronger change detectors, a parameter sweep fixed before the new evaluation, and evidence that a benefit survives when matched simulator randomness is unavailable. Cumulative-sum monitoring is one established baseline to include [14, 24], and Appendix A10 calibrates one.
+
+The analysis in this essay also yields predictions specific enough to fail. [S]
+
+1. Seed-level graphs from the first suite will show the common specialists pruned after the workload shift under permanent pruning, and pruned in a substantial share of stable-world runs.
+2. Replacing the audit’s 1.96 multiplier with zero and its 32 probe pairs with 12 will raise sensitivity to the harmful mutation from about 0.8 to about 0.94 and cut always-on audit overhead by more than half, provided old and new versions share random draws.
+3. With graded harm, the saved audit’s rejection rate will fall along the curve tabulated above, to roughly 0.4 for a 14-point loss.
+4. With independent executions, the saved rule will begin rejecting functionally identical changes about 2% of the time, and a zero-multiplier rule about 40% of the time.
+
+That study might find a useful mechanism. It might also show that ordinary orchestration already explains the gain. Either outcome would clarify what the biological picture contributes.
+
+The question guiding this work is precise: which changes improve the collaboration, which damage it, and how much should a system spend to learn the difference?
+
+
+TECHNICAL APPENDIX A: MODEL AND DERIVATIONS
+
+Notation. q is a success probability and c = 2q - 1 the corresponding correlation. H is the number of production opportunities remaining, m the number consumed by an audit, and n the number of paired probes, so m = 2n for a group audit. π is the probability that a change is harmful, s the probability that an audit rejects a harmful change, and f the probability that it rejects a useful one. L is the per-task loss from keeping a harmful change and G the per-task gain from keeping a useful one.
+
+A1. A changing graph is only part of the state
+
+[A] For a proposed integrated architecture, write the system state as
+
+S_t = (G_t, θ_t, n_t, A_t, D_t).
+
+G_t = (V_t, E_t, w_t) is the communication graph: V_t contains program roles, E_t the permitted communication links, and w_t the routing or scheduling weights. θ_t contains program parameters or instructions. n_t records active instance counts. A_t is an archive of restorable templates and versions. D_t contains the observations available to the controller.
+
+Dormant templates can remain in A_t when their active count is zero. Deleting a template is therefore a different operation from suspending its instances.
+
+This state definition is a bookkeeping framework. The three experiments implement different restricted parts of it. No experiment here simultaneously learns unrestricted code, topology, population size, and an immune policy. [G]
+
+Let x_t be a task and R(S_t, x_t) an externally verified reward, equal to one for a correct production result and zero otherwise in the toy experiments. Let c_t include all charged resource use. A general finite-horizon objective is
+
+maximize E[Σ_t R(S_t, x_t)] subject to Σ_t c_t ≤ B.
+
+An alternative priced objective is E[Σ_t (R_t - λ c_t)]. A study should say whether costs enter as a hard budget, a price, or both for distinct constraints. Our main execution scores use the fixed-budget form, with audit executions displacing production. They do not subtract the same execution cost a second time as a penalty.
+
+An eventual physical accounting model could use
+
+c_t = c_work,t + c_audit,t + c_setup,t + c_verification,t + c_controller,t + c_memory,t + c_communication,t.
+
+The saved simulations charge only selected terms. Verification and controller computation in particular are free. “Budget-adjusted” here means adjusted for the defined synthetic execution budget, not for measured end-to-end compute, energy, money, tokens, or wall time.
+
+A2. Resource allocation, replication, and pooling
+
+Suppose task family k arrives at rate λ_k, each active worker of that family serves at rate μ_k, and n_k workers are active. In a stationary queue with suitable regularity assumptions, the load condition λ_k < n_k μ_k is necessary for stable service without indefinite backlog. It is not a finite-deadline guarantee.
+
+Our surge experiment simulates discrete arrivals, explicit queues, and expiration. Its capacity constraint is
+
+Σ_k n_k(t) = 12.
+
+The controller computes an exponentially smoothed arrival estimate:
+
+λhat_k(t) = 0.92 λhat_k(t-1) + 0.08 arrivals_k(t).
+
+At review times it forms a pressure score proportional to
+
+pressure_k = λhat_k + queue_length_k / 10.
+
+It allocates the twelve positions in proportion, rounds counts while preserving the ceiling, and gives a queued family at least one worker when its template is available. Reviews occur every five ticks with a fifteen-tick cooldown between changes. New instances consume two setup ticks. These are hand-set rules, not a learned optimal controller.
+
+[K] Load. The smoothing constant gives the arrival estimate a half-life of ln(0.5) / ln(0.92) = 8.3 ticks. During the surge, rare demand averages 0.70 × 9 = 6.3 tasks per tick, so at one task per worker-tick at least seven rare workers are needed. The saved mean was 8.26. Total demand of nine per tick against twelve workers is a load of 0.75.
+
+[K] Ceiling. A served task is correct with probability 0.92, so expected correct completion is 0.92 times the fraction served. Serving everything gives 92.0% (saved: 92.00 to 92.04 in every unconstrained phase). Serving nothing rare during the surge gives 0.92 × 0.30 = 27.6% (saved: 27.57). The fixed-count controller’s 49.26% implies that it served 53.5% of surge arrivals.
+
+[K] Dominance. Let a copying schedule assign worker j to family k_j(t) at tick t, with some ticks lost to setup. If any worker can run any archived skill with no setup delay and no loss of state, the assignment k_j(t) is itself a feasible pooled schedule, and the pooled scheduler may also use the ticks that copying spends on setup. The set of pooled schedules therefore contains every copying schedule, and the best pooled schedule serves at least as many tasks on time on every sample path. The saved tie, identical verified completions in all eighty seeds with 162.3 fewer executions for the pool, is what this predicts when both controllers are also on the ceiling. Neither queue notation nor the cellular metaphor establishes an extra computational advantage.
+
+[S] Pooling results of this kind assume interchangeable servers. With family-specific state or switching costs they can fail [23], and that is where a replication mechanism would have to earn its keep.
+
+A3. Contribution must be defined relative to an alternative
+
+For a fixed evaluation distribution D and resource budget B, let J_D(S; B) denote expected verified production output. For a changed group C, a useful counterfactual quantity is
+
+Δ_C = J_D(S_candidate; B) - J_D(S_with_C_restored; B).
+
+The alternative must be specified: restore an old version, disable a link, substitute a fallback, or reallocate its resources. These interventions answer different questions. For fair structural comparisons, both systems need the same resource ceiling and accounting rules.
+
+This definition is an estimand. It does not assume that an exact causal answer is freely observable. Task matching, confounding changes, verification quality, and simulation realism determine whether a measurement estimates it well.
+
+In the first routing experiment, a team route is compared with a common fallback on a matched task. Within a task family, subtracting the same fallback expectation from each route preserves their ordering:
+
+argmax_a [q_a - q_fallback] = argmax_a q_a.
+
+The first test therefore does not demonstrate superiority of counterfactual rewards over ordinary verified rewards. Nor does it assign credit among internal nodes of a complex collaboration. COMA’s critic-based action marginalization is a different, established construction [4].
+
+[K] Subtracting a baseline does change the variance of each observation:
+
+Var(r_a - r_f) = Var(r_a) + Var(r_f) - 2 Cov(r_a, r_f).
+
+The subtraction reduces variance only when Cov(r_a, r_f) > Var(r_f) / 2. With independent outcomes it adds variance, and the diagnostic execution costs a block besides. [G] The saved summaries do not report the covariance between route and fallback outcomes on matched tasks, so we cannot say which side of that line the first test was on.
+
+A4. Nonadditivity and complementarity
+
+Let F(C) be expected correctness when information from a set C of readers is available. A pair interaction can be written
+
+I_ij = F({i,j}) - F({i}) - F({j}) + F(∅).
+
+If F(∅) = F({i}) = F({j}) = 0.5 for an XOR task and F({i,j}) = 0.82, then I_ij = 0.32. Independent fair bits make either bit alone uninformative about parity. Together they can be informative. A positive interaction means standalone scores do not add up to the collaboration’s score.
+
+[K] This quantity has standard names. With F(∅) subtracted as a baseline it is the Möbius coefficient, or Harsanyi dividend, of the pair in the cooperative game F, and for two players it coincides with the Shapley interaction index [19]. Parity is the extreme case: all of the surplus sits in the top-order term and none in the individual terms. Three common attribution rules then give three different answers for one primary reader: 0 standalone, 0.16 by the Shapley value [18], and 0.32 by leave-one-out. Leave-one-out credits the two readers with 0.64 between them for a surplus of 0.32.
+
+The separate 50,000-task mechanism check uses a different sensor reliability, chosen so that joint theoretical accuracy is 0.80. Its observed joint accuracy is 80.40%. That check must not be confused with the mutation experiment’s primary-pair accuracy of 0.82.
+
+For mutations, define V0 as the original pair’s expected correctness, Vi and Vj as correctness with only mutation i or only mutation j, and Vij as correctness with both. The mutation interaction is
+
+M_ij = Vij - Vi - Vj + V0.
+
+For the engineered double inversion with original accuracy q:
+
+V0 = Vij = q; Vi = Vj = 1 - q; M_ij = 4q - 2.
+
+At q = 0.82, M_ij = 1.28. This is a difference of differences, so it need not lie between zero and one. Both single-mutation effects are -0.64, while the joint effect Vij - V0 is exactly zero. No new skill and no increase in joint accuracy is involved in the compensating case.
+
+Searching every possible group would itself be expensive: a graph with N mutable components has 2^N subsets. Restricting audits to recent change bundles or suspected interaction neighborhoods is a possible practical response. [S] It was not evaluated here.
+
+A5. Exact XOR quality in correlation form
+
+[A] Let the two relevant reader errors be independent Bernoulli variables with probabilities e_i and e_j, and let b_i and b_j be deterministic inversion bits. The combiner is correct when
+
+error_i XOR error_j XOR b_i XOR b_j = 0.
+
+If the inversion bits agree, expected correctness is
+
+q = (1 - e_i)(1 - e_j) + e_i e_j.
+
+If they disagree it is 1 - q. A pair that does not cover both relevant channels has expected correctness 0.5 in this independent-fair-input construction.
+
+[K] Correlation form. Recode each bit as +1 or -1, so that XOR becomes multiplication. A reader with error rate e has correlation c = 1 - 2e with its target bit, and an inversion multiplies c by -1. For independent errors the correlations multiply:
+
+c_pair = (-1)^(b_i + b_j) × (1 - 2 e_i)(1 - 2 e_j), and q = (1 + c_pair) / 2.
+
+For a team that XORs k readers, c_team is the product of the k signed correlations. This is the piling-up lemma of linear cryptanalysis [17], and like that lemma it depends on independence.
+
+The values used in the experiments:
+
+Original primary pair, e = 0.10 each: c = 0.8 × 0.8 = 0.64, q = 0.82.
+Useful primary pair, e = 0.01 each: c = 0.9604, q = 0.9802.
+Harmful primary pair, e = 0.48 each: c = 0.0016, q = 0.5008.
+Backup pair, e = 0.22 each: c = 0.3136, q = 0.6568.
+One primary with one backup: c = 0.448, q = 0.724.
+One harmful primary with one intact primary: c = 0.032, q = 0.516.
+Double deterministic inversion: c = +0.64, q = 0.82.
+Single deterministic inversion: c = -0.64, q = 0.18.
+
+In this form the interactions of A4 are I_ij = c / 2 and M_ij = 2c.
+
+[K] Parity rule. Suppose a set C of readers in a k-reader XOR team is inverted and an audit swaps a subset S of C into the archived team. The team’s output is multiplied by (-1)^|S|. The audit therefore sees no change when |S| is even and a complete reversal, accuracy 1 - q in place of q, when |S| is odd. Function is preserved by exactly half of all inversion patterns, those of even weight. An audit that tests changes one at a time sees |S| = 1 every time and rejects every member of every compensating set. Testing larger subsets does not help unless the parity is right. The rule was verified by exhaustive enumeration for k from 2 to 6.
+
+The useful and harmful labels are assigned by construction. The controller must infer consequences from rewards, but the experimenter already knows the mechanism. Non-independent errors, changing input distributions, or a different combiner can change all of these relationships.
+
+A6. The implemented graph selector
+
+For candidate pair a, the mutation experiment maintains positive Beta parameters α_a and β_a, both initially one. Before each budget step it discounts earlier observations toward that prior:
+
+α_a ← 1 + 0.999 (α_a - 1).
+β_a ← 1 + 0.999 (β_a - 1).
+
+For an ordinary production decision it samples
+
+qtilde_a ~ Beta(α_a, β_a), and selects argmax_a qtilde_a.
+
+After observing binary reward r for the selected pair:
+
+α_a ← α_a + r; β_a ← β_a + (1 - r).
+
+Discounted counts are a pragmatic adaptation to changing rewards. They are not the exact posterior of a fully specified changing-environment model. The effective count half-life is ln(0.5) / ln(0.999), about 693 budget steps. The use of Thompson sampling draws on established methods [9].
+
+[K] Discounting caps what the controller can know. An arm pulled on every step accumulates at most 1 / (1 - 0.999) = 1,000 effective observations, shared among whichever arms are being pulled, and an arm left alone drifts back toward its uniform prior and must be explored again. The no-mutation score of 75.74 against a best-pair accuracy of 0.82 is the measured price of initial learning plus this permanent forgetting. [G] The saved summaries do not separate the two.
+
+Change-aware routing resets pairs involving changed readers to Beta(1,1). Functional audits avoid this reset when matched probes show no output difference. Triggered auditing runs a fixed thirty-two-task canary on the previously preferred pair before either resetting the affected estimates or auditing. The policies therefore differ in how they handle information as well as in what they spend on tests.
+
+A7. The implemented audit: statistic, exact distribution, and operating characteristic
+
+For probe l, let r_new,l and r_old,l be correctness indicators for the candidate and archived graphs on the same input with shared simulator randomness. Define
+
+d_l = r_new,l - r_old,l, which is -1, 0, or 1;
+dbar = (1/n) Σ_l d_l;
+SE = sample_standard_deviation(d_1, ..., d_n) / sqrt(n).
+
+The code uses n = 32 and rejects a candidate group when
+
+dbar + 1.96 SE < -0.02.
+
+This is a fixed-sample, normal-approximation harm rule. The 1.96 multiplier corresponds to a two-sided 95% normal interval, or a one-sided 97.5% bound. It is not an exact small-sample guarantee, a confidence sequence, or an equivalence test. Failing to reject harm does not prove safety, usefulness, or general behavioral equivalence.
+
+Identical outputs give d_l = 0 in every probe and therefore no rejection in the silent case. For the compensating pair, cancellation also makes every matched difference exactly zero.
+
+Individual audits evaluate one mutated reader at a time against the fully archived team, even if another candidate has already been inspected. Group audits evaluate the complete two-reader candidate against the archived team. The comparison concerns these particular counterfactual scopes. Individual auditing also costs twice as many graph executions. The experiment does not hold scope and total diagnostic cost independently constant. [G]
+
+[K] Known name. The statistic compares two correlated proportions on matched pairs, which is McNemar’s setting [15]. Only probes on which the two versions differ carry information. With N+ wins and N- losses for the candidate among n probes,
+
+dbar = (N+ - N-) / n, and sample variance = [(N+ + N-) - n dbar^2] / (n - 1).
+
+[K] Exact distribution. If a probe is a loss with probability p-, a win with probability p+, and a tie otherwise, then (N+, N-) is multinomial and
+
+P(reject) = Σ over pairs (a, b) that satisfy the rule of n! / (a! b! (n - a - b)!) × (p+)^a × (p-)^b × (1 - p+ - p-)^(n - a - b).
+
+The sum has 561 terms for n = 32 and can be evaluated exactly.
+
+[A] Coupling. We assume shared randomness means each reader draws one uniform number u and errs when u is below its error threshold, with the same u used for the archived and the candidate version. When both readers move from error e to a larger error e′, each reader falls in one of three bands: it errs under both versions (probability e), only under the new version (e′ - e), or under neither (1 - e′). Enumerating the nine combinations gives
+
+p- = 2 (e′ - e)(1 - e′), and p+ = 2 e (e′ - e).
+
+For a useful change to a smaller error e′ the roles reverse: p+ = 2 (e - e′)(1 - e) and p- = 2 e′ (e - e′). When only one reader changes, as in an individual audit, p- = (e′ - e)(1 - e) and p+ = (e′ - e) e. For independent executions with accuracies q_old and q_new, p- = q_old (1 - q_new) and p+ = q_new (1 - q_old).
+
+[K] Results under the coupling assumption, n = 32, saved rule:
+
+Group audit, harmful: p- = 0.3952, p+ = 0.0760, P(reject) = 0.778. Saved: 53/64 = 0.828.
+Individual audit, harmful: p- = 0.3420, p+ = 0.0380, P(reject) = 0.863 per audit and 0.981 for at least one of two. Saved: 63/64 = 0.984.
+Individual audit, single inversion: p- = 0.82, p+ = 0.18, P(reject) = 0.980 per audit and 0.9996 for at least one of two. Saved: 63 of 63 primary-pair runs.
+Group audit, useful: p- = 0.0018, p+ = 0.1620, P(reject) about 3 × 10^-11.
+Individual audit, useful: p- = 0.0090, p+ = 0.0810, P(reject) about 10^-6.
+Group audit, silent or compensating: p- = p+ = 0, P(reject) = 0 exactly.
+
+The fewest losing probes that can produce a rejection, with no winning probes, is five of 32 (dbar = -0.156). An exact one-sided sign test on the differing probes rejects the harmful pair with probability 0.726 at level 0.025 and 0.830 at level 0.05, so the saved rule behaves like an exact test with a level between the two.
+
+[K] What shared randomness buys. The variance of a probe difference is p+ + p- - (p+ - p-)^2. For the harmful pair that is 0.369 with shared draws and 0.398 with independent executions, a 7% reduction, and the rejection probability moves only from 0.744 to 0.778. For a functionally neutral change the difference is categorical: shared draws give zero variance and zero rejections, while independent executions give a rejection probability of 0.020. This is the variance-reduction technique known as common random numbers [16].
+
+Operating characteristic. Both primary readers move from 10% error to e; n = 32; saved rule. Each line gives team accuracy, then P(reject) with shared draws, P(reject) with independent executions, and the probability that the canary fires.
+
+e = 0.12: accuracy 0.789; 0.004; 0.041; 0.058.
+e = 0.15: accuracy 0.745; 0.102; 0.090; 0.170.
+e = 0.20: accuracy 0.680; 0.408; 0.216; 0.452.
+e = 0.25: accuracy 0.625; 0.609; 0.368; 0.704.
+e = 0.30: accuracy 0.580; 0.713; 0.510; 0.854.
+e = 0.35: accuracy 0.545; 0.764; 0.619; 0.927.
+e = 0.40: accuracy 0.520; 0.785; 0.692; 0.959.
+e = 0.45: accuracy 0.505; 0.786; 0.733; 0.972.
+e = 0.48: accuracy 0.501; 0.778; 0.744; 0.974.
+
+Sensitivity is not monotone at the top. Once the candidate is close to chance, extra winning probes add variance faster than extra losing probes add signal.
+
+Canary. With a historical estimate of 0.82 the trigger fires when 21 or fewer of 32 production tasks succeed. The firing probability is 0.974 at accuracy 0.5008, 0.564 at the backup-level accuracy 0.6568, and 0.020 when nothing has changed. A two-point change in the historical estimate moves the cutoff by one success: at an estimate of 0.80 the three probabilities are 0.944, 0.416, and 0.007. The saved harmful runs fired in 61 of 64.
+
+Sample size and threshold, for the group audit of the harmful pair with shared draws:
+
+Saved rule by sample size: n = 16 gives 0.496; n = 32 gives 0.778; n = 48 gives 0.916; n = 64 gives 0.970.
+Multiplier at n = 32: 1.96 gives 0.778; 1.645 gives 0.859; 1.282 gives 0.927; zero gives 0.997.
+
+Raising sensitivity from 0.78 to 0.97 by sample size costs a second audit’s worth of executions. Doing it by threshold costs nothing in executions and, under shared draws, almost nothing in false rejections of the tested useful change (about 3 × 10^-4 at n = 32). Under independent executions the price is paid on neutral changes instead: rejection probabilities of 0.020, 0.036, 0.072, and 0.435 for the four multipliers above.
+
+[S] Zero-multiplier rule, reject when dbar < -0.02, shared draws. Each line gives P(reject) for catastrophic harm (e = 0.48), moderate harm (e = 0.30), and mild harm (e = 0.20), then for the useful change.
+
+n = 12: 0.942; 0.915; 0.804; 0.0031.
+n = 16: 0.970; 0.953; 0.870; 0.0021.
+n = 32: 0.997; 0.994; 0.968; 0.0003.
+
+With independent executions the same rule rejects a neutral change with probability 0.39 at n = 12 and 0.44 at n = 32.
+
+[S] Predicted scores for an always-on 12-pair audit with the zero-multiplier rule, using the accounting of A13: harmful 74.3, useful 88.5, silent 75.1, compensating 75.1. Applied to the saved 32-pair design, the same accounting returns 71.70, 87.23, and 74.05 for the first three, against saved values of 71.65, 87.23, and 74.06.
+
+Shared random numbers make these comparisons unusually favorable. Independent stochastic executions need more samples or more caution, and a real system may offer neither exact archives nor exact replay.
+
+A8. From audit overhead to value of information
+
+Let D be current evidence and Z prospective audit evidence. Suppose a decision d chooses among available versions with unknown expected correctness p_d. Define
+
+μ0 = max_d E[p_d | D];
+μ1 = E_Z[max_d E[p_d | D, Z]].
+
+With no production during m audit executions, a stationary environment, H remaining opportunities, and non-execution costs c_other expressed in expected-success units, the net expected value of inspection is
+
+VOI = (H - m) μ1 - H μ0 - c_other,
+
+or equivalently
+
+VOI = (H - m)(μ1 - μ0) - m μ0 - c_other.
+
+The first term values improved decisions after learning. The second is foregone production. In this ideal Bayesian formulation information can be ignored, so μ1 ≥ μ0. A real fixed audit rule can still make mistaken decisions. The saved thirty-two-task trigger does not compute this expression.
+
+[K] Known names. μ1 - μ0 is the expected value of sample information, and the whole expression is the expected net gain of sampling, in the preposterior analysis of Raiffa and Schlaifer [20]. Howard’s information value theory is the same idea [13]. The finite-horizon structure, in which the test consumes part of the population that the decision will apply to, is the test-and-roll problem [21].
+
+The break-even inequality in the main text follows by replacing μ0 and μ1 with fixed q0 and q1 and setting c_other to zero. Its numerical example:
+
+(2,000 - 64) × 0.82 - 2,000 × 0.66 = 267.52;
+required δ > (64 × 0.66) / 1,936 = 0.021818..., or 2.18 points.
+
+[K] Two actions, two states. Let the decision be to keep or restore a change. Restoring yields q_r per task. Keeping yields q_r - L with probability π and q_r + G otherwise. Then:
+
+restore everything: H q_r;
+keep everything: H [q_r + (1 - π) G - π L];
+perfect information at cost m: (H - m) [q_r + (1 - π) G].
+
+The two blanket policies tie at π = G / (L + G). The value of perfect information per remaining task is min(π L, (1 - π) G), which is what the better blanket policy still loses. No audit of cost m can beat both blanket policies unless
+
+(H - m) × min(π L, (1 - π) G) > m × (success rate of the better blanket policy).
+
+For an audit that rejects harmful changes with probability s and useful ones with probability f, restoring on rejection, the value is
+
+(H - m) [q_r + (1 - π)(1 - f) G - π (1 - s) L] - c_other.
+
+Its advantage over keeping everything is
+
+(H - m) [π s L - (1 - π) f G] - m q_keep - c_other, where q_keep = q_r + (1 - π) G - π L,
+
+and its advantage over restoring everything is
+
+(H - m) [(1 - π)(1 - f) G - π (1 - s) L] - m q_r - c_other.
+
+These expressions ignore learning dynamics and inspection delays beyond m. They say which quantities a follow-up should measure: π, s, f, L, G, and the horizon. They are not a fit to the current results or a general guarantee.
+
+[K] Static prediction against the saved map. Take the static stakes of the mutation experiment: q_r = 0.82, L = 0.82 - 0.6568 = 0.163 because the router falls back to the backup pair, G = 0.9802 - 0.82 = 0.160, H = 2,100, and m = 64. Then:
+
+the blanket policies tie at π = 0.495 (saved: 0.474);
+a perfect audit can beat both only for π between 0.178 and 0.839;
+an audit with the saved sensitivity 53/64 and no false rejections beats both for π between 0.212 and 0.714 (saved always-on group audit: 0.173 to 0.738).
+
+The static model lands within about four points of each realized boundary. That agreement is better than the model deserves, because the realized stakes are larger than the static ones: L_eff = (75.74 - 60.35) × 30 / 2,100 = 0.220 and G_eff = (89.59 - 75.74) × 30 / 2,100 = 0.198 successes per remaining block. Both exceed their static values because a learning router pays to rediscover its best option. The boundaries depend mostly on the ratio of the stakes, which the static model gets nearly right.
+
+[S] Repeated changes. The drift condition in the main text, (1 - f) / (1 - s) > π L / ((1 - π) G), is the per-change version of the same comparison with audit cost left out. With s = 52/64 and f = 0 the left side is 5.33, and with the realized stakes the condition holds for π below 0.83. It assumes that effects add. In the XOR world correlations multiply (A5), so that assumption fails in the one setting we have simulated. [G]
+
+A9. Retaining dormant capabilities has option value
+
+[S] A template can have low current utilization and still be worth storing. A possible decision model is
+
+V_retain = -c_store + E[γ^τ (gain_when_needed - c_reactivate)].
+
+Here τ is the time until a future opportunity, γ is a discount factor, and the gain is measured against deletion and the best feasible replacement. Both uncertainty about future demand and uncertainty about capability matter.
+
+[K] A closed form. Suppose the template is needed at each step independently with probability h, storage costs c_s per step until then, and the net payoff when needed is W - c_r. Then E[γ^τ] = h γ / (1 - γ (1 - h)), the expected discounted storage time is 1 / (1 - γ (1 - h)), and
+
+V_retain = [h γ (W - c_r) - c_s] / (1 - γ (1 - h)).
+
+Retention is worthwhile exactly when
+
+c_s < h γ (W - c_r).
+
+The rent must be less than the per-step chance of need times the discounted net payoff. The formula was checked against direct summation.
+
+[K] Scale from the saved runs. Deleting the rare template cost 64.46 points of correct completion across roughly 2,700 surge arrivals, about 1,740 verified tasks. [A] If a surge of that size has a one-in-ten-thousand chance of starting on any tick, the break-even rent for the template is about 0.17 task-equivalents per tick. At one in a hundred thousand it is about 0.017. The hazard rates are illustrative.
+
+The current experiments show consequences of retaining or deleting predefined templates. They do not estimate this option value, learn a storage policy, or charge storage costs. [G]
+
+A10. A stronger surveillance baseline
+
+[S] One conventional baseline for future work is a lower-side cumulative-sum statistic on production rewards [24]:
+
+g_t = max(0, g_(t-1) + q_ref - r_t - k).
+
+An alarm occurs when g_t exceeds a chosen threshold h. The allowance k and the threshold h control responsiveness and false alarms. This is a standard process-monitoring form, documented by NIST [14]. Calibration has to account for binary rewards, changing selected routes, and changes in task difficulty. Our experiment implements a single short post-notification window, not continuous monitoring.
+
+[K] A calibrated example. For binary outcomes whose success rate falls from p0 to p1, the likelihood-ratio form of the statistic adds κ - r_t at each step, where
+
+κ = ln[(1 - p1) / (1 - p0)] / ln[p0 (1 - p1) / (p1 (1 - p0))].
+
+For p0 = 0.82 and p1 = 0.50, κ = 0.674. Rounding to 2/3 gives a rule in whole numbers: add 2 after a failure, subtract 1 after a success, never go below zero, and raise the alarm at h. Run lengths for a scheme like this can be computed exactly from a Markov chain [25]:
+
+h = 10: a false alarm about every 1,180 blocks at accuracy 0.82; mean delay 17.6 blocks after a drop to 0.5008 and 52.6 after a drop to 0.6568.
+h = 12: 3,438 blocks; 21.6; 72.5.
+h = 14: 9,915 blocks; 25.6; 95.1.
+h = 16: 28,469 blocks; 29.7; 120.3.
+
+For comparison, the saved canary used as a fixed 32-task window, back to back, would raise a false alarm about every 1,590 blocks, would catch a drop to 0.5008 in a given window with probability 0.974, and would catch a drop to backup-level accuracy with probability 0.564. A cumulative-sum monitor at h = 12 has about twice the false-alarm interval, detects the catastrophic drop in about 22 blocks, and needs no change notice. The advantage is real and modest. The exact chain calculation and a seeded simulation agree to within sampling error.
+
+[G] These figures assume independent outcomes at a fixed accuracy. Production under a learning router satisfies neither condition.
+
+A11. Across-seed uncertainty
+
+For seed s and policy p, the execution score is
+
+Y_s,p = 100 × verified_production_successes_s,p / total_budget_blocks_s,p.
+
+For a paired policy comparison, define D_s = Y_s,p - Y_s,baseline. The reported interval is
+
+mean(D_s) ± 1.96 × sample_sd(D_s) / sqrt(number_of_seeds).
+
+Seed-level policy scores receive equal weight. The replication experiment instead averages seed-level percentages of arriving tasks completed correctly; its denominator is task arrivals, not executed blocks. Its ceiling includes idle and setup capacity, and actual used calls differ across policies.
+
+The seed, not the individual task, is the independent unit for the main policy comparisons. The separate 50,000-task complementarity check uses paired task-level differences and has a different uncertainty calculation. Intervals describe Monte Carlo uncertainty within engineered worlds. They do not include uncertainty about transfer to real systems. Multiple exploratory comparisons were not adjusted for multiplicity.
+
+[K] Three refinements. First, with 64 or 80 seeds the Student t quantile is 1.998 or 1.990 in place of 1.96, so every reported interval should be read as about 2% wider. Second, rejection and trigger frequencies are binomial counts and have exact intervals [26]:
+
+52/64 triggered rejections of harm: 81.25%, interval 69.5% to 89.9%.
+53/64 always-on group rejections of harm: 82.81%, interval 71.3% to 91.1%.
+63/64 individual-audit rejections of harm: 98.44%, interval 91.6% to 99.96%.
+61/64 canary firings under harm: 95.31%, interval 86.9% to 99.0%.
+52/61 rejections given a firing: 85.25%, interval 73.8% to 93.0%.
+1/64 group rejections of the compensating pair: 1.56%, interval 0.04% to 8.4%.
+
+The triggered and always-on rejection rates differ by one run in 64 and are statistically indistinguishable. Third, in the harmful regime the seed-level scores of the audit policies are bimodal, with one cluster for runs that restored the original pair and one for runs that did not. The normal interval for a mean of 64 such values is serviceable, but its width is set almost entirely by the binomial variance of detection (A13), so a more sensitive audit would narrow it faster than more seeds would.
+
+A12. Comparing policies across regimes
+
+[K] Let Y_p,r be the expected score of policy p in regime r. If each run contains one change whose regime is drawn with probabilities w_r, and the policy’s rule does not depend on the regime, then by the law of total expectation
+
+E[Y_p] = Σ_r w_r Y_p,r.
+
+Expected scores are linear in the mixture, the best policy for a given mixture is the highest of a set of linear functions, and the saved regime means of Appendix B4 are estimates of the coefficients. On the harmful/useful slice the crossings are:
+
+adaptive routing and triggered audit: π = 0.29 / 11.13 = 0.026;
+triggered audit and blanket rollback: π = 13.56 / 18.11 = 0.749;
+adaptive routing and blanket rollback: π = 13.85 / 29.24 = 0.474;
+always-on group audit and adaptive routing: π = 0.173;
+always-on group audit and blanket rollback: π = 0.738;
+always-on group audit and triggered audit: π = 0.818, beyond the point where rollback is already best.
+
+Treating the saved means as independent, the delta method gives a standard error of about 0.027 for the 0.749 boundary. The 0.026 boundary has a numerator of 0.29 with an unpaired standard error of about 0.15 and is correspondingly loose. [G] Paired seed-level data would tighten both.
+
+A grid search over mixtures of all four mutation regimes, in steps of 0.02, finds only three policies that are ever best: adaptive routing, the triggered audit, and blanket rollback.
+
+Two worked mixtures. With 20% harmful, 20% useful, 50% silent, and 10% compensating: triggered 77.11, group 76.21, rollback 75.74, adaptive 75.43, change-aware 75.15, individual 74.42. With equal quarters: triggered 77.67, group 76.74, rollback 75.74, adaptive 75.35, change-aware 75.26, individual 74.89.
+
+Regret is defined against the best tested policy in each regime, not against an unattainable oracle: 75.74 for harmful, silent, and compensating, and 89.59 for useful. Minimizing the worst-case regret is Savage’s criterion [22]. The table is in the main text.
+
+[G] Linearity fails as soon as a run contains more than one change or a policy adapts to the frequency of past changes. Those cases need simulation.
+
+A13. Consistency checks between calculation and saved results
+
+[K] Each line gives a quantity computed from the model’s stated parameters, then the saved value.
+
+Routing and pruning:
+Uniform routing, stable world: 68.04; saved 68.04.
+Uniform routing, shift world: 68.28; saved 68.29.
+Uniform routing, shift world, final half: 68.56; saved 68.61.
+Adaptive routing with equal skills, (1 - 0.04) × 72: 69.12; saved 69.13.
+Ceiling for a 4%-overhead controller that knows every skill: 88.51 stable, 89.67 shift, 91.01 final half; saved adaptive 87.03, 88.23, 89.82.
+Final-half ceiling under permanent pruning: 80.26 if only the rare branch is gone, 76.80 if all three specialists are gone; saved 75.82.
+
+Replication:
+Reserved worker slots, 920 × 12: 11,040; task, setup, and idle calls sum to 11,040.00 for all four controllers.
+Correct completion with every task served: 92.00; saved 92.00 to 92.04.
+Correct completion with rare tasks unserved in the surge: 27.60; saved 27.57.
+
+Mutation maintenance:
+Audit overhead per displaced block, silent regime: 0.788 from the group audit (50.4 successes over 64 blocks) and 0.790 from the individual audit (101.1 over 128). The two estimates agree.
+Audit overhead in the useful regime, 64 × 0.98: 62.7 successes; saved 62.7.
+Always-on group audit, harmful regime, (53 × 74.06 + 11 × 60.38) / 64: 71.71; saved 71.65.
+Triggered audit, harmful regime, (52 × 73.75 + 9 × 60.07 + 3 × 61.39) / 64: 71.24; saved 71.19.
+Standard deviation of the seed-level paired gain, two-outcome mixture: 5.3; implied by the saved interval: 5.0.
+Group-audit rejection of the harmful pair, under the coupling assumption of A7: 0.778; saved 53/64 = 0.828.
+At least one individual-audit rejection, same assumption: 0.981; saved 63/64 = 0.984.
+Canary firing under harm, historical estimate 0.82: 0.974; saved 61/64 = 0.953.
+
+Complementarity check:
+Joint accuracy with sensor reliability 0.8873: 0.8000; saved 0.8040, which is 2.2 binomial standard errors high.
+
+In the two harmful-regime reconstructions, a restored run is valued at the same policy’s silent-regime score for the group audit, and at the no-mutation score less canary and audit overhead for the triggered audit: 32 × (0.79 - 0.5008) / 30 = 0.31 points and 64 × 0.79 / 30 = 1.69 points. A missed run is valued at the change-aware score less the audit, with displaced blocks priced at 0.62 successes each. [A] That last rate is assumed. Changing it by 0.1 moves either total by less than 0.05.
+
+Agreement here shows that the saved results are internally coherent and that this simple accounting is adequate. It is not an independent replication of the simulations.
+
+
+TECHNICAL APPENDIX B: COMPLETE NUMERICAL RESULTS
+
+Values in brackets are approximate 95% Monte Carlo intervals. Paired differences are percentage points, not relative percent increases. Scores from different suites use different tasks and block definitions and should not be directly compared.
+
+Sections B1 to B5 are saved simulation output, reproduced as archived. Quantities derived from them appear in the main text and in A11 to A13.
+
+B1. Initial routing and pruning
+
+Eighty seeds per world, five policies, 8,000 blocks per policy run. Each block is two synthetic agent invocations, giving 16,000 calls per run. A diagnostic fallback execution consumes one block and yields no new production completion. Adaptive policies spend 4% of their blocks on these diagnostics.
+
+Assigned success probabilities, in family order A / B / rare:
+Generalist: 0.68 / 0.68 / 0.68.
+Specialist A: 0.92 / 0.50 / 0.50.
+Specialist B: 0.50 / 0.92 / 0.50.
+Rare specialist: 0.50 / 0.50 / 0.96.
+Cooperative pair: 0.80 / 0.80 / 0.80.
+
+Stable task mixture: 47.5% A, 47.5% B, 5% rare. In the shift world, the first-half mixture is 49.75% A, 49.75% B, 0.5% rare; the second half is 15% A, 15% B, 70% rare. In the equal-skill control, all routes have probability 0.72 and families are equally frequent.
+
+Pruning starts after 400 blocks, is reviewed every 100, and uses a 300-block recent task mix. A route is disabled when estimated global success is more than 0.16 below the best route; the generalist fallback remains. Reversible pruning can probe and restore dormant branches. Permanent pruning cannot.
+
+Stable specializations — successes per 100 total budget blocks:
+Fixed uniform: 68.04 [67.92, 68.16].
+Fixed cooperative pair: 80.03 [79.93, 80.13].
+Adaptive, no pruning: 87.03 [86.97, 87.10].
+Adaptive, reversible pruning: 85.60 [85.33, 85.87].
+Adaptive, permanent pruning: 82.66 [81.88, 83.44].
+Paired differences from the fixed cooperative pair:
+Adaptive, no pruning: 7.00 [6.89, 7.12].
+Adaptive, reversible pruning: 5.56 [5.27, 5.86].
+Adaptive, permanent pruning: 2.63 [1.84, 3.43].
+
+Rare skill becomes common — successes per 100 total budget blocks:
+Fixed uniform: 68.29 [68.19, 68.40].
+Fixed cooperative pair: 80.00 [79.91, 80.10].
+Adaptive, no pruning: 88.23 [88.16, 88.31].
+Adaptive, reversible pruning: 85.73 [85.53, 85.93].
+Adaptive, permanent pruning: 79.80 [79.32, 80.28].
+Paired differences from the fixed cooperative pair:
+Adaptive, no pruning: 8.23 [8.10, 8.36].
+Adaptive, reversible pruning: 5.73 [5.50, 5.96].
+Adaptive, permanent pruning: -0.20 [-0.69, 0.29].
+
+Equal-skill control — successes per 100 total budget blocks:
+Fixed uniform: 72.05 [71.93, 72.16].
+Fixed cooperative pair: 72.03 [71.93, 72.13].
+Adaptive, no pruning: 69.13 [69.02, 69.25].
+Adaptive, reversible pruning: 69.16 [69.05, 69.27].
+Adaptive, permanent pruning: 69.08 [68.98, 69.19].
+Paired differences from the fixed cooperative pair:
+Adaptive, no pruning: -2.90 [-3.05, -2.75].
+Adaptive, reversible pruning: -2.87 [-3.01, -2.73].
+Adaptive, permanent pruning: -2.95 [-3.07, -2.83].
+
+Final half of the rare-skill shift world:
+Fixed uniform: 68.61 [68.44, 68.77].
+Fixed cooperative pair: 79.99 [79.85, 80.13].
+Adaptive, no pruning: 89.82 [89.74, 89.91].
+Adaptive, reversible pruning: 85.81 [85.66, 85.97].
+Adaptive, permanent pruning: 75.82 [75.25, 76.40].
+
+Rare-specialist branch retained at the end of the shift world:
+Adaptive, no pruning: 100.00% of seeds.
+Adaptive, reversible pruning: 100.00% of seeds.
+Adaptive, permanent pruning: 0.00% of seeds.
+
+B2. Static complementarity mechanism check
+
+50,000 paired XOR tasks; seed 778899. Sensor reliability is 0.8872983346, chosen so joint theoretical correctness is 0.80. Spare slots are padded so configurations use equal synthetic reader-call budgets. The fixed XOR combination is unmetered in this initial mechanism check; the later mutation experiment explicitly charges its combiner execution. This is planted complementarity.
+Fallback generalist: 67.81% correct.
+Sensor A link only: 50.05% correct.
+Sensor B link only: 49.76% correct.
+Both sensor links: 80.40% correct.
+Paired differences from the fallback generalist:
+Sensor A link only: -17.76 [-18.36, -17.16].
+Sensor B link only: -18.05 [-18.65, -17.45].
+Both sensor links: 12.59 [12.05, 13.13].
+
+The observed joint accuracy of 80.40% lies 2.2 binomial standard errors above the theoretical 80.00% (standard error 0.18 points at 50,000 tasks). One excursion of that size among the quantities checked in A13 is unremarkable, but this check used a single seed and has not been repeated. [G]
+
+B3. Replication and shrinkage
+
+Eighty paired seeds; twelve workers; three 300-tick arrival phases plus twenty finishing ticks. Mean arrivals are nine tasks per tick. Each task has a twenty-tick deadline. Every policy reserves 11,040 worker slots; actual task and setup calls differ. Any served task has a 0.92 correctness probability.
+
+Correct completion as a percentage of tasks arriving in each phase, in order before surge / during surge / after surge:
+Fixed specialist counts: 92.00 [91.89, 92.11] / 49.26 [49.03, 49.49] / 92.04 [91.93, 92.16].
+Demand-driven copies: 92.00 [91.89, 92.11] / 92.03 [91.92, 92.14] / 92.04 [91.93, 92.16].
+Copies, rare template deleted: 91.98 [91.87, 92.09] / 27.57 [27.37, 27.76] / 91.16 [91.04, 91.28].
+Pooled dispatch (no setup cost): 92.00 [91.89, 92.11] / 92.03 [91.92, 92.14] / 92.04 [91.93, 92.16].
+
+Surge-phase paired differences, demand-driven copies minus comparator:
+Versus Fixed specialist counts: 42.77 [42.53, 43.00].
+Versus Copies, rare template deleted: 64.46 [64.25, 64.67].
+Versus Pooled dispatch (no setup cost): 0.00 [0.00, 0.00].
+
+Mean actual task calls / setup calls / idle reserved slots across each complete run:
+Fixed specialist counts: 6848.70 / 0.00 / 4191.30.
+Demand-driven copies: 8105.50 / 162.30 / 2772.20.
+Copies, rare template deleted: 6184.15 / 122.40 / 4733.45.
+Pooled dispatch (no setup cost): 8105.50 / 0.00 / 2934.50.
+
+Demand-driven rare population, averaged over the last fifty ticks of each phase: 0.469 / 8.261 / 0.414.
+Copies and pooled dispatch produce identical verified-completion outcomes in the saved runs. Identical task outcomes do not imply identical used compute: the pool avoids setup executions.
+
+B4. Mutation maintenance
+
+Sixty-four paired seeds, five regimes, six policies, 3,000 blocks per run. Each block is two reader calls and one combiner call, giving exactly 9,000 synthetic agent invocations. Each run has one mutation event at index 900, except the no-mutation control.
+
+For compactness, the policy names below retain their exact archive spelling. Each value is verified successes per 100 total budget blocks, including audit overhead.
+
+No mutation:
+Adaptive routing: 75.74 [75.47, 76.01].
+Change-aware routing: 75.74 [75.47, 76.01].
+Rollback every change: 75.74 [75.47, 76.01].
+Individual functional audit: 75.74 [75.47, 76.01].
+Group functional audit: 75.74 [75.47, 76.01].
+Triggered group audit: 75.74 [75.47, 76.01].
+Paired differences from change-aware routing:
+Individual functional audit: 0.00 [0.00, 0.00].
+Group functional audit: 0.00 [0.00, 0.00].
+Triggered group audit: 0.00 [0.00, 0.00].
+
+Silent code mutations:
+Adaptive routing: 75.74 [75.47, 76.01].
+Change-aware routing: 74.87 [74.54, 75.19].
+Rollback every change: 75.74 [75.47, 76.01].
+Individual functional audit: 72.37 [72.11, 72.62].
+Group functional audit: 74.06 [73.75, 74.36].
+Triggered group audit: 74.97 [74.66, 75.28].
+Paired differences from change-aware routing:
+Individual functional audit: -2.50 [-2.75, -2.25].
+Group functional audit: -0.81 [-1.06, -0.56].
+Triggered group audit: 0.10 [-0.16, 0.37].
+
+Harmful mutations:
+Adaptive routing: 60.35 [60.04, 60.66].
+Change-aware routing: 61.70 [61.37, 62.03].
+Rollback every change: 75.74 [75.47, 76.01].
+Individual functional audit: 69.88 [68.85, 70.92].
+Group functional audit: 71.65 [70.33, 72.97].
+Triggered group audit: 71.19 [69.97, 72.40].
+Paired differences from change-aware routing:
+Individual functional audit: 8.18 [7.18, 9.17].
+Group functional audit: 9.94 [8.58, 11.31].
+Triggered group audit: 9.48 [8.26, 10.71].
+
+Useful mutations:
+Adaptive routing: 89.59 [89.41, 89.78].
+Change-aware routing: 89.32 [89.11, 89.52].
+Rollback every change: 75.74 [75.47, 76.01].
+Individual functional audit: 85.21 [84.99, 85.42].
+Group functional audit: 87.23 [87.02, 87.44].
+Triggered group audit: 89.30 [89.08, 89.52].
+Paired differences from change-aware routing:
+Individual functional audit: -4.11 [-4.17, -4.05].
+Group functional audit: -2.09 [-2.14, -2.04].
+Triggered group audit: -0.01 [-0.06, 0.03].
+
+Compensating mutations:
+Adaptive routing: 75.72 [75.42, 76.01].
+Change-aware routing: 75.15 [74.86, 75.44].
+Rollback every change: 75.74 [75.47, 76.01].
+Individual functional audit: 72.12 [71.67, 72.56].
+Group functional audit: 74.02 [73.73, 74.31].
+Triggered group audit: 75.24 [74.93, 75.55].
+Paired differences from change-aware routing:
+Individual functional audit: -3.04 [-3.40, -2.68].
+Group functional audit: -1.13 [-1.25, -1.01].
+Triggered group audit: 0.09 [-0.07, 0.24].
+
+B5. Audit costs and rollback outcomes
+
+Each line gives mean audit blocks, then percent of seeds with at least one mutation rejected. Rejection is not automatically correct detection: interpreting it requires the regime and the collaboration tested.
+
+No mutation:
+Adaptive routing: 0.00 audit blocks; 0.00% with rollback.
+Change-aware routing: 0.00 audit blocks; 0.00% with rollback.
+Rollback every change: 0.00 audit blocks; 0.00% with rollback.
+Individual functional audit: 0.00 audit blocks; 0.00% with rollback.
+Group functional audit: 0.00 audit blocks; 0.00% with rollback.
+Triggered group audit: 0.00 audit blocks; 0.00% with rollback.
+
+Silent code mutations:
+Adaptive routing: 0.00 audit blocks; 0.00% with rollback.
+Change-aware routing: 0.00 audit blocks; 0.00% with rollback.
+Rollback every change: 0.00 audit blocks; 100.00% with rollback.
+Individual functional audit: 128.00 audit blocks; 0.00% with rollback.
+Group functional audit: 64.00 audit blocks; 0.00% with rollback.
+Triggered group audit: 0.00 audit blocks; 0.00% with rollback.
+
+Harmful mutations:
+Adaptive routing: 0.00 audit blocks; 0.00% with rollback.
+Change-aware routing: 0.00 audit blocks; 0.00% with rollback.
+Rollback every change: 0.00 audit blocks; 100.00% with rollback.
+Individual functional audit: 128.00 audit blocks; 98.44% with rollback.
+Group functional audit: 64.00 audit blocks; 82.81% with rollback.
+Triggered group audit: 61.00 audit blocks; 81.25% with rollback.
+
+Useful mutations:
+Adaptive routing: 0.00 audit blocks; 0.00% with rollback.
+Change-aware routing: 0.00 audit blocks; 0.00% with rollback.
+Rollback every change: 0.00 audit blocks; 100.00% with rollback.
+Individual functional audit: 128.00 audit blocks; 0.00% with rollback.
+Group functional audit: 64.00 audit blocks; 0.00% with rollback.
+Triggered group audit: 0.00 audit blocks; 0.00% with rollback.
+
+Compensating mutations:
+Adaptive routing: 0.00 audit blocks; 0.00% with rollback.
+Change-aware routing: 0.00 audit blocks; 0.00% with rollback.
+Rollback every change: 0.00 audit blocks; 100.00% with rollback.
+Individual functional audit: 128.00 audit blocks; 100.00% with rollback.
+Group functional audit: 64.00 audit blocks; 1.56% with rollback.
+Triggered group audit: 1.00 audit blocks; 1.56% with rollback.
+
+No functional audit rejected useful or silent mutations in these sixty-four seeds. That is an observed zero, not proof of a zero underlying false-rejection probability. For an independent binomial event, zero events in sixty-four trials has a one-sided exact 95% upper bound of 1 - 0.05^(1/64), about 4.57%; dependence or a different target population changes that interpretation.
+
+Under the coupling assumption of A7 the corresponding exact probabilities are far smaller than that bound: zero for silent changes and below 10^-6 for the useful change. [A]
+
+In the post-run subset of sixty-three compensating-mutation runs whose preferred pair was the primary team, individual audits rejected changes in 63/63; always-on and triggered group audits rejected in 0/63. Across all sixty-four runs, the group policies rejected in 1/64. The exception involved another collaboration, so whole-primary-pair cancellation was not a guarantee for its current graph.
+
+A final graph may be optimal among its accepted versions even if a harmful version should have been rolled back. Optimization within an accepted version set and successful maintenance are distinct outcomes. All seed-level graph choices, estimated qualities, and rejection records remain in the companion data.
+
+
+TECHNICAL APPENDIX C: LIMITS, PROVENANCE, AND REPRODUCTION
+
+C1. What the experiments do and do not measure
+
+[K] The archive contains 1,200 initial routing/pruning policy runs, 320 population-allocation runs, and 1,920 mutation-maintenance runs: 3,440 policy runs in total. These are not 3,440 independent worlds. Within each suite, policies share seed-matched environmental realizations; the independent seed counts are eighty, eighty, and sixty-four respectively. The static complementarity check contains 50,000 additional paired puzzles.
+
+The suites were developed sequentially in response to the research questions. Their scripts write settings before their full run, and the saved plans identify parameters as frozen for those runs. This is an archived protocol record, not an independent public preregistration. This article adds mathematical interpretation and reports the saved results; it does not describe a newly run full-scale experiment.
+
+All tasks and mutations are synthetic. No language-model agents, unrestricted program synthesis, endogenous skill discovery, learned immune agent, unannounced mutation detector, or independently evolved cooperation is present. Reader instruction changes are deliberately assigned. The fifteen candidate reader graphs have fixed size and a fixed combining operation.
+
+Verification is perfect and free. Controller computation, change notifications, memory, communication, and archival costs are unmetered. The mutation audit has privileged matched randomness and access to exact original versions. Template deletion in the replication test is a controlled intervention, not an organically learned deletion policy.
+
+Production tasks are fresh, but controllers learn online. No untouched final evaluation set separates design from deployment. The study contains one mutation event per maintenance run; it does not establish behavior under recurrent changes, correlated attacks, or several mutation types within a single run.
+
+The harmful and useful mutations are extreme. One reduces the best team to chance and the other nearly perfects it. Appendix A7 shows that the saved audit is much less sensitive to moderate harm, and no graded-harm regime was simulated.
+
+The trigger observes a short window after a correct change notice. It does not continually patrol a large graph, localize arbitrary faults, or distinguish agent failure from an unannounced shift in task difficulty. A production drop can have several causes. Larger systems would require additional experiments on attribution and detection.
+
+There is no demonstrated advantage over a conventional canary controller that implements the same rule. There is also no demonstrated advantage of replication over pooled dispatch. The routing baselines never use the archive, so part of what the harmful regime measures is the value of being able to restore at all; a router free to choose between archived and mutated versions has not been run. The biological analogy and the mathematical framework should be assessed separately from these concrete simulation findings.
+
+C2. What was checked for this article, and how
+
+Saved results. Archive checksums were verified during manuscript preparation. The saved execution budgets and mutation-summary contrasts were recomputed, and one representative seed was reproduced across all forty-nine policy/world combinations spanning the three suites. This is a reproducibility spot check, not a claim that all original seed runs were rerun during writing.
+
+Calculations. The closed-form results, exact enumerations, exact binomial intervals, and run-length calculations in the main text and Appendix A were produced by a short script that uses only the Python standard library (math_checks.py, distributed alongside the companion archive). The script also cross-checks two of its exact results by seeded simulation. These are calculations about the stated models. They do not rerun or modify the archived suites, and they take the saved means as given.
+
+One assumption needs settling. The operating-characteristic results in A7 depend on how the simulator shares randomness between archived and candidate executions. The assumed coupling is consistent with the saved rejection and firing counts but is not established by them. Reading the audit code will settle it, and the A7 results should not be relied on until that is done. [G]
+
+Predictions. Statements tagged [S] that give numbers, including the zero-multiplier audit scores and the pruning prediction for the first suite, are outputs of the same calculations applied to designs or records that have not been run or inspected. They are listed so that they can be checked.
+
+C3. Reproducing the archived suites and the calculations
+
+The companion archive is Dynamic_Agent_Graph_Toy_Tests.zip. An anonymous public data location has not yet been assigned. Public replication requires publishing the archive or its contents at an accessible location alongside this article.
+
+Extract the archive and run commands from its Dynamic_Agent_Graph_Toy_Tests directory. Python and NumPy run the simulations; Matplotlib is also needed for the report figure. The source specifies Python 3.10 or later. The manuscript spot checks used Python 3.12.14 and NumPy 2.3.5. No API keys, model calls, or network access are needed for simulation.
+
+Initial routing and pruning:
+python3 run_tests.py --seeds 80 --budget 8000 --out results
+
+Replication and shrinkage:
+python3 run_division_test.py
+
+Mutation maintenance:
+python3 run_immune_tests.py --seeds 64 --budget 3000
+
+Report generation:
+python3 build_immune_report.py
+python3 make_report.py
+
+Closed-form checks (standard library only; run for this article under Python 3.13):
+python3 math_checks.py
+
+The scripts can overwrite their output files when rerun; use a separate extracted copy if preserving the originals. Seed-level data are in results/results.json, division_results/results.json, and immune_results/results.json. Corresponding plan.json files record the run settings. SHA256.json records the archived file digests. Executed seeds and random-number initialization are explicit in the source. math_checks.py reads no files and writes none. It prints each computed value beside the saved value it is compared with.
+
+C4. The next falsifiable study
+
+[S] A follow-up should vary one principal factor at a time before testing interactions. Useful factors are mutation arrival rate, harmful-change frequency, the size of harm and benefit, interaction strength, audit cost, verifier noise, archive cost, and time remaining. Audit scope and audit budget should also be controlled independently, since the current individual and group audits have different costs.
+
+Baselines should include change-aware routing, blanket rollback, ordinary canary testing, calibrated continuous change detection, flexible pooled scheduling where relevant, and a router that can choose between archived and mutated versions without a dedicated audit. A maintained graph should receive no private information or free resource that its baseline lacks. Verification must remain external to the agents’ own agreement.
+
+Four inexpensive checks come first, because each can be made with the existing archive or a small change to it: read the audit code to settle the coupling assumption of A7; read the seed-level final graphs of the first suite against the pruning prediction; rerun the mutation suite with the zero-multiplier rule at 12 and 32 probe pairs; and rerun it with independent executions for the archived and candidate versions.
+
+The primary outcome should be externally verified output under a fully specified resource budget. Detection delay, unnecessary rollback, specialist recovery, and audit expenditure are explanatory outcomes. A success criterion should be fixed before evaluation, with all mutation regimes and failures reported.
+
+The decisive result would be a reproducible net benefit that persists when conventional maintenance uses the same information and costs. Until then, the present contribution remains a set of transparent toy findings, a body of arithmetic that agrees with them, and a framework for asking a better question.
+
+
+REFERENCES
+
+References [1] to [14] were checked on November 8, 2026 and [15] to [26] on November 9, 2026, through primary publisher records, original abstracts, author-hosted papers, or official technical documentation. This is a targeted literature search, not a systematic review or exhaustive novelty assessment. Where full text was unavailable, the discussion uses only the scope supported by the accessible abstract or publication record. No external paper’s full theoretical claims were independently replicated.
+
+[1] Forrest, S., Perelson, A. S., Allen, L., and Cherukuri, R. (1994). Self-Nonself Discrimination in a Computer. Proceedings of the 1994 IEEE Computer Society Symposium on Research in Security and Privacy, pp. 202–212. DOI: 10.1109/RISP.1994.296580.
+https://profsforrest.github.io/homepage/data/publications/1994-self-nonself.pdf
+
+[2] Matzinger, P. (2002). The Danger Model: A Renewed Sense of Self. Science, 296(5566), 301–305. Viewpoint. DOI: 10.1126/science.1071059.
+https://pubmed.ncbi.nlm.nih.gov/11951032/
+
+[3] Potter, M. A., and De Jong, K. A. (2000). Cooperative Coevolution: An Architecture for Evolving Coadapted Subcomponents. Evolutionary Computation, 8(1), 1–29. DOI: 10.1162/106365600568086.
+https://pubmed.ncbi.nlm.nih.gov/10753229/
+
+[4] Foerster, J., Farquhar, G., Afouras, T., Nardelli, N., and Whiteson, S. (2018). Counterfactual Multi-Agent Policy Gradients. Proceedings of the AAAI Conference on Artificial Intelligence, 32(1). DOI: 10.1609/aaai.v32i1.11794. Preprint first posted in 2017.
+https://arxiv.org/abs/1705.08926
+
+[5] Zhuge, M., Wang, W., Kirsch, L., Faccio, F., Khizbullin, D., and Schmidhuber, J. (2024). GPTSwarm: Language Agents as Optimizable Graphs. Proceedings of the 41st International Conference on Machine Learning, PMLR 235, 62743–62767.
+https://proceedings.mlr.press/v235/zhuge24a.html
+
+[6] Vierling, L., Fu, J., and Chen, K. (2024). Input Conditioned Graph Generation for Language Agents. arXiv:2406.11555. Preprint.
+https://arxiv.org/abs/2406.11555
+
+[7] Bakhouya, M., Nemiche, M., and Gaber, J. (2016). An Adaptive Regulation Approach of Mobile Agent Population Size in Distributed Systems. International Journal of Intelligent Systems, 31(2), 173–188. First published online in 2015. DOI: 10.1002/int.21750.
+https://onlinelibrary.wiley.com/doi/10.1002/int.21750
+
+[8] Garnier, J.-P. (2026). Agentic Hives: Equilibrium, Indeterminacy, and Endogenous Cycles in Self-Organizing Multi-Agent Systems. arXiv:2603.00130, version 2. Preprint.
+https://arxiv.org/abs/2603.00130v2
+
+[9] Russo, D., Van Roy, B., Kazerouni, A., Osband, I., and Wen, Z. (2018). A Tutorial on Thompson Sampling. Foundations and Trends in Machine Learning, 11(1), 1–96. DOI: 10.1561/2200000070.
+https://arxiv.org/abs/1707.02038
+
+[10] Harrand, N., Allier, S., Rodriguez-Cancio, M., Monperrus, M., and Baudry, B. (2019). A journey among Java neutral program variants. Genetic Programming and Evolvable Machines, 20, 531–580. DOI: 10.1007/s10710-019-09355-3.
+https://link.springer.com/article/10.1007/s10710-019-09355-3
+
+[11] Warner, A., and Davidovič, Š., with Hidalgo, A., Beyer, B., Smith, K., and Duftler, M. (2018). Canarying Releases. Chapter 16, The Site Reliability Workbook. Google / O’Reilly.
+https://sre.google/workbook/canarying-releases/
+
+[12] Ray Project. Ray Serve Autoscaling. Official technical documentation. Accessed November 8, 2026.
+https://docs.ray.io/en/latest/serve/autoscaling-guide.html
+
+[13] Howard, R. A. (1966). Information Value Theory. IEEE Transactions on Systems Science and Cybernetics, 2(1), 22–26. DOI: 10.1109/TSSC.1966.300074.
+https://ieeexplore.ieee.org/document/4082064/
+
+[14] NIST/SEMATECH. e-Handbook of Statistical Methods, section 6.3.2.3: CUSUM Control Charts. Official technical documentation. Accessed November 8, 2026.
+https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc323.htm
+
+[15] McNemar, Q. (1947). Note on the sampling error of the difference between correlated proportions or percentages. Psychometrika, 12(2), 153–157. DOI: 10.1007/BF02295996.
+https://doi.org/10.1007/BF02295996
+
+[16] Glasserman, P., and Yao, D. D. (1992). Some Guidelines and Guarantees for Common Random Numbers. Management Science, 38(6), 884–908. DOI: 10.1287/mnsc.38.6.884.
+https://doi.org/10.1287/mnsc.38.6.884
+
+[17] Matsui, M. (1994). Linear Cryptanalysis Method for DES Cipher. Advances in Cryptology – EUROCRYPT ’93, Lecture Notes in Computer Science 765, pp. 386–397. Springer. DOI: 10.1007/3-540-48285-7_33.
+https://doi.org/10.1007/3-540-48285-7_33
+
+[18] Shapley, L. S. (1953). A Value for n-Person Games. In Kuhn, H. W., and Tucker, A. W. (eds.), Contributions to the Theory of Games II, Annals of Mathematics Studies 28, pp. 307–317. Princeton University Press. DOI: 10.1515/9781400881970-018.
+https://doi.org/10.1515/9781400881970-018
+
+[19] Grabisch, M., and Roubens, M. (1999). An axiomatic approach to the concept of interaction among players in cooperative games. International Journal of Game Theory, 28(4), 547–565. DOI: 10.1007/s001820050125.
+https://doi.org/10.1007/s001820050125
+
+[20] Raiffa, H., and Schlaifer, R. (1961). Applied Statistical Decision Theory. Division of Research, Graduate School of Business Administration, Harvard University, Boston.
+
+[21] Feit, E. M., and Berman, R. (2019). Test & Roll: Profit-Maximizing A/B Tests. Marketing Science, 38(6), 1038–1058. DOI: 10.1287/mksc.2019.1194.
+https://arxiv.org/abs/1811.00457
+
+[22] Savage, L. J. (1951). The Theory of Statistical Decision. Journal of the American Statistical Association, 46(253), 55–67. DOI: 10.1080/01621459.1951.10500768.
+https://doi.org/10.1080/01621459.1951.10500768
+
+[23] Smith, D. R., and Whitt, W. (1981). Resource Sharing for Efficiency in Traffic Systems. Bell System Technical Journal, 60(1), 39 ff.
+https://www.nokia.com/bell-labs/publications-and-media/publications/resource-sharing-for-efficiency-in-traffic-systems/
+
+[24] Page, E. S. (1954). Continuous Inspection Schemes. Biometrika, 41(1–2), 100–115. DOI: 10.1093/biomet/41.1-2.100.
+https://doi.org/10.1093/biomet/41.1-2.100
+
+[25] Reynolds, M. R., Jr., and Stoumbos, Z. G. (1999). A CUSUM Chart for Monitoring a Proportion When Inspecting Continuously. Journal of Quality Technology, 31(1), 87–108. DOI: 10.1080/00224065.1999.11979900.
+https://doi.org/10.1080/00224065.1999.11979900
+
+[26] Clopper, C. J., and Pearson, E. S. (1934). The Use of Confidence or Fiducial Limits Illustrated in the Case of the Binomial. Biometrika, 26(4), 404–413. DOI: 10.1093/biomet/26.4.404.
+https://doi.org/10.1093/biomet/26.4.404
+
+END OF MANUSCRIPT
