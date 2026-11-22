@@ -19,3 +19,5 @@ The Codex offers a way to think and work together. The reader remains free to qu
 - [Coupled Semantic Entropy and Verified Attractors](Xenonostra_Coupled_Semantic_Entropy_and_Verified_Attractors_Merged.txt) — a geometric and quantum-inspired framework for semantic uncertainty dynamics, with analytical toy models, source-reported experiments, and a falsifiable verification program.
 
 - [Mutation Is Not Malfunction](Xenonostra_Mutation_Is_Not_Malfunction_v2.txt) — an exploratory computational essay on adaptive routing, capability retention, mutation audits, and maintenance cost, with toy experiments and mathematical analysis.
+
+- [What Should Stick in a Liquid AI Memory?](Xenonostra_Liquid_Graph_Memory.txt) — seven toy experiments on graph memory, wave dynamics, and the limits of recursive self-improvement. [Download the tests and reference results](Xenonostra_Liquid_Graph_Toy_Tests.zip).

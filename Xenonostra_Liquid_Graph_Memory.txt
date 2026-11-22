@@ -1,0 +1,284 @@
+What Should Stick in a Liquid AI Memory?
+
+Seven toy experiments on graph memory, wave dynamics, and the limits of recursive self-improvement
+
+By Xenonostra’
+
+Imagine an ant walking across a bottle. Ask what the bottle is made of and “plastic” comes to mind. Ask what the ant can see and the same bottle brings up curvature, scale, and the limits of a local view. The object stayed put. The question changed which relationships mattered.
+
+Now suppose an AI could use that analogy once, then recognize another occasion for it weeks later. Those are two different demands on memory. The first calls for a temporary route between ideas. The second calls for evidence that the route deserves to persist. If every passing analogy becomes a durable association, the next question about recyclable plastic might bring back the ant.
+
+We built a small version of this idea and ran it. A trained next-token predictor did better when two different cues could reach a shared memory. A rule that waited for a second matching observation also helped in slowly changing worlds. When the world changed quickly, the same rule held on too long. One surprise came from the embeddings themselves. Even when the graph activated exactly two answers, a simple vector decoder sometimes chose a third.
+
+The extension asks two further questions. Can a memory use the direction that activation was moving? And can it get better at changing its own learning rule? A predictor that switched between ordinary memory and directional motion earned a measurable gain when both behaviors occurred. Descendants that edited their own search step improved, but conventional tuning reached essentially the same score.
+
+What “liquid” means here
+
+Three quantities can move independently. Activation measures which memories matter to the current question. Edge weights express how strongly the system connects one memory to another. An embedding gives each memory a location in a vector space. We held the embeddings still so we could observe what happened when activation and edge weights changed. In the first four tests, “liquid” describes how activation and associations redistribute over time. The fifth test gives wave motion a precise mathematical meaning.
+
+Here is the smallest model we found that keeps those distinctions visible. Imagine eight objects, eight intermediate memory nodes we will call relays, and eight possible answer tokens. For object i and context c, let eᵢ be a row vector with a 1 at position i and zeros elsewhere. Each row of R_c gives the weights from an object to the relays in that context. Each row of B_t gives the weights from a relay to the candidate tokens at time t. The rows sum to one.
+
+    a_t = eᵢ R_c B_t
+    m_t = a_t E = Σⱼ a_t(j) vⱼ
+
+The first multiplication follows two links. The resulting row a_t says how much activation reached each token. The rows vⱼ of E are its token embeddings. The second line produces a single memory vector, m_t, that a language model can read. If z_t represents the visible prefix, a simple next-token decoder is
+
+    p_t = softmax(z_t U + m_t V)
+    softmax(l)ⱼ = exp(lⱼ) / Σₖ exp(lₖ)
+
+U and V convert prefix and memory features into scores for the next token. We actually fitted this decoder in the third experiment. In the others, a fixed readout or an explicit probability rule let us isolate one part of the mechanism at a time.
+
+1. Can the right route produce the wrong word?
+
+We first gave the system a complete graph. In each of 256 random worlds, two contexts routed the same eight objects through independently permuted relays. Each relay pointed to one answer. All 4,096 object–context queries had a known solution. The model received both links, so this was a wiring check.
+
+With the correct context and eight orthonormal token vectors, retrieval was perfect. Averaging the two context maps gave 55.76% accuracy. Randomly shuffling the relay-to-answer rows at read time gave 12.40%, close to the one-in-eight chance rate. An ordinary pair of dictionary lookups can also solve the clean task exactly.
+
+Then we deliberately made the cue ambiguous. We sent 65% of activation down one context’s route and 35% down the other. On the 1,812 objects where those routes led to different answers, we decoded the weighted vector by choosing the token with the largest dot product. How often did a token on neither route win?
+
+    Random unit vectors, 2 dimensions — 48.73%
+    Random unit vectors, 4 dimensions — 11.98%
+    Random unit vectors, 8 dimensions — 0.88%
+    Orthonormal vectors, 8 dimensions — 0.00%
+
+You can reproduce the failure on paper. Give the first two tokens the vectors (1, 0) and (0, 1). Their mixture is m = (0.65, 0.35). Its dot products with those tokens are 0.65 and 0.35. Give a third token a unit vector pointing along m. Its score is the length of m, about 0.738. The third token wins despite receiving zero graph activation.
+
+The failure has a useful constraint. For two distinct unit vectors u and v mixed in proportions 0.65 and 0.35, the score difference between the two original answers is
+
+    m · u − m · v = 0.30 (1 − u · v) > 0.
+
+The weaker route cannot beat the stronger one under this readout. Every error in these mixed cases must therefore come from a third token. That is a property of the geometry, and it explains what to measure in the simulation.
+
+In general, the decoded scores are a_t E Eᵀ. With orthonormal rows, E Eᵀ is the identity and the scores recover a_t exactly. With overlapping rows, the geometry can change the ranking. Those percentages describe these random vectors and this fixed decoder. Even at the same dimension, the orthonormal and random codes gave different results. Testing how much a learned decoder can undo that interference would require training it on the overlapping codes.
+
+2. When should a connection stick?
+
+[A] We gave each relay a hidden answer that could change. At each visit its answer switched to a uniformly chosen different token with probability h. A report named the current answer correctly 85% of the time. Otherwise it named one of the seven alternatives with equal probability. Every method had to predict the next report before seeing it. A wrong report could therefore be noise or the first sign that the world had changed.
+
+Our candidate rule kept a fast row F and a slow row S for each relay. After observing token y, it updated the rows as follows. Here “old” means before this observation, and e_y puts all mass on y.
+
+    F_new = F_old + f (e_y − F_old)
+    S_new = S_old + s g (e_y − S_old)
+    b_new = w F_new + (1 − w) S_new
+
+For the ordinary two-rate rule, g always equals 1. For the repeat gate, g equals 1 only when the current and previous reports at this relay match. The first observation can change F immediately. A matching second observation can also change S. With a constant rate r, an observation’s contribution k updates later is r(1 − r)ᵏ. This gives “fast” and “slow” a measurable meaning. For the gated slow row, its clock counts eligible writes.
+
+We measured mean negative log probability assigned to the actual next report. Lower is better. A confident wrong answer costs more than an uncertain one. Hyperparameters were selected on separate development worlds at the 3% change rate. Each test condition used 163,840 predictions across 128 held-out worlds.
+
+Mean loss in nats per token, listed from slowest to fastest world (h = 0.5%, 3%, 18%)
+
+    Uniform guess                         2.079 / 2.079 / 2.079
+    Freeze after the first report         1.970 / 2.881 / 2.756
+    Use the latest report                 1.185 / 1.227 / 1.472
+    One adjustable rate                   0.881 / 0.969 / 1.394
+    Two rates, update both every time     0.868 / 0.970 / 1.419
+    Two rates, repeat-gated slow row      0.847 / 0.964 / 1.431
+    Bayesian filter with the true rates   0.765 / 0.894 / 1.363
+
+At the middle change rate, requiring a repeat saved 0.0061 nats per token over the identical two-rate rule with the gate open. The paired 95% bootstrap interval for the saving was 0.0054 to 0.0068. At the fast change rate, the gate cost 0.0122 nats. We repeated the model selection separately at each extreme. The sign still reversed. With local tuning, gating saved 0.0414 nats in the slow world and cost 0.0101 in the fast one.
+
+The Bayesian filter offers a precise answer to what should stick under these assumptions. Suppose it knows a relay was showing blue. In the 3% world, after one report of red its probability that the hidden answer is now red is 14.58%. After two consecutive reds it is 87.07%. After three it is 99.54%. Those numbers depend on both the rate of real change and the reliability of each report. Three independent readings can carry much more evidence than three copies of one reading.
+
+3. Can a trained next-token predictor use the graph?
+
+In a new set of worlds we brought routing, updating, and decoding together. A prefix identified one of two contexts and one of eight objects. Different prefixes could reach the same relay. Think of two descriptions of the same bottle. Learning something through either description could help the model complete the other. We supplied the route map, randomized it independently in each world, and changed the hidden answers at the 3% rate.
+
+We trained a small softmax decoder on 81,920 prefix–target examples, froze its parameters, and scored 163,840 examples from new worlds. Memory continued to update after each scored prediction. The strongest comparison used the same embeddings, the same update rule, the same input dimensions, and a separately fitted decoder. It gave each of the 16 distinct prefixes its own memory. The graph version pooled observations at the eight shared relays.
+
+    Prefix alone — 12.10% accuracy, 2.090 nats per token
+    Prefix and phrase-specific memory — 72.50%, 1.060 nats
+    Prefix and shared graph memory — 77.61%, 0.939 nats
+    Same graph decoder, memory rows shuffled — 20.77%, 2.892 nats
+
+Sharing gained 5.11 percentage points over phrase-specific memory, even though the latter had twice as many memory rows. The paired reduction in loss was 0.121 nats per token, with a 95% bootstrap interval of 0.118 to 0.123. Shuffling memory at test time sometimes left the correct relay in place by chance. On other trials, the trained decoder could be confidently misled.
+
+The advantage came from pooling evidence about a common source. A table that maps aliases to the same record implements exactly that operation. This comparison establishes the value of the shared relation in this task. It leaves open whether a graph offers an implementation advantage at larger scales.
+
+4. What if the link itself moves?
+
+The first and third tests handed the system the right routes. We ran a separate experiment where it had to infer them. Eight visible stations each broadcast a random color every round. Each object secretly followed one station and reported its color with the same 15% error rate. An object switched stations with 3% probability per round. Several stations could display the same color, so even a truthful report could leave the source ambiguous.
+
+Before each report, the model saw all eight station colors. It carried a probability for each candidate link and predicted the object’s report. Only then did it see that report and revise the links. We compared freezing the most likely link after 20 rounds, choosing the current most likely link on every read, and letting activation flow down all plausible links. The last two used the same stored probabilities. Only their readout differed.
+
+Across 143,360 scored reports, the frozen links recovered the true station 29.23% of the time. Choosing the current most likely link recovered it 91.41% of the time. That average hides the delay. On the very round of an unannounced switch, the predictor picked the new station only 0.82% of the time. Four reports later, for routes that had stayed in place, it picked the new station 89.78% of the time.
+
+Choosing the single best link gave 78.70% next-token accuracy. Following the distribution of links gave 78.72%. By accuracy alone the two look interchangeable. Their losses were 0.946 and 0.886 nats per token, respectively. Keeping plausible routes alive chiefly improved how much probability went to the observed answer. A reference predictor told the true station scored 84.96% accuracy, close to the 85% reporting reliability built into the generator.
+
+5. What can a wave remember that ordinary spreading forgets?
+
+Imagine two pulses crossing on a ring, one positive and one negative. For an instant they can cancel. A photograph of that instant can show nearly nothing. A second photograph taken just before it can tell you that something is about to emerge on either side. That is the sense in which a wave can carry memory. Its current displacement and its recent motion both matter.
+
+Let A be the adjacency matrix of a ring, D the diagonal matrix of node degrees, and L = D − A the graph Laplacian. Let x_t be the signed activation across its nodes at time t. One discrete wave model is
+
+    x_(t+1) = x_t + b (x_t − x_(t−1)) − k x_t L.
+
+The second term carries motion forward. The third couples neighboring nodes. Our pulse test used b = k = 1 on a ring with unit spacing and time step. For comparison, diffusion used x_(t+1) = x_t − 0.30 x_t L. These equations describe amplitudes. They need a separate readout to become probabilities for words.
+
+We sent two opposite-signed Gaussian pulses around a 16-node ring by moving each pulse one node per step in opposite directions. An alternative world started from the same kind of profile and let it diffuse. Predictors received two noisy observations and forecast four steps ahead without seeing the intervening states. Each score below is mean squared error per node across 128 new worlds. Lower is better.
+
+    Predictor                         Traveling pulses / Diffusing profile
+    Fixed diffusion                              0.27842 / 0.00043
+    Fitted one-frame graph predictor             0.22716 / 0.00070
+    Fixed wave equation                          0.02305 / 0.20108
+    Fitted two-frame graph predictor             0.01956 / 0.00065
+
+On traveling pulses, the fixed wave cut the error roughly tenfold against the fitted one-frame predictor. A conventional graph autoregression with the same two observations did slightly better still. Its advantage over the wave was 0.00349 squared units per node, with a paired 95% interval of 0.00152 to 0.00555. The fixed wave is itself one choice of coefficients in that model. On diffusing profiles, carrying velocity forward produced a large error. The experiment identifies when a second observation can pay for itself. It also shows how easily that benefit could be misattributed to the word “wave.”
+
+6. Can the existing memory decide when to use a wave?
+
+We brought the idea back to the paper’s eight possible next tokens. Give those tokens positions on a ring. Suppose the last two tokens lay at adjacent positions. On a degree-two ring, the unit-speed wave equation simplifies to
+
+    x_(t+1) = x_t A − x_(t−1).
+
+For one-hot observations, x_t A activates both neighbors. Subtracting the previous token cancels the route back. Clipping negative amplitudes to zero and normalizing leaves the forward neighbor. If the last token came from outside the current neighborhood, both neighbors survive. We checked this identity for all 64 ordered pairs on an eight-node ring.
+
+There is an exact conventional explanation here. A program that remembers the incoming edge and avoids immediately retracing it produces the same readout. In the token tests, we gave forward motion 90% probability and reversal 10% when direction was available. We also reserved 8% of total probability for a uniform jump. All methods were told the current ring, which could change every 32 rounds in the movement tasks. When the observations favored continuing forward, the directional reader beat equal spreading, 0.686 versus 0.986 nats per token. In a world favoring reversal, it lost, 2.105 versus 0.984. No interference between continuous waves was needed for this token result.
+
+We first added the directional reader to the original changing-fact task. On development data, the best weight for the new reader was zero. On fresh test worlds, the original memory scored 0.971 nats. Forcing the wave reader to supply a quarter of each forecast raised the loss to 1.143. The token labels in that task have no underlying spatial order. Giving them positions on a ring imposed a relationship the generator did not have.
+
+Then we built a harder case. Each relay sometimes reported a persistent, noisy fact and sometimes followed a moving token. It could switch modes without announcing the change. Both readers saw every report. Could the memory infer which one to trust?
+
+Let M(y) be the original gated memory’s forecast, W(y) the directional forecast, and z the current weight on W. The combined forecast is P(y) = (1 − z) M(y) + z W(y). Once the actual next token y arrives, the two readers provide evidence about which mode is active. With assumed switch probability d, update the weight for the following prediction by
+
+    r = z W(y) / P(y)
+    z_next = d + (1 − 2d) r.
+
+For example, a token that the directional reader considered much more likely raises that reader’s weight. The switch term leaves room for the world to change again. This is Bayesian updating for a switching pair of predictors. Its application here does not require learning new source code or rewriting the memory graph.
+
+Held-out next-token loss, with hidden modes switching 3% of the time
+
+    Original memory alone                            1.938 nats
+    Directional reader alone                         2.538 nats
+    Best fixed mixture from development              1.303 nats
+    Adaptive mixture with equal neighbor spreading   1.118 nats
+    Adaptive mixture with the directional reader     0.975 nats
+
+The adaptive directional mixture saved 0.328 nats per token over the fixed mixture (paired 95% interval 0.325 to 0.331). Holding the switching rule constant and removing direction cost 0.143 nats (0.139 to 0.147). When the actual switching rate jumped to 18% and the model still assumed 3%, its advantage over the fixed mixture shrank to 0.048 nats. These worlds were deliberately built to contain a kind of motion the directional reader understands. They show that an optional reader can earn its place when its assumptions apply. They also explain why attaching it permanently to the earlier task failed.
+
+7. Can the system improve the rule it uses to improve?
+
+The last experiment distinguished three operations. During a stream, the system updates its belief z. Across generations, it can change d, the rule governing how readily z changes. One level higher, it can change the size of the step it will use to propose its next change to d. The third operation is our bounded test of recursive self-improvement.
+
+Each learner inherited an index j selecting one of 17 switch rates and a search step s spanning 1, 2, or 4 index positions. Each generation compared the parent with two children on the same four fresh synthetic worlds. One child tried a lower rate, the other a higher rate. In the self-adjusting version, a child could also change its own search step before proposing its rate. The winner passed both settings into the next generation. A conventional comparison searched with a fixed step and the same three candidate evaluations. Neither method inherited answers from the scoring worlds.
+
+We ran 40 independent lineages for eight generations. We measured each generation on separate audit worlds that never selected a parent. Lower loss means descendants made better next-token predictions on fresh data.
+
+    Method                                         Loss at generation 8
+    Keep the starting switch rate                         0.99153
+    Search with a fixed two-position step                 0.96927
+    Inherit and revise the search step                    0.96923
+    Rate chosen by a separate exhaustive grid search      0.96920
+
+The descendants improved on their starting point. Almost all of that gain was available to ordinary tuning. The self-adjusting method’s loss minus the fixed-step method’s was −0.00003 nats per token, with a paired 95% interval from −0.00018 to +0.00007. When descendants faced worlds switching at 18%, their inherited settings scored 1.35611, compared with 1.35027 for fixed-step search. Here the extra freedom cost 0.00585 nats (0.00265 to 0.00907).
+
+We also tested the same inheritance scheme on the rate at which a relay learns whether a moving token tends to continue or reverse. From a deliberately slow starting rate, self-adjusting search went from 0.95821 to 0.81465 nats, while ordinary two-position search reached 0.81226. A separate run randomized the starting index. The small difference then favored self-adjusting search, and its interval crossed zero. Across these comparisons, improvement over a weak ancestor was easy to demonstrate. An extra benefit attributable to changing the search rule itself was much harder to establish.
+
+What was handed to the system matters. We supplied the candidate rules, the scoring objective, fresh feedback, a finite range of allowed edits, and the selection procedure. The system could change a number that governs its future changes. These experiments give no evidence of open-ended self-improvement, accelerating capability, or a language model learning to redesign itself.
+
+What already exists
+
+[K] Adaptive-network research has long distinguished activity on a network from changes to the connections themselves. Gross and Blasius reviewed systems where network structure and node dynamics influence one another. Ba and colleagues used rapidly changing associative weights to give neural networks temporary memory. Both ideas precede our use of “liquid.” [1, 2]
+
+[K] The closest precedent we found was Park and Bak’s Memoria. It stores representations in a directed, weighted memory graph, adjusts associations using joint retrieval, and evaluates the system on language modeling. Two other lines of work cover different parts of the proposal. Logan and colleagues built a language model that selects and copies context-relevant facts from a knowledge graph. HippoRAG uses Personalized PageRank over a knowledge graph to retrieve information for a language model. Those papers establish prior art for mutable associative memory, graph-conditioned generation, and activation spreading during retrieval. [3–5]
+
+[K] The probability update in the fourth test is a standard hidden Markov filtering calculation. Interpreting the hidden state as the endpoint of an edge gives that calculation a graph interpretation. Our contribution here is the comparison of specific update and readout choices in toy worlds where we know the answer. The literature check was targeted and establishes no priority claim. [6]
+
+[K] Waves and associative memory also have direct precedents. Hoppensteadt and Izhikevich studied oscillatory associative memory with dynamic connectivity. Hughes and colleagues connected wave propagation to recurrent neural computation. GraphCON modeled coupled, damped oscillators on a graph. Our traveling-pulse result has a classical comparator in graph autoregression, and the rectified token readout reduces to a non-backtracking walk when forward motion receives full weight and jumps are disabled. [7–11]
+
+[K] Letting observations change the relative weight of competing forecasts has precedent in dynamic model averaging. Inheriting a parameter that controls future mutations is a standard idea in evolution strategies. Schmidhuber, Zhao, and Wiering also studied incremental self-improvement through changes to a learner’s policy. Our seven experiments make a narrower contribution by measuring what the wave readout, the switching rule, and the inheritable search step each buy on specified tasks, including cases where a simpler method matches them. The targeted search leaves priority for this exact experimental combination open. [12–14]
+
+Where the idea leads
+
+The bottle example asks for more than remembering that “ant” and “bottle” appeared together. A useful memory would preserve why they belonged together on that occasion. A future question about an insect on a dome should be able to recover the relationship between local perception and global curvature, even if neither original noun appears.
+
+[S] One way to let language choose the route is to have the prefix representation z_t assign a weight to each candidate relation. If C is a learned matrix and each R_c is a relation-specific route map, then
+
+    α_t = softmax(z_t C)
+    R(z_t) = Σ_c α_t(c) R_c
+    a_t = eᵢ R(z_t) B_t
+
+Now a phrase can favor curvature strongly while leaving a little weight on material. The next-token loss can train C. That makes contextual routing learnable in principle. The routing experiments supplied contexts, candidate links, or graph neighborhoods explicitly. Learning the route map from natural language remains open.
+
+That gives this idea a harder test. Teach the relationship through one example, then present an unfamiliar object, an unfamiliar observer, and a competing material-properties question. Hide the route labels. Compare the liquid memory with a phrase cache, a shared-key lookup, and a language model with the same memory and compute budget. Score whether it transfers the relevant relationship and whether it keeps the irrelevant one quiet. The token experiments here used eight possible answers, synthetic noise, and structured cues. Learning which relationships deserve a node in open-ended language remains the larger problem.
+
+For the self-improvement claim, a stronger result would require descendants to keep learning new tasks more efficiently than equally resourced, independently tuned controls. For the wave claim, a stronger result would require a task where signed interference beats a two-step predictor given the same history. Our moving-token example sets a particularly clear standard because its forecasts can already be reproduced by remembering the incoming edge.
+
+Technical notes for reproducing the comparisons
+
+Vectors multiplied by graph matrices in the equations are row vectors. T means transpose in the superscript Eᵀ. The experiments used Python 3.12 and NumPy 2.3.5 with default_rng. The decoder also used SciPy 1.17.0. Intervals use 10,000 paired bootstrap resamples, percentile endpoints, seed 712. The sampling unit is an independent world or, for inherited learners, a whole lineage with its own audit worlds.
+
+For the first test, use seeds 20000–20255. Per seed, draw two independent permutations of eight relays, then a third permutation from relays to answers. Form an orthonormal code by QR decomposition of an 8-by-8 standard normal matrix. Draw a fresh row permutation for the shuffling control, followed by row-normalized Gaussian codebooks with dimensions 2, 4, and 8. Test all objects under both contexts. For the mixed cue, give the first route weight 0.65. Exclude the cases where the two answers coincide. For a context-blind tie, split credit equally.
+
+For the second test, set K = 8 and ε = 0.15. Each relay begins with a uniformly random hidden token. Each memory row begins uniform. The symmetric transition operator, applied component by component to any belief b, is
+
+    T_r(b)ⱼ = (1 − r)bⱼ + r(1 − bⱼ)/(K − 1)
+
+The forecast before a report is p = T_ε(T_h(b)). This common readout gives every method the same transition and noise rates. The uniform, frozen, and latest-report rules respectively keep a uniform row, retain the first reported token, or put all mass on the last report. The single-rate rule uses F alone. For the Bayesian baseline set u = T_h(b), then update after observing y by
+
+    Lⱼ(y) = 1 − ε if j = y, and ε/(K − 1) otherwise
+    b_new(j) = uⱼ Lⱼ(y) / Σₖ uₖ Lₖ(y)
+
+Score with mean loss = −Σₜ ln pₜ(yₜ) / N, where N is the number of predictions. Development seeds were 0–31 and test seeds 1000–1127. Each world contained eight independent relays, each visited 160 times. At each round, draw eight switch flags, eight nonzero switch offsets, eight corruption flags, and eight nonzero corruption offsets, in that order. Add applicable offsets modulo eight. Score first, then update. Search single rates {0.05, 0.15, 0.30, 0.50, 0.70, 0.90}. For both two-rate rules search f in {0.50, 0.80}, s in {0.05, 0.15}, and w in {0.25, 0.50, 0.75}, minimizing mean development loss. At h = 0.03, the selected single rate was 0.50. Both two-rate rules selected f = 0.50, s = 0.15, and w = 0.75.
+
+For the third test, use the same 160-round report generator with training seeds 3000–3063 and test seeds 5000–5127. Each world has two independently permuted context maps. Visit each relay once per round, choose either context with equal probability, and use the inverse map to find the corresponding object. Route generation and cue selection use a separate generator seeded at world seed + 50000. After drawing the two maps, draw eight binary contexts and a shuffle permutation each round. Each prefix is a 16-way indicator for the context–object pair. Memory is the gated row b multiplied by a fixed orthonormal code from Gaussian QR, seed 403. All worlds use this same code. Fit each linear softmax head from zeros by L-BFGS on mean next-token loss plus 0.00005 times the sum of squared coefficients. The shuffled condition reuses the trained graph head and permutes memory rows within the same world and round. Predictions never receive their own target as input.
+
+For the fourth test, use fresh seeds 7000–7127, eight objects, eight stations, and 160 rounds. Initialize the true route of each object uniformly and each estimated route row uniformly. Draw route switches and nonzero offsets, then station colors, report-error flags, and nonzero error offsets per round. The first 20 rounds supply history. Score rounds 21–160. Let bⱼ be the posterior probability that an object follows station j. Apply u = T_h(b). If station j currently shows color cⱼ, the soft forecast for color k and the update after report y are
+
+    P(y = k) = Σⱼ uⱼ Lₖ(cⱼ)
+    b_new(j) = uⱼ L_y(cⱼ) / Σᵢ uᵢ L_y(cᵢ)
+
+Here Lₖ(c) equals 0.85 when k = c and 0.15/7 otherwise. The single-link reader forecasts from the station maximizing uⱼ, choosing the lowest station index in a tie. It still maintains the full posterior for its next update. A hidden endpoint can change among eight known candidates. Discovering a new entity or relation type would require an additional mechanism.
+
+For the fifth test, draw two circular Gaussian profiles with independent integer centers on a 16-node ring, positive amplitudes uniform on [0.7, 1.3], and widths uniform on [0.55, 1.30]. Subtract one profile from the other. Either translate them in opposite directions at one node per step or diffuse the signed initial profile. Add independent Gaussian noise with standard deviation 0.05 to frames 0 and 1. Fit least squares from these frames to clean frame 2 on 64 training worlds per domain. The one-frame model uses x_t and x_t L. The two-frame model adds x_(t−1). Evaluate clean frame 5 after four recursive predictions from frame 1. Training batch seeds are 76000–76001 and test batch seeds 77000–77001. With noise removed, the matched fixed operator reproduces the clean target to numerical precision in both domains.
+
+For the sixth test, each movement world has eight relays on a common randomly labeled eight-node token ring. Independent uniform permutations set the ring initially and every 32 rounds. Relays have their own token histories. If the two most recent reports are neighbors on the current ring, let F and B indicate the forward and return destinations. Otherwise take F and B to be the two neighbors and set q = 0.5. With U uniform on the eight tokens, the reader is W = 0.08 U + 0.92 [q F + (1 − q) B]. The movement-only runs used 96 rounds and 128 held-out worlds per condition (batch seeds 63000–63002). The reversal generator used q = 0.1 while the fixed directional reader kept q = 0.9. The changing-fact control used the original generator, development seeds 61000–61031, test seeds 62000–62127, and a fixed random ring per world. Mix weights tested were 0, 0.05, 0.10, 0.25, 0.50, 0.75, and 1. Both readers shared the original forecast during the two-token cold start.
+
+In the mixed task, each relay’s latent fact continues to evolve even when the directional mode supplies the observed token. Each relay has its own hidden mode with a symmetric switch probability and an initially even prior. The original memory learns from all reports. The directional reader uses the two most recent observed labels, seeded with two random labels. Choose the fixed mixture from weights 0 to 1 in steps of 0.05 on 64 development worlds (seed 78000). The winner assigned 45% to the directional reader. Each test used 128 new worlds, eight relays, and 160 rounds (163,840 predictions, batch seeds 79000 and 79001). The adaptive model kept d = 0.03 in both test regimes. The adaptive spreading control replaces q by 0.5 on the same streams.
+
+For the seventh test, set rate(j) = 0.005 × 160^(j/16) for integer j from 0 to 16. Start at j = 0. In self-adjusting search take s = 2^k, start k at 1, and let each child perturb k by a uniform draw from {−1, 0, +1}, clipped to [0, 2]. Propose j_new = clip(j ± 2^k_new, 0, 16). Compare the parent and both children by mean pre-update next-token loss. Ties favor the parent, then the lower proposal. Controls use fixed s in {1, 2, 4}. All candidates face the same data within a generation, all generations use new selection data, and token memories start fresh in every world. One separate 256-world development batch chooses the grid reference. For the mixed learner, seeds are 84000 for the grid, 85000–85007 for generation selection, 86000 for the primary audit, 87000 for transfer, and 88000 for proposals. Each lineage has 16 independent audit worlds per condition. Reported generation curves were read after the search. For the inheritance comparisons bootstrap intervals resample 40 whole paired lineages, preserving the dependence between descendants. For pulse and token comparisons they resample 128 paired worlds.
+
+In the secondary movement task, hidden modes favor continuing with q = 0.9 or q = 0.1 and switch at 3% per round, or 18% on transfer. Here the inherited rate is η. On an observed valid forward or return transition, set q_new = clip(q + η (I_forward − q), 0.02, 0.98). Other observations leave q unchanged. The source bundle contains all batch seeds, the randomized-start check, and the results for every fixed step. Forecasts throughout precede learning from the target being scored.
+
+References
+
+[1] Thilo Gross and Bernd Blasius (2008). Adaptive coevolutionary networks: a review. Journal of the Royal Society Interface.
+https://doi.org/10.1098/rsif.2007.1229
+
+[2] Jimmy Ba, Geoffrey E. Hinton, Volodymyr Mnih, Joel Z. Leibo, and Catalin Ionescu (2016). Using Fast Weights to Attend to the Recent Past. NeurIPS.
+https://proceedings.neurips.cc/paper_files/paper/2016/hash/9f44e956e3a2b7b5598c625fcc802c36-Abstract.html
+
+[3] Sangjun Park and Jinyeong Bak (2024). Memoria: Resolving Fateful Forgetting Problem through Human-Inspired Memory Architecture. ICML.
+https://proceedings.mlr.press/v235/park24a.html
+
+[4] Robert Logan, Nelson F. Liu, Matthew E. Peters, Matt Gardner, and Sameer Singh (2019). Barack’s Wife Hillary: Using Knowledge Graphs for Fact-Aware Language Modeling. ACL.
+https://aclanthology.org/P19-1598/
+
+[5] Bernal Jiménez Gutiérrez, Yiheng Shu, Yu Gu, Michihiro Yasunaga, and Yu Su (2024). HippoRAG: Neurobiologically Inspired Long-Term Memory for Large Language Models. NeurIPS.
+https://proceedings.neurips.cc/paper_files/paper/2024/hash/6ddc001d07ca4f319af96a3024f6dbd1-Abstract-Conference.html
+
+[6] Lawrence R. Rabiner (1989). A tutorial on hidden Markov models and selected applications in speech recognition. Proceedings of the IEEE.
+https://doi.org/10.1109/5.18626
+
+[7] Frank C. Hoppensteadt and Eugene M. Izhikevich (1999). Oscillatory Neurocomputers with Dynamic Connectivity. Physical Review Letters.
+https://doi.org/10.1103/PhysRevLett.82.2983
+
+[8] Tyler W. Hughes, Ian A. D. Williamson, Momchil Minkov, and Shanhui Fan (2019). Wave physics as an analog recurrent neural network. Science Advances.
+https://doi.org/10.1126/sciadv.aay6946
+
+[9] T. Konstantin Rusch, Ben Chamberlain, James Rowbottom, Siddhartha Mishra, and Michael Bronstein (2022). Graph-Coupled Oscillator Networks. ICML.
+https://proceedings.mlr.press/v162/rusch22a.html
+
+[10] Elvin Isufi, Andreas Loukas, Nathanaël Perraudin, and Geert Leus. Forecasting Time Series with VARMA Recursions on Graphs. Preprint (2018).
+https://arxiv.org/abs/1810.08581
+
+[11] Noga Alon, Itai Benjamini, Eyal Lubetzky, and Sasha Sodin (2007). Non-backtracking random walks mix faster. Communications in Contemporary Mathematics.
+https://arxiv.org/abs/math/0610550
+
+[12] Adrian E. Raftery, Miroslav Kárný, and Pavel Ettler (2010). Online Prediction Under Model Uncertainty via Dynamic Model Averaging: Application to a Cold Rolling Mill. Technometrics.
+https://doi.org/10.1198/TECH.2009.08104
+
+[13] Hans-Georg Beyer and Hans-Paul Schwefel (2002). Evolution strategies: A comprehensive introduction. Natural Computing.
+https://doi.org/10.1023/A:1015059928466
+
+[14] Jürgen Schmidhuber, Jieyu Zhao, and Marco A. Wiering (1997). Shifting Inductive Bias with Success-Story Algorithm, Adaptive Levin Search, and Incremental Self-Improvement. Machine Learning.
+https://doi.org/10.1023/A:1007383707642
